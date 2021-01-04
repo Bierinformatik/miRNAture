@@ -132,8 +132,10 @@ if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs.
         ;#$nameC = "$data_folder/new_cm.list";
     }
     ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
-} else { #Here get all the scores from RFAM database
+} elsif ($mode =~ m/Infernal/) { #Here get all the scores from RFAM database
     ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
+} else { #Here get all the scores from RFAM database
+    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
 }
 
 ## Start all
