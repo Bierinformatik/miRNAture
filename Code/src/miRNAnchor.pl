@@ -216,8 +216,10 @@ my $classification = miRNAnchor::Classify->new(
     bed_high_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_high_conf.bed",
     gff_med_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_medium_conf.gff3",
     bed_med_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_medium_conf.bed",
-    gff_low_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_low_conf.gff3",
-    bed_low_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_low_conf.bed",
+    gff_NO_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_NO_conf.gff3",
+    bed_NO_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_NO_conf.bed",
+    gff_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.gff3",
+    bed_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.bed",
 );
 
 $classification->process_all_candidates; #Generate evaluation at STO align level

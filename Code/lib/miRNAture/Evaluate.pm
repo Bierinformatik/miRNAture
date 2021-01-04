@@ -206,6 +206,9 @@ sub cleancmsearch {
                 $max = $$lengs{$valuesT[3]};
             }
         } 
+        if (!$max){
+            print_error("Seems that the family: $_\n did not have a reference into the scores list, please add to scores files\n");
+        }
         my $ln = join "\t", @valuesT;
         if ($evalue > 0.01){ #miRNAture
         #if ($evalue > 100){

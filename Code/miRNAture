@@ -233,7 +233,7 @@ Setup number of maximum loci number that will be evaluated by the mature's annot
     -'default,200,100': Will label miRNA families with > 200 loci as repetititive. From them, the best 100 will be evaluated by the annotation stage, meanwhile the remaining will be reported as 'potential' candidates on the homology part.
     -'relax,Number_Loci,Candidates_to_evaluate': Allow the user to select the threshold to consider the families as repetitive, defined in the second number (Number_Loci). The number of candidates prone to be evaluated are defined by the third number (Candidates_to_evaluate).
 
-=back 
+=back
 
 =head1 DESCRIPTION
 
