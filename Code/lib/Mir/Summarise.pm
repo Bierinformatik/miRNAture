@@ -22,7 +22,7 @@ sub generate_summary_file {
 	my $variables = shift;
 	my $validatedStr = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/high_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
 	my $validatedNoStr = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/medium_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $discarded = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/low_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
+	my $discarded = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/NO_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
 	my $out_summary_file = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/miRNAture_summary_".$shift->all_parameters->[3]->{Specie_data}->{Tag}.".txt";
 	calculate_summary_file($validatedStr, $validatedNoStr, $discarded, $out_summary_file);
 	return;
@@ -31,6 +31,7 @@ sub generate_summary_file {
 sub calculate_summary_file {
 	my ($input_fileStr, $input_fileNoStr, $input_discarded, $outfile) = @_;
 	open (my $OUT, ">", $outfile) or die "Not possible to generate summary file\n";
+    print $OUT "##\n# miRNAture v.1 \n# ".localtime()."\n##\n";
 	my $R = Statistics::R->new();
 	#Packages
 	$R->run(q`suppressPackageStartupMessages(library(dplyr))`);
@@ -65,7 +66,7 @@ sub calculate_summary_file {
 	#Categories
 	$R->run(q`subsetDataStr$Class = "High"`);
 	$R->run(q`subsetDataNoStr$Class = "Medium"`);
-	$R->run(q`subsetDataDiscarded$Class = "Low"`);
+	$R->run(q`subsetDataDiscarded$Class = "NO"`);
 	$R->run(q`subsetDataStr$ConservationStr = "SS_Conserved"`);
 	$R->run(q`subsetDataNoStr$ConservationStr = "SS_modified"`);
 	$R->run(q`subsetDataDiscarded$ConservationStr = "NA"`);
@@ -73,17 +74,34 @@ sub calculate_summary_file {
 	$R->run(q`subsetData = rbind(subsetDataStr,subsetDataNoStr,subsetDataDiscarded)`);
 	$R->run(q`subsetData = subsetData %>% filter(!is.na(Chr))`);
     $R->run(q`familycountHigh = subsetData %>% subset(Class == "High") %>% group_by(Family, ACC, Class) %>% summarise(Total = n(), AverageMFE = mean(MFE), AverageLength = mean(LEN)) %>% arrange(Total)`); #Number loci by family
+    $R->run(q`familycountMed = subsetData %>% subset(Class == "Medium") %>% group_by(Family, ACC, Class) %>% summarise(Total = n(), AverageMFE = mean(MFE), AverageLength = mean(LEN)) %>% arrange(Total)`); #Number loci by family
+
 	$R->run(q`familycountHigh2 = as.data.frame(familycountHigh)`);
-	$R->run(q`countfamilies = nrow(familycountHigh)`); #number of validated miRNA families detected
+    $R->run(q`familycountMed2 = as.data.frame(familycountMed)`);
+
+	$R->run(q`countfamiliesHigh = nrow(familycountHigh)`); #number of validated miRNA families detected
+    $R->run(q`countfamiliesMed = nrow(familycountMed)`); #number of validated miRNA families detected
+    
+    #Count Accepted
 	$R->run(q`total = subsetData %>% group_by(Class) %>% summarise(Total_miRNAs = n())`); #Count of total miRNAs
-	$R->run(q`accepted = subsetData %>% subset(Class == "High") %>% group_by(ConservationStr) %>% summarise(Total_miRNAs = n())`); #Count of total miRNAs
-	$R->run(q`strand = subsetData %>% subset(Class == "High") %>% group_by(Strand) %>% summarise(Total = n())`); #Count Strand
-	$R->run(q`numberChr = subsetData %>% subset(Class == "High") %>% group_by(Chr) %>% summarise(Total = n()) %>% summarise(Total_Genomic_Unit = sum(Total))`); 
-	$R->run(q`methods = subsetData %>% subset(Class == "High") %>% group_by(Homology_Method) %>% summarise(Total = n())`);
+	$R->run(q`accepted = subsetData %>% subset(Class == "High" | Class == "Medium") %>% group_by(ConservationStr) %>% summarise(Total_miRNAs = n())`); #Count of total accepted miRNAs
+    $R->run(q`acceptedHigh = subsetData %>% subset(Class == "High") %>% group_by(ConservationStr) %>% summarise(Total_miRNAs = n())`); #Count of total accepted miRNAs HIGH
+    $R->run(q`acceptedMed = subsetData %>% subset(Class == "Medium") %>% group_by(ConservationStr) %>% summarise(Total_miRNAs = n())`); #Count of total accepted miRNAs MED
+
+	$R->run(q`strand = subsetData %>% subset(Class == "High" | Class == "Medium") %>% group_by(Strand) %>% summarise(Total = n())`); #Count Strand
+	$R->run(q`numberChr = subsetData %>% subset(Class == "High" | Class == "Medium") %>% group_by(Chr) %>% summarise(Total = n()) %>% summarise(Total_Genomic_Unit = sum(Total))`); 
+	$R->run(q`methods = subsetData %>% subset(Class == "High" | Class == "Medium") %>% group_by(Homology_Method) %>% summarise(Total = n())`);
 	my $total_miRNAs = $R->get('total');
 	my $total_accepted = $R->get('accepted');
-	my $number_families = $R->get('countfamilies');
-	my $table_detail_loci = $R->get('familycountHigh2');
+    my $total_accepted_High = $R->get('acceptedHigh');
+    my $total_accepted_Med = $R->get('acceptedMed');
+
+
+	my $number_familiesHigh = $R->get('countfamiliesHigh');
+	my $table_detail_loci_High = $R->get('familycountHigh2');
+    my $number_familiesMed = $R->get('countfamiliesMed');
+	my $table_detail_loci_Med = $R->get('familycountMed2');
+
 	my $table_strand = $R->get('strand');
 	my $number_chr = $R->get('numberChr');
 	my $methodCount = $R->get('methods');
@@ -92,13 +110,22 @@ sub calculate_summary_file {
 	print $OUT "# Number of total detected miRNA loci:\n"; 
 	process_table_small($total_miRNAs, $OUT);
 	print $OUT "##\n";
-	print $OUT "## High confidence miRNAs ##\n";
-	print $OUT "# miRNA loci:\n";
-	process_table_small($total_accepted, $OUT);
-	print $OUT "# miRNA families:\n$number_families\n";
-	print $OUT "# Detail of miRNA loci:\n";
-	print $OUT "# miRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
-	process_table($table_detail_loci, $OUT);
+	print $OUT "# Accepted miRNAs ##\n";
+    process_table_small($total_accepted, $OUT);
+    print $OUT "## High confidence miRNAs ##\n";
+    print $OUT "## miRNA loci:\n";
+    process_table_small($total_accepted_High, $OUT);
+	print $OUT "## miRNA families:\n$number_familiesHigh\n";
+	print $OUT "## Detail of miRNA loci:\n";
+	print $OUT "## miRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
+	process_table($table_detail_loci_High, $OUT);
+    print $OUT "## Medium confidence miRNAs ##\n";
+    print $OUT "## miRNA loci:\n";
+    process_table_small($total_accepted_Med, $OUT);
+	print $OUT "## miRNA families:\n$number_familiesMed\n";
+	print $OUT "## Detail of miRNA loci:\n";
+	print $OUT "## miRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
+	process_table($table_detail_loci_Med, $OUT);
 	print $OUT "##\n";
 	print $OUT "# Distribution of miRNA over the target genomic sequence:\n";
 	print $OUT "# Genomic units with at least one miRNA: $$number_chr[-1]\n";
