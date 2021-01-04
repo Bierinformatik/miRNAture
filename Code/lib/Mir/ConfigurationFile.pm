@@ -312,7 +312,7 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Current_dir"} = $shift->current_folder->stringify;
 	$yaml->[3]->{Default_folders}{"Output_folder"} = $shift->output_folder->stringify;
 	#$yaml->[3]->{Default_folders}{"Temp_folder"} = $shift->output_folder->stringify."/Temp";
-    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature"; # Let-7 Experiment
+    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/Let7Validation"; # Let-7 Experiment
     #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/HumanValidation"; #Hosa Experiment
     #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/ReAnnotation"; #Re_annotation Experiment
 	$yaml->[3]->{Default_folders}{"Data_folder"} = $shift->current_folder->stringify."/Data";
