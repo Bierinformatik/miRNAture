@@ -133,7 +133,7 @@ if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs.
     }
     ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
 } else { #Here get all the scores from RFAM database
-    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
+    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
 }
 
 ## Start all
@@ -219,6 +219,7 @@ if (exists $genomes{$specie}){
         $start_infernal = time;
         while (<$LIST>){ #In this case, list is the CM names
             chomp;
+            next if $_ !~ /^RF/;
             #print_process("Running on $specie\t$_");
             my $cm_experiment = miRNAture::CM->new(
                 cm_model => $_,
@@ -244,6 +245,7 @@ if (exists $genomes{$specie}){
         $start_other = time;
         while (<$LIST>){ #In this case, list is the CM names
             chomp;
+            next if $_ =~ /^RF/;
             my $other_experiment = miRNAture::Others->new(
                 cm_model => $_,
                 genome_subject => $genomes{$specie},
