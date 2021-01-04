@@ -1,7 +1,7 @@
 ![miRNAture](https://github.com/cavelandiah/miRNAture_v1/blob/main/mirnature_logo.png "miRNAture") 
 =========
 ## Computational detection of microRNA candidates
-[![License](https://img.shields.io/github/license/cavelandiah/Mirsanmir)](https://github.com/cavelandiah/Mirsanmir) 
+[![License](https://img.shields.io/github/license/cavelandiah/miRNAture_v1)](https://github.com/cavelandiah/miRNAture_v1) 
 =========
 
 ### Description
