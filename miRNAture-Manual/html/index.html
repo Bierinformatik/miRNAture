@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>miRNAture &#8212; miRNAture Alpha documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="miRNAture" href="includeme.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">miRNAture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="includeme.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="includeme.html#strategy">Strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="includeme.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+<div class="section" id="mirnature">
+<h1>miRNAture<a class="headerlink" href="#mirnature" title="Permalink to this headline">¶</a></h1>
+<p>Computational detection of microRNA candidates.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> is used to annotate homologs of metazoan microRNAs, discovered by means of
+sequence, structural validation and correct position of their <em>mature</em> sequences,
+detected on a harboring-hairpin-loop structure. This computational strategy enables
+an automated annotation workflow to search <em>bona fide</em> miRNA candidates, based
+on pairwise comparisons and hidden Markov profiles, at sequence level. The
+secondary structure is evaluated using covariance models and evaluating the
+correct folding of the hairpin sequences, based on the position of the <em>mature</em>
+sequences.</p>
+</div>
+<div class="section" id="strategy">
+<h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline">¶</a></h2>
+<p>Current approaches to computational miRNA detection relies on homology relationships
+or detection of hairpin-loop candidates with lower folding energy. A complete set of
+tools to automatize this task have been assembled on <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>. This current
+approach combines two different sequence-homology modes, using <code class="docutils literal notranslate"><span class="pre">blast</span></code> or <code class="docutils literal notranslate"><span class="pre">HMMer</span></code>, and
+a secondary structure validation step, performed by the <code class="docutils literal notranslate"><span class="pre">INFERNAL</span></code> package. Combination
+of different strategies and the modification of default covariance models, let <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>
+report not only the homology relationships, but also define positions of <em>mature</em> sequences
+and the correct miRNA annotation, supported by multiple family specific alignments.
+Current workflow is depicted as follows:</p>
+<a class="reference internal image-reference" href="_images/mirnature.png"><img alt="_images/mirnature.png" src="_images/mirnature.png" style="width: 600px;" /></a>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Download the source code or clone the miRNAture project located on <a class="reference external" href="https://github.com/cavelandiah/miRNAture">Github</a>.
+On the <code class="docutils literal notranslate"><span class="pre">Code/</span></code> folder execute the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">activate_environment_conda</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>Which will create the <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> conda repository (based on the
+<code class="docutils literal notranslate"><span class="pre">miRNAture.yml</span></code> file) and will install all the required programs to run
+<code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#annotating-some-coelacanth-mirnas">Annotating (some) coelacanth miRNAs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Need Help</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">miRNAture</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">miRNAture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Need Help</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="includeme.html" title="next chapter">miRNAture</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cristian A. Velandia Huerto.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

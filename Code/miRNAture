@@ -1,0 +1,248 @@
+#!/usr/bin/perl
+
+#######################
+## Cristian A. Velandia
+# miRNAture
+# Sun 15 Mar 2020 12:55:22 PM CET
+# run as:
+# ./miRNAture <parameters>
+#####################
+
+use strict;
+use warnings;
+use Data::Dumper;
+use POSIX qw(strftime);
+use Getopt::Long qw(HelpMessage GetOptionsFromArray);
+use Pod::Usage;
+use YAML::Tiny;
+use Term::ANSIColor;
+use Cwd qw(getcwd);
+
+use lib "lib";
+use Mir::ConfigurationFile;
+use Mir::miRNAture;
+use Mir::miRNAnchor;
+use Mir::Eval;
+use Mir::Summarise;
+use miRNAnchor::Tools;
+
+### Input data
+my $mode = ""; #run mode
+my @strategy;
+my $specie_genome_path = ""; #target specie genomes
+my $work_folder = ""; #output folder
+my $name_specie = ""; #Scientific name of specie
+my $specie_tag = ""; #Label of specie
+my $subset_models; #Subset of models provided by the user
+my $rep_cutoff = ""; # Homology cutoff to speed-up the searches 
+my $parallel_run = 0;
+my $current_path = getcwd;
+my $stagesRun = "";
+my $mirfix_path = "";
+my $path_blast_queries = "";
+my $help;
+my $man;
+my %opts;
+GetOptions (
+    \%opts,
+    'specie_genome|speG=s' => \$specie_genome_path,
+    'specie_name|speN=s' => \$name_specie,
+    'specie_tag|speT=s' => \$specie_tag,
+    'subset_models|sublist=s' => \$subset_models,
+    'workdir|w=s' => \$work_folder,
+    'mirfix_path|mfx=s' => \$mirfix_path, ###Temporal
+    'mode|m=s' => \$mode,
+    'strategy|str=s' => \@strategy,
+    'blastQueriesFolder|blstq=s' => \$path_blast_queries,
+    'stage|stg=s' => \$stagesRun,
+    'repetition_cutoff|rep=s' => \$rep_cutoff,
+    'help|h' => \$help,
+    man => \$man,
+    'parallel|pe=i' => \$parallel_run,
+) or pod2usage (
+    -verbose => 99,
+    -sections => "NAME"
+);
+pod2usage ( -verbose => 1 ) if $help;
+pod2usage ( -verbose => 2 ) if $man;
+pod2usage ( -message => "Seems that you did pass any flag, please refer to documentation.", -verbose => 1) if (keys %opts eq "");
+
+@strategy = split (/,/, join(',',@strategy));
+
+my $config_file = Mir::ConfigurationFile->new (
+    stage => $stagesRun,
+    specie_name => $name_specie,
+    specie_tag => $specie_tag,
+    specie_genome => $specie_genome_path,
+    output_folder => $work_folder,
+    current_folder => $current_path,
+    model_list => $subset_models,
+    mirfix_path => $mirfix_path,
+    mode => $mode,
+    repetition_rules => $rep_cutoff,
+    blast_strategy => \@strategy,
+    blast_queries_path => $path_blast_queries,
+    parallel => $parallel_run
+);
+$config_file->start;
+$config_file->generate_copy_genome;
+
+my $variables;
+if ($config_file->stage =~ /^summarise$/){
+    #I don't need to create a new summarise file,
+    #but read the last one created.
+    $variables = $config_file->read_last_file;
+} else {
+    $config_file->create_config_file;
+    $config_file->write_header;
+    $config_file->write_config_file;
+    $variables = $config_file->read_final_file;
+}
+
+my $homology_searches = Mir::miRNAture->new(
+    all_parameters => $variables
+);
+
+# Running modes: Homology and Validation
+if ($config_file->stage =~ /^homology$/){
+    $homology_searches->create_folder_environment(
+        $config_file->config_file, $variables
+    );
+    $homology_searches->generate_file_mirnature(
+        $variables, $config_file->config_file
+    );
+    $homology_searches->run_miRNAture($variables);
+    #$homology_searches->clean_cache($variables);
+} elsif ($config_file->stage =~ /^validation$/){
+    my $validation_mirnas = Mir::miRNAnchor->new(
+        all_parameters => $variables
+    );
+    $validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+    $validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+    $validation_mirnas->run_miRNAnchor($variables);
+} elsif ($config_file->stage =~ /^complete$/){
+    $homology_searches->create_folder_environment($config_file->config_file, $variables);
+    $homology_searches->generate_file_mirnature($variables, $config_file->config_file);
+    $homology_searches->run_miRNAture($variables);
+    #$homology_searches->clean_cache($variables);
+    my $validation_mirnas = Mir::miRNAnchor->new(
+        all_parameters => $variables
+    );
+    $validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+    $validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+    $validation_mirnas->run_miRNAnchor($variables);
+    my $evaluation_results = Mir::Eval->new(
+        all_parameters => $variables
+    );
+    $evaluation_results->create_folder_environment($config_file->config_file, $variables);
+    $evaluation_results->test_input_files($config_file->config_file, $variables);
+    $evaluation_results->perform_evaluation($variables); #Add MFE & final fasta
+    my $summary_results = Mir::Summarise->new(
+		all_parameters => $variables
+	);
+	$summary_results->generate_summary_file($config_file->config_file, $variables);
+} elsif ($config_file->stage =~ /^evaluation$/){
+    my $evaluation_results = Mir::Eval->new(
+        all_parameters => $variables
+    );
+    $evaluation_results->create_folder_environment($config_file->config_file, $variables);
+    $evaluation_results->test_input_files($config_file->config_file, $variables);
+    $evaluation_results->perform_evaluation($variables);
+} elsif ($config_file->stage =~ /^summarise/){
+	my $summary_results = Mir::Summarise->new(
+		all_parameters => $variables
+	);
+	$summary_results->generate_summary_file($config_file->config_file, $variables);
+} else {
+    print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise' or even better 'complete'.");
+}
+
+##
+#my $validation_mirnas = Mir::miRNAnchor->new(
+#	all_parameters => $variables
+#);
+#$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+#$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+#$validation_mirnas->run_miRNAnchor($variables);
+
+__END__
+
+
+=head1 NAME
+C<miRNAture> - Computational detection of microRNA candidates
+
+=head1 SYNOPSIS
+
+./miRNAture [-options]
+
+=head1 Author:
+
+I<Cristian A. Velandia Huerto>
+
+=head1 OPTIONS
+
+=over 12
+
+=item -help           
+
+print this documentation
+
+=item -man 
+
+Prints the manual page and exits.
+
+=item -stage
+
+Selects the running mode of miRNAture. The options are: 'homology', 'validation' or 'complete'.
+
+=item -speG 
+
+path of target genome or genomic sequence to be analyzed
+
+=item -speN
+
+Specie or sequence source's scientific name. The format must be: I<Genera_specie>, separated by '_'.
+
+=item -speT
+
+Tag of the specie, sequence or project. Just for future reference.
+
+=item -w
+
+Path of working directory
+
+=item -mfx
+
+Path of the L<MIRfix|https://github.com/Bierinformatik/MIRfix> program: C<MIRfix.py>
+
+=item -m
+
+Homology search modes: Blast,HMM,Infernal and Final. It is possible to perform individual analysis, but it is always desirable include the I<Final> option.
+
+=item -str
+
+This flag is blast specific. It corresponds to the selected blast strategies used to search miRNAs. It might be indicated along with -m I<Blast> or in case you refer it in your selected mode. 
+
+=item -blstq
+
+Path of blast queries sequences in fasta format to be searched on the subject sequence.
+
+=item -rep
+
+Setup number of maximum loci number that will be evaluated by the mature's annotation stage. It will detect the families that reported high number of loci, > 200 by default or a number X defined by the user. Then, it will select the top 100 candidates in terms of alignment scores to be evaluated in the next stage. The options are: 'default' and 'relaxed':
+    -'default,200,100': Will label miRNA families with > 200 loci as repetititive. From them, the best 100 will be evaluated by the annotation stage, meanwhile the remaining will be reported as 'potential' candidates on the homology part.
+    -'relax,Number_Loci,Candidates_to_evaluate': Allow the user to select the threshold to consider the families as repetitive, defined in the second number (Number_Loci). The number of candidates prone to be evaluated are defined by the third number (Candidates_to_evaluate).
+=back 
+
+=head1 DESCRIPTION
+
+B<miRNAture> detects I<bona fide> miRNA candidates through sequences homology searches, validation steps using structural alignments with pre-defined and modified miRNA-specific covariance models. At a complement another layer of validation was implemented, which relies on the verification and prediction of best position of I<mature> sequences along the detected hairpin containing sequence. At the end, based on detected candidates, new covariance models are build and searched on the target genomic sequence to detect specie-specific candidates.
+
+=head1 AUTHOR
+
+I<Cristian A. Velandia Huerto>
+
+=head1 BUGS, CAVEATS, COMPLAINS or DONATIONS 
+Write directly to cristian at bioinf.uni-leipzig.de
+
+=cut 

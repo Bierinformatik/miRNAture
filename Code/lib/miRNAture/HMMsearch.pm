@@ -1,0 +1,187 @@
+package miRNAture::HMMsearch;
+
+use Exporter;
+@ISA = qw(Exporter);
+@EXPORT = qw(searchHomologyHMM cmsearch_specific_sequence define_final_CMs runNhmmer obtainTrueCandidates update_coordinates_to_genome check_format_input_header);
+use Moose::Role;
+use Data::Dumper;
+use miRNAture::ToolBox;
+with 'miRNAture::Merging';
+with 'miRNAture::ToolBox';
+with 'miRNAture::Evaluate';
+
+my %len;
+
+sub searchHomologyHMM {
+	my ($hmm, $genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore) = @_;
+	if (!-d "$outHMM/$specie"){ #Check if already exists specie-specific directory
+		create_folders($outHMM,$specie);#Create folder specific to specie
+	}
+    runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
+	my @result_files = check_folder_files("$outHMM/$specie", "tab");
+	my $new_out = "$outHMM/$specie";
+    obtainTrueCandidates($specie, $new_out, $hmm);
+	if (!-e "$outHMM/$specie/$specie.$hmm.tab.true.table" || -z "$outHMM/$specie/$specie.$hmm.tab.true.table"){
+        #print "It does not found true HMM homology candidates for $hmm\n";
+		return 1;
+	} else {
+		my @result_true = check_folder_files("$outHMM/$specie", "$hmm\\.tab\\.true\\.table");
+        getSequencesFasta($specie, $genome, $hmm, "$outHMM/$specie", "2", $len_r, $names_r); #Header mode == 2 HMM
+		my @result_fasta = check_folder_files("$outHMM/$specie", "fasta");
+		create_folders("$outHMM/$specie","Infernal");#Create folder specific to specie
+		my $infernal_out_path = "$outHMM/$specie/Infernal";
+		if (-z "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta" || !-e "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta"){
+            #print "Fasta file for $hmm is empty!\n";
+			return 1;	
+		} else {
+            $zvalue = $zvalue/2; # Because it is only one strand
+            cmsearch_specific_sequence($hmm, $CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
+			my @result_cmseach = check_folder_files($infernal_out_path, "tab");
+			my $molecule = get_family_name($hmm, $families_names);
+			create_folders("$outHMM/$specie/Infernal","Final");#Create folder specific to specie
+			classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"HMM", $molecule, $bitscores, $len_r, $names_r, $minBitscore); #Obtain true candidates
+		}
+		return;
+	}
+}
+
+sub cmsearch_specific_sequence {
+	my ($hmm, $cm_models_path, $out_path_infernal, $genome_tag, $cmsearch_path, $Zscore) = @_;
+	existenceProgram($cmsearch_path);
+	my $cm = $hmm;
+    my $fasta = "$out_path_infernal/../$genome_tag.$hmm.tab.true.table.fasta";
+    #my ($Zscore, $minBitscore) = calculate_Z_value($fasta, "Region");
+    foreach my $cm_models_path_specific (@$cm_models_path){
+        my $model = "$cm_models_path_specific/${cm}.cm";
+        if (-e $model && !-z $model){
+            my $param = "--cpu 5 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.${cm}.tab $model $fasta";
+	        system "$cmsearch_path $param 1> /dev/null";
+        }
+    }
+	return;
+}
+
+sub define_final_CMs {
+	my ($outpath, $specie, $str, $len_r) = @_;
+	my @result_cmsearch;
+	if ($str =~ /^HMM$/){
+	    @result_cmsearch = check_folder_files($outpath, "true\\.table");
+	} elsif ($str =~ /^INFERNAL$/){
+		@result_cmsearch = check_folder_files($outpath, "true\\.table");
+		concatenate_true_cand($specie, $outpath,\@result_cmsearch, $str); #Concantenate all true
+		resolve_mergings($specie, $outpath, "3", $str);
+		return;
+	} elsif ($str =~ /^OTHER_CM$/){
+		@result_cmsearch = check_folder_files($outpath, "true\\.table");
+		concatenate_true_cand($specie, $outpath,\@result_cmsearch, $str); #Concantenate all true
+		resolve_mergings($specie, $outpath, "3", $str);
+		return;
+	} else {
+		@result_cmsearch = check_folder_files($outpath, "$specie\_$str\\..*\\.tab\\.true\\.table");
+	}
+    # Analyze all files
+	my $numFiles = scalar @result_cmsearch;
+	if ($numFiles == 0){
+		print_result("I did not found true candidates for the CM evaluation on HMM searches");
+		return;
+	} else {
+		concatenate_true_cand($specie, $outpath, \@result_cmsearch, $str); #Concantenate all true
+		update_coordinates_to_genome($outpath, $specie, $str, $len_r);
+		resolve_mergings($specie, $outpath, "1", $str);
+	}
+	return;
+}
+
+sub runNhmmer {
+	#In: out, CM model, genome
+	my ($genome, $HMM, $specie, $out_folder, $path_hmm, $nhmmer_path, $zvalue) = @_;
+	existenceProgram($nhmmer_path);
+	my $param = "--cpu 8 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $path_hmm/$HMM.hmm $genome";
+	system "$nhmmer_path $param 1> /dev/null";
+}
+
+sub obtainTrueCandidates {
+	my ($specie, $out_path, $hmm_query) = @_;
+	my $threshold_hmm = 0.01;
+	open my $IN, "< $out_path/$specie.$hmm_query.tab" or die;
+	open my $OUTTTRUE, "> $out_path/$specie.$hmm_query.tab.true.table" or die;
+	open my $OUTFALSE, "> $out_path/$specie.$hmm_query.tab.false.table" or die;
+	while (<$IN>){
+		chomp;
+		next if $_ =~ /^\#/;
+		my @spl = split /\s+|\t/, $_;
+		if ($spl[12] > $threshold_hmm){
+			print $OUTFALSE "$_\n";
+		} else {
+			print $OUTTTRUE "$_\n";
+		}
+	}
+	close $OUTTTRUE; close $OUTFALSE; close $IN;
+	return;
+}
+
+sub update_coordinates_to_genome { #Only for HMMs and Blast strategies
+	my ($input_folder, $specie, $strategy, $len_r) = @_;
+	my ($IN, $OUT);
+	if ($strategy =~ /^HMM$/){
+		open $IN, "< $input_folder/all_RFAM_$specie.truetable" or die;
+		open $OUT, "> $input_folder/all_RFAM_$specie.truetable.clean" or die;
+	} else {
+		open $IN, "< $input_folder/all_RFAM_${specie}_${strategy}.truetable" or die;
+		open $OUT, "> $input_folder/all_RFAM_${specie}_${strategy}.truetable.clean" or die;
+	}
+	#dvexscf65180.-.7909.8051.RF00001.3.117.119      -       RF00001 -       cm      1       119     14      132     +       no      1       0.58    0.0     130.5   2.5e-30 !       -
+	my ($realEnd, $realStart);
+	my (@parts, @other);
+	while (<$IN>){
+		chomp;
+	#scaffold1545-size16374.-.2678.2796.RF00001.3.117.119	-	RF00001	-	cm	1	119	1	119	+	no	1	0.58	0.0	130.5	9.4e-32	!	-	119
+    #JH126831.1.+.75490.75749.14      -         RF01021              -          cm        1       94       99    190 +    no    1 0.21   8.8   34.9   2.7e-07 !   -
+		@parts = split /\s+|\t/, $_;
+		@other = split /\./, $parts[0]; #Header
+		@other = check_format_input_header(\@other);
+		my $distance = abs($other[3] - $other[2]) + 1;
+		my $sense = $other[1];
+        if($sense eq "+"){
+			    if($parts[7] >= $parts[8]){
+				    die "This makes no sense, negative is not correct, hasn't evaluated!\n";
+		        } else {
+		                $realStart = ($other[2] + $parts[7]);
+		                $realEnd = ($other[2] + $parts[8]);
+		        }		
+		} elsif ($sense eq "-"){
+			if($parts[7] >= $parts[8]){
+				die "This makes no sense, negative is not correct, hasn't evaluated!\n";
+			} else {
+				$realStart = ($other[2] + $parts[7]);
+				$realEnd = ($other[2] + $parts[8]);
+			}
+		}
+		my $len_cm = $$len_r{$parts[3]};
+        # Here prints the line with the group reference of the merged query candidates
+        # on the blast block file specie_str.miRNA.tab.db.location.database: $parts[-1]
+		if ($strategy =~ /^HMM$/){
+            print $OUT "$other[0]\t$other[4]\t$other[1]\t$parts[5]\t$parts[6]\t$realStart\t$realEnd\t$parts[14]\t$parts[15]\t$parts[10]\t$parts[2]\t$len_cm\t$strategy\n";
+        } else {
+            print $OUT "$other[0]\t$other[-1]\t$other[1]\t$parts[5]\t$parts[6]\t$realStart\t$realEnd\t$parts[14]\t$parts[15]\t$parts[10]\t$parts[2]\t$len_cm\t$strategy\n";
+        }
+    }
+	close $IN;
+	close $OUT;
+	return;
+}
+
+sub check_format_input_header {
+	my $header_array = shift;
+	#my @header_array =  split /\./, $header;
+	my $len = scalar @$header_array;
+	if ($$header_array[1] =~ /^[0-9]/ && $len >= 5){ #Discriminate "NW_003107091.1.+.410955.411080.xtr101.21.89.108" and accept "chr1.-.3351215.3351292.cin280.1.53.53"
+		splice @$header_array, 1, 1;
+	} else {
+		;
+	}
+	return @$header_array;
+}
+
+no Moose::Role;
+1;
