@@ -31,7 +31,7 @@ sub generate_summary_file {
 sub calculate_summary_file {
 	my ($input_fileStr, $input_fileNoStr, $input_discarded, $outfile) = @_;
 	open (my $OUT, ">", $outfile) or die "Not possible to generate summary file\n";
-    print $OUT "##\n# miRNAture v.1 \n# ".localtime()."\n##\n";
+    print $OUT "###############\n# miRNAture v.1 \n# ".localtime()."\n###############\n#\n";
 	my $R = Statistics::R->new();
 	#Packages
 	$R->run(q`suppressPackageStartupMessages(library(dplyr))`);
@@ -39,26 +39,26 @@ sub calculate_summary_file {
     if (-e $input_fileStr && !-z $input_fileStr){
         $R->run(qq`tabStr = read.table(file='$input_fileStr', h=F)`);
     } else {
-        $R->run(qq`tabStr = data.frame(matrix(,ncol=26, nrow=1))`);
+        $R->run(qq`tabStr = data.frame(matrix(,ncol=27, nrow=1))`);
         $R->run(qq`colnames(tabStr) = sub("X", "V", colnames(tabStr))`)
     }
     if (-e $input_fileNoStr && !-z $input_fileNoStr){
     	$R->run(qq`tabNoStr = read.table(file='$input_fileNoStr', h=F)`);
     } else {
-        $R->run(qq`tabNoStr = data.frame(matrix(,ncol=26, nrow=1))`);
+        $R->run(qq`tabNoStr = data.frame(matrix(,ncol=27, nrow=1))`);
         $R->run(qq`colnames(tabNoStr) = sub("X", "V", colnames(tabNoStr))`)
     }
     if (-e $input_discarded && !-z $input_discarded){
         $R->run(qq`tabDiscarded = read.table(file='$input_discarded', h=F)`);
     } else {
-        $R->run(qq`tabDiscarded = data.frame(matrix(,ncol=26, nrow=1))`);
+        $R->run(qq`tabDiscarded = data.frame(matrix(,ncol=27, nrow=1))`);
         $R->run(qq`colnames(tabDiscarded) = sub("X", "V", colnames(tabDiscarded))`)
     }
 	#Parsing and cleaning data
 	#Chr, Start, End, Strand, Family, MFE, Len,Homology_Method
-	$R->run(q`subsetDataStr = tabStr %>% select(c("V2","V7","V8","V3","V12","V4","V25","V26","V15"))`);
-	$R->run(q`subsetDataNoStr = tabNoStr %>% select(c("V2","V7","V8","V3","V12","V4","V25","V26","V15"))`);
-	$R->run(q`subsetDataDiscarded = tabDiscarded %>% select(c("V2","V7","V8","V3","V12","V4","V25","V26","V15"))`);
+	$R->run(q`subsetDataStr = tabStr %>% select(c("V2","V7","V8","V3","V12","V4","V26","V27","V15"))`);
+	$R->run(q`subsetDataNoStr = tabNoStr %>% select(c("V2","V7","V8","V3","V12","V4","V26","V27","V15"))`);
+	$R->run(q`subsetDataDiscarded = tabDiscarded %>% select(c("V2","V7","V8","V3","V12","V4","V26","V27","V15"))`);
 	#Column names
 	$R->run(q`colnames(subsetDataStr) = c("Chr", "Start", "End", "Strand", "Family", "ACC", "MFE", "LEN", "Homology_Method")`);
 	$R->run(q`colnames(subsetDataNoStr) = c("Chr", "Start", "End", "Strand", "Family", "ACC", "MFE", "LEN", "Homology_Method")`);
@@ -107,34 +107,34 @@ sub calculate_summary_file {
 	my $methodCount = $R->get('methods');
 	$R->stop();
 
-	print $OUT "# Number of total detected miRNA loci:\n"; 
-	process_table_small($total_miRNAs, $OUT);
+	print $OUT "# Number of total detected miRNA loci\n"; 
+	process_table_small($total_miRNAs, $OUT, "Num_loci");
 	print $OUT "##\n";
 	print $OUT "# Accepted miRNAs ##\n";
-    process_table_small($total_accepted, $OUT);
+    process_table_small($total_accepted, $OUT, "Accepted_miRNAs");
     print $OUT "## High confidence miRNAs ##\n";
     print $OUT "## miRNA loci:\n";
-    process_table_small($total_accepted_High, $OUT);
-	print $OUT "## miRNA families:\n$number_familiesHigh\n";
+    process_table_small($total_accepted_High, $OUT, "miRNA_loci_high");
+	print $OUT "## miRNA families:\nNumber_families_high\t$number_familiesHigh\n";
 	print $OUT "## Detail of miRNA loci:\n";
-	print $OUT "## miRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
-	process_table($table_detail_loci_High, $OUT);
+	print $OUT "## Section\tmiRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
+	process_table($table_detail_loci_High, $OUT, "Detail_loci_high");
     print $OUT "## Medium confidence miRNAs ##\n";
     print $OUT "## miRNA loci:\n";
-    process_table_small($total_accepted_Med, $OUT);
-	print $OUT "## miRNA families:\n$number_familiesMed\n";
+    process_table_small($total_accepted_Med, $OUT, "miRNA_loci_medium");
+	print $OUT "## miRNA families:\nNumber_families_medium\t$number_familiesMed\n";
 	print $OUT "## Detail of miRNA loci:\n";
-	print $OUT "## miRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
-	process_table($table_detail_loci_Med, $OUT);
+	print $OUT "## Section\tmiRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
+	process_table($table_detail_loci_Med, $OUT, "Detail_loci_medium");
 	print $OUT "##\n";
 	print $OUT "# Distribution of miRNA over the target genomic sequence:\n";
 	print $OUT "# Genomic units with at least one miRNA: $$number_chr[-1]\n";
-	print $OUT "# Strand\tLoci\n";
-	process_table_small($table_strand, $OUT);
+	print $OUT "# Section\tStrand\tLoci\n";
+	process_table_small($table_strand, $OUT, "Strand");
 	print $OUT "##\n";
-	print $OUT "# Mode detection of miRNA loci\n";
-	print $OUT "# Mode\tLoci\n";
-	process_table_small($methodCount, $OUT);
+	print $OUT "# miRNA detection methodology\n";
+	print $OUT "# Section\tMethod\tLoci\n";
+	process_table_small($methodCount, $OUT, "Detection_method");
 	close $OUT;
 	return;
 }
@@ -143,14 +143,15 @@ sub calculate_summary_file {
 sub process_table {
 	my $table = shift;
 	my $OUT = shift;
+    my $label = shift;
 	my $number = scalar @$table;
     if ($number < 12){
         for (my $i=6; $i <= $number-1; $i += 6){
-		    print $OUT "$$table[$i-5]\t$$table[$i-4]\t$$table[$i-2]\t$$table[$i-1]\t$$table[$i]\n";	
+		    print $OUT "$label\t$$table[$i-5]\t$$table[$i-4]\t$$table[$i-2]\t$$table[$i-1]\t$$table[$i]\n";	
 	    }
     } else {
         for (my $i=12; $i <= $number-1; $i += 7){
-		    print $OUT "$$table[$i-5]\t$$table[$i-4]\t$$table[$i-2]\t$$table[$i-1]\t$$table[$i]\n";	
+		    print $OUT "$label\t$$table[$i-5]\t$$table[$i-4]\t$$table[$i-2]\t$$table[$i-1]\t$$table[$i]\n";	
 	    }
     }
 	return;
@@ -159,9 +160,10 @@ sub process_table {
 sub process_table_small {
 	my $table = shift;
 	my $OUT = shift;
+    my $label = shift;
 	my $number = scalar @$table;
 	for (my $i=12; $i <= $number-1; $i += 3){
-		print $OUT "$$table[$i-1]\t$$table[$i-0]\n";	
+		print $OUT "$label\t$$table[$i-1]\t$$table[$i-0]\n";	
 	}
 	return;
 }
