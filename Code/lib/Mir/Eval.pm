@@ -46,7 +46,7 @@ sub test_input_files {
     }
     if (-e $final_discarded){
         #$variables->[4]->{"User_results"}{"Discarded_miRNAs"} = $final_discarded;
-        $variables->[4]->{"User_results"}{"Low_confidence_miRNAs"} = $final_discarded;
+        $variables->[4]->{"User_results"}{"NO_confidence_miRNAs"} = $final_discarded;
     } else {
         print_error("The discarded structure file was not created");
     }
@@ -61,13 +61,13 @@ sub perform_evaluation {
     my $specie_name = $shift->all_parameters->[3]->{Specie_data}->{Name};
     my $specie_tag = $shift->all_parameters->[3]->{Specie_data}->{Tag};
     #my @modes = ('validatedStr', 'validatedNoStr', 'discarded');
-    my @modes = ('high_confidence', 'medium_confidence', 'low_confidence');
+    my @modes = ('high_confidence', 'medium_confidence', 'NO_confidence');
     my $input_table;
     my $out_fasta = $variables->[4]->{"User_results"}{"Evaluation_results_folder"};
     foreach my $md (@modes){
-        if ($md eq 'low_confidence'){
+        if ($md eq 'NO_confidence'){
             #$input_table = $variables->[4]->{"User_results"}{"Discarded_miRNAs"};
-            $input_table = $variables->[4]->{"User_results"}{"Low_confidence_miRNAs"};
+            $input_table = $variables->[4]->{"User_results"}{"NO_confidence_miRNAs"};
         } elsif ($md eq 'high_confidence'){
             #$input_table = $variables->[4]->{"User_results"}{"Validated_miRNAs_with_structure"};
             $input_table = $variables->[4]->{"User_results"}{"High_confidence_miRNAs"};
