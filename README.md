@@ -1,4 +1,4 @@
-![miRNAture](https://github.com/cavelandiah/miRNAture_v1/blob/master/mirnature_logo.png "miRNAture") 
+![miRNAture](https://github.com/cavelandiah/miRNAture_v1/blob/main/mirnature_logo.png "miRNAture") 
 =========
 ## Computational detection of microRNA candidates
 [![License](https://img.shields.io/github/license/cavelandiah/Mirsanmir)](https://github.com/cavelandiah/Mirsanmir) 
@@ -32,4 +32,4 @@ predicted mature, miR and miR\*, sequences.
 
 
 ### General workflow
-![workflow](https://github.com/cavelandiah/miRNAture_v1/blob/master/miRNAture2.png "miRNAture") 
+![workflow](https://github.com/cavelandiah/miRNAture_v1/blob/main/miRNAture2.png "miRNAture") 
