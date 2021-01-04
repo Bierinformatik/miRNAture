@@ -118,20 +118,33 @@ has 'bed_med_file' => (
     required => 1
 );
 
-has 'gff_low_file' => (
+has 'gff_NO_file' => (
     is => 'ro',
     isa => 'Path::Class::File',
     coerce => 1,
     required => 1
 );
 
-has 'bed_low_file' => (
+has 'bed_NO_file' => (
     is => 'ro',
     isa => 'Path::Class::File',
     coerce => 1,
     required => 1
 );
 
+has 'gff_ACCEPTED_file' => (
+    is => 'ro',
+    isa => 'Path::Class::File',
+    coerce => 1,
+    required => 1
+);
+
+has 'bed_ACCEPTED_file' => (
+    is => 'ro',
+    isa => 'Path::Class::File',
+    coerce => 1,
+    required => 1
+);
 sub load_all_results {
     my $shift = shift;
     my $db_codes = load_database_miRNAs($shift->database_mirnas); #Complete miRNA table
@@ -536,7 +549,7 @@ sub generate_output_files {
     open (my $POSITIVE_NO_STR, "<", $shift->accepted_noStr_file->stringify);
     open (my $DISCARDED, "<", $shift->discarded_file->stringify);
     open (my $INFO, "<", $shift->mature_description);
-    my (%info, %positiveHigh, %positiveMed, %negativeLow);
+    my (%info, %positiveHigh, %positiveMed, %positiveAccepted, %negativeLow);
     #H1601739630	X	-	RF00711	1	90	45932312	45932381	17.0	0.0034	no	mir-449	90	10	Blast	ANCA,DARE,XELA,XETR	anca148299,anca148674,anca149012,dare322,dare719,xela37007,xetr2120,xetr2352	miRNA	1
     #H1601747417	>patr-RF00711-42 H1601747417 Pan troglogytes mir-449 stem-loop H1601747417 MIMAT0041140/B1600189418/H1601747417 MIMAT0041140/B1600189418/H1601747417-star 10 31 45 67 RF00711 RF00711_1	Accepted	RF00711_1
     #H1601739630	>patr-RF00711-35 H1601739630 Pan troglogytes mir-449 stem-loop NA RF00711 RF00711_0	Discarded	RF00711_0
@@ -566,6 +579,7 @@ sub generate_output_files {
         my $idrfam = $all[3];
         my $support = "High_confidence";
         $positiveHigh{$id} = [$chr, $strand, $start, $end, $idfam, $idrfam, $evalue, $support];
+        $positiveAccepted{$id} = [$chr, $strand, $start, $end, $idfam, $idrfam, $evalue, $support];
     }
     while (<$POSITIVE_NO_STR>){
         chomp;
@@ -580,6 +594,7 @@ sub generate_output_files {
         my $idrfam = $all[3];
         my $support = "Medium_confidence";
         $positiveMed{$id} = [$chr, $strand, $start, $end, $idfam, $idrfam, $evalue, $support];
+        $positiveAccepted{$id} = [$chr, $strand, $start, $end, $idfam, $idrfam, $evalue, $support];
     }
     while (<$DISCARDED>){
         chomp;
@@ -592,10 +607,12 @@ sub generate_output_files {
         my $evalue = $all[9];
         my $idfam = $all[11];
         my $idrfam = $all[3];
-        my $support = "Low_confidence";
+        my $support = "NO_confidence";
         $negativeLow{$id} = [$chr, $strand, $start, $end, $idfam, $idrfam, $evalue, $support];
     }
-
+    #Generate Accepted (High + Medium) output
+    generate_gff($shift->gff_ACCEPTED_file, \%positiveAccepted, \%info);
+    generate_bed($shift->bed_ACCEPTED_file, \%positiveAccepted, \%info);
     #Genererate High Output
     generate_gff($shift->gff_high_file, \%positiveHigh, \%info);
     generate_bed($shift->bed_high_file, \%positiveHigh, \%info);
@@ -603,8 +620,8 @@ sub generate_output_files {
     generate_gff($shift->gff_med_file, \%positiveMed, \%info);
     generate_bed($shift->bed_med_file, \%positiveMed, \%info);
     #Genererate Low Output
-    generate_gff($shift->gff_low_file, \%negativeLow, \%info);
-    generate_bed($shift->bed_low_file, \%negativeLow, \%info);
+    generate_gff($shift->gff_NO_file, \%negativeLow, \%info);
+    generate_bed($shift->bed_NO_file, \%negativeLow, \%info);
     return;
 }
 
