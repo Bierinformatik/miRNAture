@@ -85,27 +85,27 @@ sub resolve_mergings {
         chomp;
         my @database = split /\s+|\t/, $_;
         if ($MODE == 2){
-            push @{ $rows{"$database[0] $database[2]"} } , [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
+            push @{$rows{"$database[0] $database[2]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
         } elsif ($MODE == 1){
-            push @{$rows{$database[0]}} , [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
+            push @{$rows{"$database[0] $database[2]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
             #push @{ $rows{"$database[0] $database[1]"} } , [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0] ];
             #push @{ $rows{"$database[0] $database[2]"} } , [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ]; #Considering strand
 
         } elsif ($MODE == 4){ #Blast ALL
             # JH126831_0	1_1	-_2	1_3	74_4	75661_5	75722_6	15.5_7	0.0021_8	no_9	mir-10_10	74_11	1_12
             $database[1] = discover_query_sequences($database[1], $database[-1], $database_grouped_queries);
-            push @{ $rows{$database[0]} }, [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
+            push @{$rows{"$database[0] $database[2]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
         } elsif ($MODE == 5){
             #scaffold101126-size1290_0 -_1       cin7,cin9_2       1_3       107_4     1006_5    1105_6    46.6_7    2.2e-09_8 no_9      RF00026_10 104_11     3_12
-            push @{ $rows{$database[0]} }, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0] ];
+            push @{$rows{"$database[0] $database[1]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0] ];
         } elsif ($MODE == 6){
             #scaffold101126-size1290_0 -_1       cin7,cin9_2       1_3       107_4     1006_5    1105_6    46.6_7    2.2e-09_8 no_9      RF00026_10 104_11     3_12
-            push @{ $rows{$database[0]} }, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0,14,15] ];  #At the end, add specie [14], and original name query [15]. 
+            push @{$rows{"$database[0] $database[1]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0,14,15] ];  #At the end, add specie [14], and original name query [15]. 
         } elsif ($MODE == 3){
             if ($database[9] eq "+"){ #Not considering sense
-                push @{ $rows{$database[0]} } , [ @database[5,6,7,8,14,15,10,2,-1],$tto,@database[2,9,0] ];
+                push @{$rows{"$database[0] $database[9]"}} , [ @database[5,6,7,8,14,15,10,2,-1],$tto,@database[2,9,0] ];
             } else {
-                push @{ $rows{$database[0]} } , [ @database[5,6,8,7,14,15,10,2,-1],$tto,@database[2,9,0] ];
+                push @{$rows{"$database[0] $database[9]"}} , [ @database[5,6,8,7,14,15,10,2,-1],$tto,@database[2,9,0] ];
             }
         }
     }
