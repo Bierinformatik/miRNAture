@@ -312,24 +312,30 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Current_dir"} = $shift->current_folder->stringify;
 	$yaml->[3]->{Default_folders}{"Output_folder"} = $shift->output_folder->stringify;
 	#$yaml->[3]->{Default_folders}{"Temp_folder"} = $shift->output_folder->stringify."/Temp";
-    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature"; # Let-7 Experiment
-    #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/HumanValidation"; #Hosa Experiment
+    #
+    #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature"; # Let-7 Experiment
+    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/HumanValidation"; #Hosa Experiment
     #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/ReAnnotation"; #Re_annotation Experiment
+    #
 	$yaml->[3]->{Default_folders}{"Data_folder"} = $shift->current_folder->stringify."/Data";
     #$yaml->[3]->{Default_folders}{"RFAM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2";
+    #
     #$yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/miRNANoLatimeria"; #Modified Lach
     $yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/All"; #Default Models
     #$yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #Re_annotation exp. No seq
-    $yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
+    #$yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
+    #
     #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/Metazoa/miRNAs";
-    $yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
+    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
     #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #OtherFAmilies
     #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #ReAnnotation exp. No seq
-    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/AnnotationHomoSapiens/Data/miRBase22/NoHuman/CM"; #OtherFAmilies without human
+    $yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/AnnotationHomoSapiens/Data/miRBase22/NoHuman/CM"; #OtherFAmilies without human
+    #
     #$yaml->[3]->{Default_folders}{"HMM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/HMM/miRNANoLatimeria"; #Modified Lach
     #$yaml->[3]->{Default_folders}{"HMM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/HMM/All"; #Modified Lach
     #$yaml->[3]->{Default_folders}{"HMM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/HMM"; #Reannotation Exp. NoSeq
     $yaml->[3]->{Default_folders}{"HMM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/AnnotationHomoSapiens/Data/miRBase22/NoHuman/HMM"; #withouthuman
+    #
     $yaml->[3]->{Default_folders}{"Basic_files_miRNAture"} = $shift->current_folder->stringify."/Data/Basic_files";
 	$yaml->[3]->{Default_folders}{"List_cm_miRNAs"} = $shift->model_list; 
 	$yaml->[3]->{Default_folders}{"Blast_queries"} = $shift->blast_queries_path->stringify;
