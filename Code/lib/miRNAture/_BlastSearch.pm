@@ -153,9 +153,9 @@ sub searchHomologySequenceBlast {
             if (-z $query_seq || !-e $query_seq){
                 next;
             } else {
-                writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->blast_program_path->stringify);
-                my $runId = runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running);
-                push @id_running, $runId;
+                #-#writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->blast_program_path->stringify);
+                #-#my $runId = runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running);
+                #-#push @id_running, $runId;
             }
         }
     }
@@ -193,43 +193,41 @@ sub searchHomologyBlast {
                 $query_seq = $shift->query_folder."/".$file_name;
             }
             my $queryDB = makeDatabaseQueryLen("$query_seq.len");
-            cleanBlastnOut($shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie,$queryDB);
+            #-#cleanBlastnOut($shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie,$queryDB);
             # Specie and molecule-specific locations
             my $output_merged = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db.location";
             my $input_path_db_file = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db";
             my $output_special = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db.special";
             # Here join all to create location file: *.db -> *db.location
-            $result_blast_experiment->resolveBlastMergings($input_path_db_file, $output_merged, $output_special);
+            #-#$result_blast_experiment->resolveBlastMergings($input_path_db_file, $output_merged, $output_special);
         }
         #Concatenate all location files with the same str and different query
-        concatenate_locations($shift, $molecule);
+        #-#concatenate_locations($shift, $molecule);
         my $output_merged_concatenated = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".tab.db.location";
         my $output_blocks = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".tab.db.location.blocks.coord";
-        $result_blast_experiment->generate_blocks($output_merged_concatenated); #Based on location concatenated, generate blocks
-        getSequencesFasta($result_blast_experiment->subject_specie, $result_blast_experiment->genome_subject, "NA", $output_blocks, "6", $result_blast_experiment->length_CM, $result_blast_experiment->names_CM); #Header mode == 6 BLAST blocks
-        create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_specie, "Infernal");#Create folder specific to specie
-        create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_specie."/Infernal","Final");#Create folder to save the classified results
+        #-#$result_blast_experiment->generate_blocks($output_merged_concatenated); #Based on location concatenated, generate blocks
+        #-#getSequencesFasta($result_blast_experiment->subject_specie, $result_blast_experiment->genome_subject, "NA", $output_blocks, "6", $result_blast_experiment->length_CM, $result_blast_experiment->names_CM); #Header mode == 6 BLAST blocks
+        #-#create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_specie, "Infernal");#Create folder specific to specie
+        #-#create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_specie."/Infernal","Final");#Create folder to save the classified results
         my $final_fasta_file = $output_blocks.".fasta";
         if (-z $final_fasta_file || !-e $final_fasta_file){
             next;
         } else {
             my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
             my $list_file = $result_blast_experiment->models_list->stringify;
-            my $all_cm_list = get_list_cms($molecule, $families, $list_file); #list of cms
-            write_cmsearch_specific_sequence_group($shift->current_directory, \@$all_cm_list, $shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore);
-            my $runIdCM = runcmSearch($shift->blast_str, $molecule, $shift->subject_specie, $shift->current_directory,$shift->parallel_running);
-            push @id_running, $runIdCM;
+            #-#my $all_cm_list = get_list_cms($molecule, $families, $list_file); #list of cms
+            #-#write_cmsearch_specific_sequence_group($shift->current_directory, \@$all_cm_list, $shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore);
+            #-#my $runIdCM = runcmSearch($shift->blast_str, $molecule, $shift->subject_specie, $shift->current_directory,$shift->parallel_running);
+            #-#push @id_running, $runIdCM;
         }
     }
-    wait_processes($shift, \@id_running, $shift->parallel_running); #Wait until complete all processes from Str
+    #-#wait_processes($shift, \@id_running, $shift->parallel_running); #Wait until complete all processes from Str
     # Iterate over infernal results, evaluate and merge
     foreach my $molecule (@$molecules){
-        #foreach my $queryS (@$query_species){
-        #    my $tag_query_spe = create_tag_specie($queryS);
         my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
-        my @result_cmsearch = check_folder_files($infernal_out_path, $shift->subject_specie."\_".$shift->blast_str."\\.$molecule\\.\.*\\.tab"); #Dive_8.miRNA.RF02024.tab
+        #-#my @result_cmsearch = check_folder_files($infernal_out_path, $shift->subject_specie."\_".$shift->blast_str."\\.$molecule\\.\.*\\.tab"); #Dive_8.miRNA.RF02024.tab
         foreach my $file_out_cmsearch (@result_cmsearch){
-            classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore); #Obtain true candidates
+            ;#-#classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore); #Obtain true candidates
         }
         print_process("Structural evaluation of $molecule complete");
     }

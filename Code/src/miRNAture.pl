@@ -177,7 +177,7 @@ if (exists $genomes{$specie}){
             );	
             if ($blast_experiment->blast_str =~ /^\d+$/){
                 my ($id_process_running, $molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast; #Run all blastn jobs, returns array by Str
-                $blast_experiment->wait_processes($id_process_running, $parallel_run); #Wait until complete all processes from Str
+                #-#$blast_experiment->wait_processes($id_process_running, $parallel_run); #Wait until complete all processes from Str
                 $blast_experiment->searchHomologyBlast($molecules, $query_species, $families, $files_relation, $Zvalue, $minBitscore);	
             } elsif ($blast_experiment->blast_str =~ /^ALL$/){
                 $blast_experiment->join_all_blast_str;
@@ -210,8 +210,8 @@ if (exists $genomes{$specie}){
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             );
             $hmm_experiment->create_folders_hmm($work_folder);
-            $hmm_experiment->search_homology_HMM($Zvalue, $minBitscore);						
-            $hmm_experiment->clean_empty;
+            #-#$hmm_experiment->search_homology_HMM($Zvalue, $minBitscore);						
+            #-#$hmm_experiment->clean_empty;
         }
         #my $diff = $start - time;
         #LogFile::write_line_log("# Running homology search time: ".$diff." s\n");
@@ -236,8 +236,8 @@ if (exists $genomes{$specie}){
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             );
             $cm_experiment->create_folders_cm;
-            $cm_experiment->search_homology_CM($Zvalue,$minBitscore);
-            $cm_experiment->clean_empty;
+            #-#$cm_experiment->search_homology_CM($Zvalue,$minBitscore);
+            #-#$cm_experiment->clean_empty;
         }		
         #my $diff = $start - time;
         #LogFile::write_line_log("# Running homology search time: ".$diff." s\n");
@@ -261,8 +261,8 @@ if (exists $genomes{$specie}){
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             );					
             $other_experiment->create_folders_other;
-            $other_experiment->search_homology_other($Zvalue,$minBitscore);
-            $other_experiment->clean_empty;
+            #-#$other_experiment->search_homology_other($Zvalue,$minBitscore);
+            #-#$other_experiment->clean_empty;
         }
         #my $diff = $start - time;
         #write_line_log("# Running search time: ".$diff." s\n");
