@@ -226,9 +226,9 @@ sub searchHomologyBlast {
     foreach my $molecule (@$molecules){
         my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
         #-#my @result_cmsearch = check_folder_files($infernal_out_path, $shift->subject_specie."\_".$shift->blast_str."\\.$molecule\\.\.*\\.tab"); #Dive_8.miRNA.RF02024.tab
-        foreach my $file_out_cmsearch (@result_cmsearch){
-            ;#-#classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore); #Obtain true candidates
-        }
+        #-#foreach my $file_out_cmsearch (@result_cmsearch){
+            #-#classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore); #Obtain true candidates
+        #-#}
         print_process("Structural evaluation of $molecule complete");
     }
     #Here, concatenate by Str
