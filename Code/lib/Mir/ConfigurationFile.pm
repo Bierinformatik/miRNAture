@@ -318,7 +318,7 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Data_folder"} = $shift->current_folder->stringify."/Data";
     #$yaml->[3]->{Default_folders}{"RFAM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2";
     #$yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/miRNANoLatimeria"; #Modified Lach
-    $yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/All"; #Default Models
+    #$yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/All"; #Default Models
     #$yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #Re_annotation exp. No seq
     $yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
     #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/Metazoa/miRNAs";
