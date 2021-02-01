@@ -1,35 +1,182 @@
-
 <!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html >
   <head>
-    <meta charset="utf-8" />
-    <title>miRNAture &#8212; miRNAture Alpha documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="miRNAture" href="includeme.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>miRNAture</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/romnnn_sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
 
-  </head><body>
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="miRNAture" href="includeme.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <div class="home-link-container">
+      <router-link to="#" class="home-link">
+      
+        <span class="site-name">miRNAture</span>
+    </router-link>
+  </div>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="includeme.html#installation"
+         class="nav-link ">
+         installation
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="#installation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
   
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
           
+          <navlinks>
+            
 
-          <div class="body" role="main">
+  
+    <div class="nav-item">
+      <a href="includeme.html#installation"
+         class="nav-link ">
+         installation
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="#installation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Search</span>
+    <div class="searchformwrapper">
+      <form autocomplete="off" class="search" action="search.html" method="get">
+        <input type="text" name="q" autocomplete="off" />
+        <input type="submit" value="Go" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="includeme.html#installation">installation</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 "><a href="tutorial.html" class="reference internal ">Tutorial</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="license.html" class="reference internal ">License</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="help.html" class="reference internal ">Need Help</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="#installation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 "><a href="tutorial.html" class="reference internal ">Tutorial</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="license.html" class="reference internal ">License</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="help.html" class="reference internal ">Need Help</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+    
+    <li><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code></li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="next">
+    <a href="includeme.html"
+       title="next chapter">miRNAture →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
             
   <div class="toctree-wrapper compound">
 <ul>
@@ -43,8 +190,8 @@
 </ul>
 </div>
 <div class="section" id="mirnature">
-<h1>miRNAture<a class="headerlink" href="#mirnature" title="Permalink to this headline">¶</a></h1>
-<p>Computational detection of microRNA candidates.</p>
+<h1><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code><a class="headerlink" href="#mirnature" title="Permalink to this headline">¶</a></h1>
+<p>Computational detection of <em>bona fide</em> microRNAs.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> is used to annotate homologs of metazoan microRNAs, discovered by means of
@@ -61,17 +208,17 @@ sequences.</p>
 <p>Current approaches to computational miRNA detection relies on homology relationships
 or detection of hairpin-loop candidates with lower folding energy. A complete set of
 tools to automatize this task have been assembled on <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>. This current
-approach combines two different sequence-homology modes, using <code class="docutils literal notranslate"><span class="pre">blast</span></code> or <code class="docutils literal notranslate"><span class="pre">HMMer</span></code>, and
-a secondary structure validation step, performed by the <code class="docutils literal notranslate"><span class="pre">INFERNAL</span></code> package. Combination
+approach combines two different sequence-homology modes, using <code class="docutils literal notranslate"><span class="pre">blastn</span></code> or <code class="docutils literal notranslate"><span class="pre">HMMer</span></code>, and
+a secondary structure validation step, performed by the <code class="docutils literal notranslate"><span class="pre">Infernal</span></code> package. Combination
 of different strategies and the modification of default covariance models, let <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>
 report not only the homology relationships, but also define positions of <em>mature</em> sequences
 and the correct miRNA annotation, supported by multiple family specific alignments.
 Current workflow is depicted as follows:</p>
-<a class="reference internal image-reference" href="_images/mirnature.png"><img alt="_images/mirnature.png" src="_images/mirnature.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="_images/mirnature2.png"><img alt="_images/mirnature2.png" src="_images/mirnature2.png" style="width: 600px;" /></a>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Download the source code or clone the miRNAture project located on <a class="reference external" href="https://github.com/cavelandiah/miRNAture">Github</a>.
+<p>Download the source code or clone the miRNAture project located on <a class="reference external" href="https://github.com/Bierinformatik/miRNAture">Github</a>.
 On the <code class="docutils literal notranslate"><span class="pre">Code/</span></code> folder execute the file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">activate_environment_conda</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
@@ -104,77 +251,22 @@ On the <code class="docutils literal notranslate"><span class="pre">Code/</span>
 
 
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">miRNAture</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">miRNAture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html#indices-and-tables">Indices and tables</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html#contact">Contact</a></li>
-<li class="toctree-l1"><a class="reference internal" href="help.html">Need Help</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="includeme.html" title="next chapter">miRNAture</a></li>
-  </ul></li>
-</ul>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="next">
+    <a href="includeme.html"
+       title="next chapter">miRNAture →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2021, Cristian A. Velandia Huerto.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.0 with <a href="https://github.com/romnnn/sphinx_press_theme">Press Theme</a>.
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+            </div>
+          </div>
+      </page>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Cristian A. Velandia Huerto.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
     
-
     
   </body>
 </html>
