@@ -9,7 +9,7 @@ echo "$specie_tag $specie_genome $specie_name"
 
 workdir="$current/../Results"
 mirfix_path="/homes/biertank/cristian/Projects/MIRfix/scripts/MIRfix.py"
-mode="Blast,HMM,Infernal,Final"
+mode="Blast,HMM,Infernal,Other_CM,Final"
 #strategy="1,2,3,4,9,10,ALL"
 strategy="9,10,ALL"
 blastQueriesFolder="$current/../Data/QueriesToTest"
