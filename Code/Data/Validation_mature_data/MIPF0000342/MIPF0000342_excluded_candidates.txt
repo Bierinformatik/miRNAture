@@ -1,0 +1,1 @@
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000342/BaseFiles/MIPF0000342.mappingtest.txt	MI0010419

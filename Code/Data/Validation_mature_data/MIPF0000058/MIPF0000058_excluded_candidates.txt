@@ -1,0 +1,2 @@
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000058/BaseFiles/MIPF0000058.mappingtest.txt	MI0019640
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000058/BaseFiles/MIPF0000058.mappingtest.txt	MI0020455

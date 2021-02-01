@@ -1,0 +1,4 @@
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Bos_taurus/Bos_taurus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Gallus_gallus/Gallus_gallus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Mus_musculus/Mus_musculus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Rattus_norvegicus/Rattus_norvegicus.fasta

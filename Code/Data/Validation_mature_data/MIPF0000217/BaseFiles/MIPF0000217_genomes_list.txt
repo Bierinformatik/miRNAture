@@ -1,0 +1,6 @@
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Bos_taurus/Bos_taurus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Canis_familiaris/Canis_familiaris.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Cricetulus_griseus/Cricetulus_griseus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Mus_musculus/Mus_musculus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Pongo_pygmaeus/Pongo_pygmaeus.fasta
+/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Rattus_norvegicus/Rattus_norvegicus.fasta

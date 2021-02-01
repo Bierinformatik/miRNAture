@@ -312,7 +312,8 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Current_dir"} = $shift->current_folder->stringify;
 	$yaml->[3]->{Default_folders}{"Output_folder"} = $shift->output_folder->stringify;
 	#$yaml->[3]->{Default_folders}{"Temp_folder"} = $shift->output_folder->stringify."/Temp";
-    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature"; # Let-7 Experiment
+    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/Validation_mature_data"; # Let-7 Experiment
+    #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature"; # Let-7 Experiment
     #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/HumanValidation"; #Hosa Experiment
     #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/ReAnnotation"; #Re_annotation Experiment
 	$yaml->[3]->{Default_folders}{"Data_folder"} = $shift->current_folder->stringify."/Data";
@@ -389,8 +390,9 @@ sub start {
 	}
 	close $IN;
 	print "Computational detection of microRNA candidates\n";
-	print "v.1.0 Mar 16, 2020\n";
-	print "Cristian A. Velandia-Huerto\n";
+    #print "v.1.0 Mar 16, 2020\n";
+	print "v.1.0 Feb 1, 2021\n";
+    print "Cristian A. Velandia-Huerto\n";
 	print "Bioinformatics Leipzig\n";
 	print "University of Leipzig\n";
 	print "\n";

@@ -1,0 +1,59 @@
+---------------------------Original precursors with bad positioned matures ----------------------------
+---> NO Original precursors with bad positioned matures
+
+---------------------------flipped/changed precursors ----------------------------
+--->NO flipped/changed precursors
+
+---------------------------flipped/changed precursors; inloop ----------------------------
+---> NO flipped/changed precursors; inloop
+
+---------------------------Flipped/changed precursors don't fit with the final alignment (changed back to original)----------------------------
+--->None of the changed/flipped precursors was changed back to original
+
+
+---------------------------Precursors without annotated mature----------------------------:
+--->All precursors have annotated matures
+
+---------------------------Original precursors totally removed ----------------------------
+---> NO Original precursors totally removed ----------------------------
+
+#Precursors without loop regions (<= 1 nt)---------------------------
+---> All precursors reported a valid loop region ----------------------------
+
+# Precursors with high N content---------------------------
+---> All precursors reported valid nucleotide composition with N content > 60 % ----------------------------
+
+# Precursors with high MFE---------------------------
+---> All precursors reported a valid MFE range ----------------------------
+
+# Precursors with reported precursor size > 200 nt---------------------------
+---> All precursors reported a valid size ----------------------------
+
+---------------------------Precursors without given genome file(s)----------------------------
+---> All the precursors have given genomes to search----------------------------
+
+---------------------------Precursors NOT found in their given genomes file(s)----------------------------
+--->All the precursors were found in their given genomes file(s)----------------------------
+---------------------------Results In Numbers----------------------------
+*Number of remained precursors= 3
+*Number of remained precursors with bad positioned matures= 0
+*Number of flipped(changed) precursors= 0
+*Number of flipped(changed) precursors with bad positioned matures= 0
+*Number of removed precursors= 0
+*Number of precursors without a given matures= 0
+*Number of precursors with successfully predicted matures= 0
+*Number of precursors without a given genome file= 0
+*Number of precursors not found in their given genomes= 0
+---------------------------Numbers Used For The Graph----------------------------
+Total number of sequences=3
+Processed=3
+Removed=0
+Predicted=0
+without given mature/no predicted mature=0
+Changed(flipped)=0
+Misaligned (shifted) precursors corrected at the end=0
+Number of precursors without annotated mature(s)=0
+Number of precursors with one annotated mature=3
+Number of precursors with two annotated matures=0
+Old Entropy=0.7346366672435918
+New Entropy=3.0970429190464834
