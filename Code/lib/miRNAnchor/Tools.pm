@@ -408,7 +408,7 @@ sub print_process {
 	Title: load_correspondence_models_rfam
 	Usage: load_correspondence_models_rfam(<path_miRNAture_code>);
 	Function: Sort all out to validate RFAM or other families into specific precalculated models. The main files
-        are located in the ~/miRNAture/Data/ folder: <mirbase_rfamv14-3_correspondence.txt> and <user_correspondence_families.txt>
+        are located in the ~/miRNAture/Data/ folder: <mirbase_rfam_correspondence.txt> and <user_correspondence_families.txt>
         that could be modified by the user to provide another relations.
 	Returns: Change the corresponding validation family into the database table all_RFAM_*_Final.ncRNAs_homology.txt.db \
             and fasta files.
@@ -416,7 +416,7 @@ sub print_process {
 
 sub load_correspondence_models_rfam {
     my $base_path = shift;
-    my $models_file = "$base_path/Data/mirbase_rfamv14-3_correspondence.txt";
+    my $models_file = "$base_path/Data/mirbase_rfam_correspondence.txt";
     open my $IN, "< $models_file" or die "The file ~/miRNAture/Code/Data/mirbase_rfamv14-3_correspondence.txt is required to perform annotation of mature's.\n";
     # <RFAM_ACC> <MIRBASE_ACC_FAMILY>
     my %db;
