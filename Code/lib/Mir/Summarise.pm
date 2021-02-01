@@ -6,6 +6,7 @@ use YAML::Tiny;
 use Data::Dumper;
 use Term::ANSIColor;
 use lib "lib/miRNAture";
+use lib 'src/Statistics-R-0.34/lib';
 use Statistics::R;
 
 with 'miRNAture::ToolBox';
