@@ -32,7 +32,7 @@ sub generate_summary_file {
 sub calculate_summary_file {
 	my ($input_fileStr, $input_fileNoStr, $input_discarded, $outfile) = @_;
 	open (my $OUT, ">", $outfile) or die "Not possible to generate summary file\n";
-    print $OUT "###############\n# miRNAture v.1 \n# ".localtime()."\n###############\n#\n";
+	print $OUT "###############\n# miRNAture v.1.0 Feb 1, 2021 \n# ".localtime()."\n###############\n#\n";
 	my $R = Statistics::R->new();
 	#Packages
 	$R->run(q`suppressPackageStartupMessages(library(dplyr))`);

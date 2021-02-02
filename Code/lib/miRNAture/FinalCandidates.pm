@@ -151,12 +151,5 @@ sub generate_gff_homology {
     return;
 }
 
-sub clean_temp_files {
-    my $shift = shift;
-    my $code_folder = shift;
-    system("rm $code_folder/.used_ids.txt");
-    return;
-}
-
 no Moose;
 __PACKAGE__->meta->make_immutable;

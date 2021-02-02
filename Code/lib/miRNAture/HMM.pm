@@ -33,15 +33,15 @@ has 'output_folder' => (
 
 has 'path_hmm_models' => (
 	is => 'ro',
-	isa => 'Path::Class::Dir',
+	#isa => 'Path::Class::Dir',
+	isa => 'ArrayRef[Str]',
 	required => 1,
-	coerce => 1,
 );
 
 has 'path_covariance' => (
 	is => 'ro',
-    #isa => 'Path::Class::Dir',	
-    isa => 'ArrayRef[Str]',
+    	#isa => 'Path::Class::Dir',	
+    	isa => 'ArrayRef[Str]',
 	required => 1,
 );
 

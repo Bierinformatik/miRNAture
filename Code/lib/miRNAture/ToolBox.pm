@@ -2,7 +2,7 @@ package miRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF read_genomes_paths create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF read_genomes_paths create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final move_log_files);
 #modify_chr 
 
 use Moose::Role; #Set of common tools that miRNAture uses
@@ -1062,7 +1062,7 @@ sub cmsearch {
 sub print_error {
     my $text = shift;
     local $Term::ANSIColor::AUTORESET = 1;
-    print BOLD RED "$text\n";
+    print BOLD RED "[ERROR] $text\n";
     die "Bis bald!\n";
     return;
 }
@@ -1070,14 +1070,14 @@ sub print_error {
 sub print_result {
     my $text = shift;
     local $Term::ANSIColor::AUTORESET = 1;
-    print BOLD GREEN "$text\n";
+    print BOLD GREEN "[RESULT] $text\n";
     return;
 }
 
 sub print_process {
     my $text = shift;
     local $Term::ANSIColor::AUTORESET = 1;
-    print FAINT BLUE "$text\n";
+    print FAINT BLUE "[PROCESS] $text\n";
     return;
 }
 

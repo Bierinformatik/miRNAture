@@ -17,10 +17,10 @@ sub searchHomologyHMM {
 	if (!-d "$outHMM/$specie"){ #Check if already exists specie-specific directory
 		create_folders($outHMM,$specie);#Create folder specific to specie
 	}
-    runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
+	runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
 	my @result_files = check_folder_files("$outHMM/$specie", "tab");
 	my $new_out = "$outHMM/$specie";
-    obtainTrueCandidates($specie, $new_out, $hmm);
+	obtainTrueCandidates($specie, $new_out, $hmm);
 	if (!-e "$outHMM/$specie/$specie.$hmm.tab.true.table" || -z "$outHMM/$specie/$specie.$hmm.tab.true.table"){
         #print "It does not found true HMM homology candidates for $hmm\n";
 		return 1;
@@ -96,7 +96,12 @@ sub runNhmmer {
 	#In: out, CM model, genome
 	my ($genome, $HMM, $specie, $out_folder, $path_hmm, $nhmmer_path, $zvalue) = @_;
 	existenceProgram($nhmmer_path);
-	my $param = "--cpu 8 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $path_hmm/$HMM.hmm $genome";
+	my $param;
+	foreach my $hmms_path_specific (@$path_hmm){
+		if (-e "$hmms_path_specific/$HMM.hmm"){
+			$param = "--cpu 8 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
+		}
+	}
 	system "$nhmmer_path $param 1> /dev/null";
 }
 

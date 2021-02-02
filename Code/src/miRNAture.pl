@@ -36,7 +36,7 @@ use miRNAture::LogFile;
 ### Input data
 my $nameC = ""; #cmlist file
 my @path_cm = ""; #cm_path
-my $path_hmm = ""; #hmm_path
+my @path_hmm = ""; #hmm_path
 my $mode = ""; #run mode
 my $specie = ""; #target specie genomes
 my $strategy = ""; #Blast strategy
@@ -55,7 +55,7 @@ my @strategy;
 GetOptions (
     'cmlist|l=s' => \$nameC,
     'cmpath|cmp=s{2}' => \@path_cm,
-    'hmmpath|hmmp=s' => \$path_hmm,
+    'hmmpath|hmmp=s{2}' => \@path_hmm,
     'mode|m=s' => \$mode,
     'specie|spe=s' => \$specie,
     'specie_name|n_spe=s' => \$name_specie,
@@ -74,11 +74,11 @@ GetOptions (
 #pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 #pod2usage("$0: No options given.") if ((scalar @ARGV) == 0);
 
-my $startComplete = time;
+my $startComplete = time();
 my $current_dir = getcwd;
 #### Flags Evaluation
 evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run,$rep_cutoff);
-my $configuration_mirnature = read_config_file("$current_dir/miRNAture_configuration_$specie.yaml");
+my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$specie.yaml");
 ## Working Paths
 get_basic_files($current_dir);
 
@@ -87,7 +87,7 @@ my %genomes;
 my $name = $nameC;
 $name =~ s/(\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 my $tag = ((strftime "%H%M%S%d%m%Y", localtime) + (int(rand(10)))); #Today date + random number 0..10.
-print_process("Processing: $name\t$tag\t$name_specie");
+print_process("Processing: $name\t$name_specie");
 
 my $input_line = join " ", @original_ARGV; 
 
@@ -101,9 +101,10 @@ $configuration_file->include_running_mode($mode);
 %genomes = $configuration_file->read_genomes_paths();
 
 my $log_file = miRNAture::LogFile->new(
-    log_file_input => "$work_folder/miRNAture_log_$tag.log",
+    log_file_input => "$work_folder/LOGs/miRNAture_homology_log_${specie}_${mode}_$tag.log",
     command_line => $input_line,		
 );
+$log_file->create_log_folder($work_folder);
 $log_file->create_file;
 
 #Key Output locations: Hard-Coded
@@ -200,7 +201,7 @@ if (exists $genomes{$specie}){
                 genome_subject => $genomes{$specie},
                 subject_specie => $specie,
                 output_folder => $outHMM,
-                path_hmm_models => $path_hmm,
+                path_hmm_models => \@path_hmm,
                 path_covariance => \@path_cm,
                 bitscores_CM => $bitscores,
                 length_CM => $len_r,
@@ -320,14 +321,11 @@ if ($configuration_file->mode eq "Final"){
     );
     $final_candidates->create_folders_final;
     $final_candidates->generate_final_output;
-    #$final_candidates->create_final_report; ###TODO
     $final_candidates->get_fasta_sequences;
     $final_candidates->generate_gff_homology;
-    $final_candidates->clean_temp_files($configuration_mirnature->[3]->{Default_folders}->{Current_dir});
-    my $diff = time - $startComplete;
+    my $end = time(); 
+    my $diff = $end - $startComplete;
     write_line_log($log_file, "# Total running time: ".$diff." s\n");
-    print_result("miRNAture finished the miRNA searches after $diff s");
-    print "Wunderschön!\n";
 }
 
 __END__

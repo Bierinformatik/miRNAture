@@ -44,24 +44,24 @@ my $help;
 my $man;
 my %opts;
 GetOptions (
-    \%opts,
-    'specie_genome|speG=s' => \$specie_genome_path,
-    'specie_name|speN=s' => \$name_specie,
-    'specie_tag|speT=s' => \$specie_tag,
-    'subset_models|sublist=s' => \$subset_models,
-    'workdir|w=s' => \$work_folder,
-    'mirfix_path|mfx=s' => \$mirfix_path, ###Temporal
-    'mode|m=s' => \$mode,
-    'strategy|str=s' => \@strategy,
-    'blastQueriesFolder|blstq=s' => \$path_blast_queries,
-    'stage|stg=s' => \$stagesRun,
-    'repetition_cutoff|rep=s' => \$rep_cutoff,
-    'help|h' => \$help,
-    man => \$man,
-    'parallel|pe=i' => \$parallel_run,
+	\%opts,
+	'specie_genome|speG=s' => \$specie_genome_path,
+	'specie_name|speN=s' => \$name_specie,
+	'specie_tag|speT=s' => \$specie_tag,
+	'subset_models|sublist=s' => \$subset_models,
+	'workdir|w=s' => \$work_folder,
+	'mirfix_path|mfx=s' => \$mirfix_path,
+	'mode|m=s' => \$mode,
+	'strategy|str=s' => \@strategy,
+	'blastQueriesFolder|blstq=s' => \$path_blast_queries,
+	'stage|stg=s' => \$stagesRun,
+	'repetition_cutoff|rep=s' => \$rep_cutoff,
+	'help|h' => \$help,
+	man => \$man,
+	'parallel|pe=i' => \$parallel_run,
 ) or pod2usage (
-    -verbose => 99,
-    -sections => "NAME"
+	-verbose => 99,
+	-sections => "NAME"
 );
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
@@ -70,100 +70,93 @@ pod2usage ( -message => "Seems that you did pass any flag, please refer to docum
 @strategy = split (/,/, join(',',@strategy));
 
 my $config_file = Mir::ConfigurationFile->new (
-    stage => $stagesRun,
-    specie_name => $name_specie,
-    specie_tag => $specie_tag,
-    specie_genome => $specie_genome_path,
-    output_folder => $work_folder,
-    current_folder => $current_path,
-    model_list => $subset_models,
-    mirfix_path => $mirfix_path,
-    mode => $mode,
-    repetition_rules => $rep_cutoff,
-    blast_strategy => \@strategy,
-    blast_queries_path => $path_blast_queries,
-    parallel => $parallel_run
+	stage => $stagesRun,
+	specie_name => $name_specie,
+	specie_tag => $specie_tag,
+	specie_genome => $specie_genome_path,
+	output_folder => $work_folder,
+	current_folder => $current_path,
+	model_list => $subset_models,
+	mirfix_path => $mirfix_path,
+	mode => $mode,
+	repetition_rules => $rep_cutoff,
+	blast_strategy => \@strategy,
+	blast_queries_path => $path_blast_queries,
+	parallel => $parallel_run
 );
 $config_file->start;
 $config_file->generate_copy_genome;
 
 my $variables;
 if ($config_file->stage =~ /^summarise$/){
-    #I don't need to create a new summarise file,
-    #but read the last one created.
-    $variables = $config_file->read_last_file;
+	#I don't need to create a new summarise file,
+	#but read the last one created.
+	$variables = $config_file->read_last_file;
 } else {
-    $config_file->create_config_file;
-    $config_file->write_header;
-    $config_file->write_config_file;
-    $variables = $config_file->read_final_file;
+	$config_file->create_config_file;
+	$config_file->write_header;
+	$config_file->write_config_file;
+	$variables = $config_file->read_final_file;
 }
 
 my $homology_searches = Mir::miRNAture->new(
-    all_parameters => $variables
+	all_parameters => $variables
 );
 
 # Running modes: Homology and Validation
 if ($config_file->stage =~ /^homology$/){
-    $homology_searches->create_folder_environment(
-        $config_file->config_file, $variables
-    );
-    $homology_searches->generate_file_mirnature(
-        $variables, $config_file->config_file
-    );
-    $homology_searches->run_miRNAture($variables);
-    #$homology_searches->clean_cache($variables);
+	$homology_searches->create_folder_environment(
+		$config_file->config_file, $variables
+	);
+	$homology_searches->generate_file_mirnature(
+		$variables, $config_file->config_file
+	);
+	$homology_searches->run_miRNAture($variables);
+	$homology_searches->clean_cache($variables, "Homology");
 } elsif ($config_file->stage =~ /^validation$/){
-    my $validation_mirnas = Mir::miRNAnchor->new(
-        all_parameters => $variables
-    );
-    $validation_mirnas->include_folder_environment($config_file->config_file, $variables);
-    $validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
-    $validation_mirnas->run_miRNAnchor($variables);
+	my $validation_mirnas = Mir::miRNAnchor->new(
+		all_parameters => $variables
+	);
+	$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+	$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+	$validation_mirnas->run_miRNAnchor($variables);
+	$homology_searches->clean_cache($variables, "Validation");
 } elsif ($config_file->stage =~ /^complete$/){
-    $homology_searches->create_folder_environment($config_file->config_file, $variables);
-    $homology_searches->generate_file_mirnature($variables, $config_file->config_file);
-    $homology_searches->run_miRNAture($variables);
-    #$homology_searches->clean_cache($variables);
-    my $validation_mirnas = Mir::miRNAnchor->new(
-        all_parameters => $variables
-    );
-    $validation_mirnas->include_folder_environment($config_file->config_file, $variables);
-    $validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
-    $validation_mirnas->run_miRNAnchor($variables);
-    my $evaluation_results = Mir::Eval->new(
-        all_parameters => $variables
-    );
-    $evaluation_results->create_folder_environment($config_file->config_file, $variables);
-    $evaluation_results->test_input_files($config_file->config_file, $variables);
-    $evaluation_results->perform_evaluation($variables); #Add MFE & final fasta
-    my $summary_results = Mir::Summarise->new(
+	$homology_searches->create_folder_environment($config_file->config_file, $variables);
+	$homology_searches->generate_file_mirnature($variables, $config_file->config_file);
+	$homology_searches->run_miRNAture($variables);
+	my $validation_mirnas = Mir::miRNAnchor->new(
+		all_parameters => $variables
+	);
+	$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+	$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+	$validation_mirnas->run_miRNAnchor($variables);
+	my $evaluation_results = Mir::Eval->new(
+		all_parameters => $variables
+	);
+	$evaluation_results->create_folder_environment($config_file->config_file, $variables);
+	$evaluation_results->test_input_files($config_file->config_file, $variables);
+	$evaluation_results->perform_evaluation($variables); #Add MFE & final fasta
+	my $summary_results = Mir::Summarise->new(
 		all_parameters => $variables
 	);
 	$summary_results->generate_summary_file($config_file->config_file, $variables);
+	$homology_searches->clean_cache($variables, "All");
 } elsif ($config_file->stage =~ /^evaluation$/){
-    my $evaluation_results = Mir::Eval->new(
-        all_parameters => $variables
-    );
-    $evaluation_results->create_folder_environment($config_file->config_file, $variables);
-    $evaluation_results->test_input_files($config_file->config_file, $variables);
-    $evaluation_results->perform_evaluation($variables);
+	my $evaluation_results = Mir::Eval->new(
+		all_parameters => $variables
+	);
+	$evaluation_results->create_folder_environment($config_file->config_file, $variables);
+	$evaluation_results->test_input_files($config_file->config_file, $variables);
+	$evaluation_results->perform_evaluation($variables);
 } elsif ($config_file->stage =~ /^summarise/){
 	my $summary_results = Mir::Summarise->new(
 		all_parameters => $variables
 	);
 	$summary_results->generate_summary_file($config_file->config_file, $variables);
 } else {
-    print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise' or even better 'complete'.");
+	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise' or even better 'complete'.");
 }
-
-##
-#my $validation_mirnas = Mir::miRNAnchor->new(
-#	all_parameters => $variables
-#);
-#$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
-#$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
-#$validation_mirnas->run_miRNAnchor($variables);
 
 __END__
 
@@ -178,6 +171,8 @@ C<miRNAture> - Computational detection of microRNA candidates
 =head1 Author:
 
 I<Cristian A. Velandia Huerto>
+I<Jöerg Fallmann>
+I<Peter F. Stadler>
 
 =head1 OPTIONS
 
@@ -213,7 +208,7 @@ Path of working directory
 
 =item -mfx
 
-Path of the L<MIRfix|https://github.com/Bierinformatik/MIRfix> program: C<MIRfix.py>
+Alternative path of the MIRfix.py program.
 
 =item -m
 
@@ -237,11 +232,18 @@ Setup number of maximum loci number that will be evaluated by the mature's annot
 
 =head1 DESCRIPTION
 
-B<miRNAture> detects I<bona fide> miRNA candidates through sequences homology searches, validation steps using structural alignments with pre-defined and modified miRNA-specific covariance models. At a complement another layer of validation was implemented, which relies on the verification and prediction of best position of I<mature> sequences along the detected hairpin containing sequence. At the end, based on detected candidates, new covariance models are build and searched on the target genomic sequence to detect specie-specific candidates.
+B<miRNAture> detects I<bona fide> miRNA candidates through sequences homology 
+searches, validation steps using structural alignments with pre-defined or/and 
+modified miRNA-specific covariance models. At a complement another layer of 
+validation was implemented, which relies on the verification and prediction 
+of best position of I<mature> sequences along the detected hairpin containing 
+sequence. 
 
 =head1 AUTHOR
 
 I<Cristian A. Velandia Huerto>
+I<Jöerg Fallmann>
+I<Peter F. Stadler>
 
 =head1 BUGS, CAVEATS, COMPLAINS or DONATIONS 
 Write directly to cristian at bioinf.uni-leipzig.de

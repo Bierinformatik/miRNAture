@@ -2,7 +2,7 @@ package miRNAture::LogFile;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(write_line_log create_file _create_new_file _header_log create_header);
+@EXPORT = qw(write_line_log create_file _create_new_file _header_log create_header create_log_folder);
 use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
@@ -31,6 +31,19 @@ sub write_line_log {
 	}
 	return;
 }
+
+sub create_log_folder {
+	my $shift = shift;
+	my $path = shift;
+	my $directory = $path."/LOGs";
+	if (!-e $directory) {
+		system "mkdir $directory";	
+	} else {
+		;
+	}
+	return;
+}
+
 sub create_file {
 	my $shift = shift;
 	_create_new_file($shift);
@@ -51,13 +64,13 @@ sub _header_log {
 	write_line_log($shift, "# User:".`whoami`);
 	write_line_log($shift, "# Host:".`hostname`);
 	write_line_log($shift, "# Start Time: ".localtime."\n");
-	write_line_log($shift, "# Executed Command line: ./run_homology_V2.pl ".$shift->command_line."\n");
+	write_line_log($shift, "# Executed Command line: ./miRNAture.pl ".$shift->command_line."\n");
 	write_line_log($shift, "#\n");
 	return;
 }
 
 sub create_header {
-	my $header = "######\n###  miRNAture : search miRNAs against a sequence\n###  Author: Cristian A. Velandia-Huerto\n###  Version: 1.0 (4 März 2020)\n###  Bioinformatics Department, Universität Leipzig\n###  Copyright (C) 2020 Cristian A. Velandia-Huerto\n###  Freely distributed under a BSD open source license.\n######\n";
+	my $header = "######\n###  miRNAture : search miRNAs against a sequence\n###  Authors: Cristian A. Velandia-Huerto, Jöerg Fallmann and Peter F. Stadler\n###  Version: v.1.0 Feb 1, 2021\n###  Bioinformatics Department, Universität Leipzig\n###  Freely distributed under a BSD open source license.\n######\n";
 	return $header;
 }
 

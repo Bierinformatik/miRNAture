@@ -8,7 +8,7 @@ specie_name="Latimeria_chalumnae"
 echo "$specie_tag $specie_genome $specie_name"
 
 workdir="$current/../Results"
-mirfix_path="/homes/biertank/cristian/Projects/MIRfix/scripts/MIRfix.py"
+mirfix_path="/home/bioinf/Proyects/MIRfix/scripts/MIRfix.py"
 mode="Blast,HMM,Infernal,Other_CM,Final"
 #strategy="1,2,3,4,9,10,ALL"
 strategy="9,10,ALL"
@@ -21,7 +21,7 @@ cd $current/../../../Code/
 ###
 
 # Run only homology-searches
-#./miRNAture -stage homology -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100
+#./miRNAture -stage homology -sublist $current/list_miRNAs_to_search.txt -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100
 # Run detection matures
 #./miRNAture -stage validation -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0
 # Run the complete analysis
@@ -29,4 +29,4 @@ cd $current/../../../Code/
 # Create summarise report
 #./miRNAture -stage summarise -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0
 
-./miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100
+./miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100

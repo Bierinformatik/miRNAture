@@ -104,11 +104,23 @@ has 'current_folder' => (
 	required => 1,
 );
 
+#has 'mirfix_path' => (
+#	is => 'ro',
+#	isa => 'Path::Class::File',
+#	coerce => 1,
+#	required => 1,
+#);
+
 has 'mirfix_path' => (
-	is => 'ro',
-	isa => 'Path::Class::File',
-	coerce => 1,
-	required => 1,
+    is => 'ro',
+    isa => 'Maybe[Str|Path::Class::File]',
+    required => 1,
+    lazy => 0,
+    default => sub {
+        my $shift = shift;
+        return "";
+        },
+    trigger => \&_path_set,
 );
 
 has 'config_file' => (
@@ -141,6 +153,19 @@ has 'repetition_rules' => (
 	required => 1,
     default => 'default,200,100',
 );
+
+sub _path_set {
+    my ($self) = @_;
+    if (!$self->mirfix_path){
+	return;
+    }
+    if (length $self->mirfix_path > 0){
+        $self->{mirfix_path} = $self->mirfix_path;
+    } else {
+        ; 
+    }
+    return;
+}
 
 sub _size_set {
     my ( $self, $size, $old_size ) = @_;
@@ -239,7 +264,7 @@ sub test_name {
 sub create_config_file {
 	my $shift = shift;
 	my $yamlNew = YAML::Tiny->new();
-	my $final_file = $shift->current_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
+	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
 	if (-e $final_file && !-z $final_file){
 		print_process("A previous configuration file was detected, then miRNAture will create an alternative one.");
 		my $final_file_alternative = test_name($final_file);
@@ -255,10 +280,11 @@ sub create_config_file {
 sub write_header {
 	my $shift = shift;
 	my $yaml_file = YAML::Tiny->read($shift->config_file);
-	my ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold) = obtain_paths_programs();
-	$yaml_file->[0]->{"miRNAture"}{"Author"} = 'Cristian A. Velandia-Huerto';
+	my ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $MIRfix) = obtain_paths_programs();
+	$yaml_file->[0]->{"miRNAture"}{"Author"} = 'Cristian A. Velandia-Huerto, Joerg Fallmann, Peter F. Stadler';
 	$yaml_file->[0]->{"miRNAture"}{"Version"} = 'v.1.0';
-	$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Mon Mar 16 19:02:25 CET 2020';
+	$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Feb 1 2021';
+	#$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Mon Mar 16 19:02:25 CET 2020';
 	$yaml_file->[1]->{"Data_user"}{"User"} = `whoami | tr -d '\n'`;
 	$yaml_file->[1]->{"Data_user"}{"Hostname"} = `hostname | tr -d '\n'`;
 	$yaml_file->[1]->{"Data_user"}{"Running_date"} = `date | tr -d '\n'`;
@@ -273,7 +299,11 @@ sub write_header {
 	$yaml_file->[2]->{"Program_locations"}{"cmbuild"} = $cmbuild;
 	$yaml_file->[2]->{"Program_locations"}{"clustalo"} = $clustalo;
 	$yaml_file->[2]->{"Program_locations"}{"RNAalifold"} = $RNAalifold;
-	$yaml_file->[2]->{"Program_locations"}{"MIRfix"} = $shift->mirfix_path->stringify;
+	if (length $shift->mirfix_path > 0){
+		$yaml_file->[2]->{"Program_locations"}{"MIRfix"} = $shift->mirfix_path;
+	} else {
+		$yaml_file->[2]->{"Program_locations"}{"MIRfix"} = $MIRfix;
+	}
 	$yaml_file->write($shift->config_file);
 	return;
 }
@@ -287,7 +317,8 @@ sub obtain_paths_programs {
 	my $cmbuild = collect_data("cmbuild");
 	my $clustalo = collect_data("clustalo");
 	my $RNAalifold = collect_data("RNAalifold");
-	return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold);
+	my $mirfix = collect_data("MIRfix.py");
+	return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix);
 }
 
 sub collect_data {
@@ -312,27 +343,13 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Current_dir"} = $shift->current_folder->stringify;
 	$yaml->[3]->{Default_folders}{"Output_folder"} = $shift->output_folder->stringify;
 	#$yaml->[3]->{Default_folders}{"Temp_folder"} = $shift->output_folder->stringify."/Temp";
-    $yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/Validation_mature_data"; # Let-7 Experiment
-    #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature"; # Let-7 Experiment
-    #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/HumanValidation"; #Hosa Experiment
-    #$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/ValidationMature/ReAnnotation"; #Re_annotation Experiment
+	$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = $shift->current_folder->stringify."/Data/Validation_mature_data";
 	$yaml->[3]->{Default_folders}{"Data_folder"} = $shift->current_folder->stringify."/Data";
-    #$yaml->[3]->{Default_folders}{"RFAM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2";
-    #$yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/miRNANoLatimeria"; #Modified Lach
-    $yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-4/CMs"; #Default Models
-    #$yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #Re_annotation exp. No seq
-    #$yaml->[3]->{Default_folders}{"CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
-    $yaml->[3]->{Default_folders}{"Other_CM_folder"} = $shift->current_folder->stringify."/Data/Other_CM";
-    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/CM/Metazoa/miRNAs";
-    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/Let7validationHuman/Data/CM/Calibrated"; #Let7
-    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #OtherFAmilies
-    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/CM"; #ReAnnotation exp. No seq
-    #$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/AnnotationHomoSapiens/Data/miRBase22/NoHuman/CM"; #OtherFAmilies without human
-    #$yaml->[3]->{Default_folders}{"HMM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-2/HMM/miRNANoLatimeria"; #Modified Lach
-    $yaml->[3]->{Default_folders}{"HMM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-4/HMMs/"; #Modified Lach
-    #$yaml->[3]->{Default_folders}{"HMM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/ReAnnotationFilter/Data/SelectedWeirdFamilies/HMM"; #Reannotation Exp. NoSeq
-    #$yaml->[3]->{Default_folders}{"HMM_folder"} = "/scr/k70san/bogota_unal/miRNAturePaper/Code/AnnotationHomoSapiens/Data/miRBase22/NoHuman/HMM"; #withouthuman
-    $yaml->[3]->{Default_folders}{"Basic_files_miRNAture"} = $shift->current_folder->stringify."/Data/Basic_files";
+	$yaml->[3]->{Default_folders}{"CM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-4/CMs"; #Default Models
+	$yaml->[3]->{Default_folders}{"Other_CM_folder"} = $shift->current_folder->stringify."/Data/Other_CM";
+	$yaml->[3]->{Default_folders}{"Other_HMM_folder"} = $shift->current_folder->stringify."/Data/Other_HMM";
+	$yaml->[3]->{Default_folders}{"HMM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-4/HMMs"; #Modified Lach
+	$yaml->[3]->{Default_folders}{"Basic_files_miRNAture"} = $shift->current_folder->stringify."/Data/Basic_files";
 	$yaml->[3]->{Default_folders}{"List_cm_miRNAs"} = $shift->model_list; 
 	$yaml->[3]->{Default_folders}{"Blast_queries"} = $shift->blast_queries_path->stringify;
 	$yaml->[3]->{Homology_options}{"Mode"} = $shift->mode;
@@ -340,7 +357,7 @@ sub write_config_file {
 	if ($shift->blast_strategy){
 		$yaml->[3]->{Homology_options}{"Blast_strategies"} = $shift->blast_strategy;
 	}
-    $yaml->[3]->{Homology_options}{Repetition_threshold} = $shift->repetition_rules;
+	$yaml->[3]->{Homology_options}{Repetition_threshold} = $shift->repetition_rules;
 	$yaml->write($shift->config_file);
 	return;
 }
@@ -353,30 +370,31 @@ sub read_final_file {
 
 sub read_last_file {
 	my $shift = shift;
-    my $final_file = $shift->current_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
-    my $last_name = get_last_name($final_file);
-    my $final = YAML::Tiny->read($last_name);
+	#my $final_file = $shift->current_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
+	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
+       	my $last_name = get_last_name($final_file);
+	my $final = YAML::Tiny->read($last_name);
 	return $final;
 }
 
 sub get_last_name {
 	my $name = shift;
-    my $nameOriginal = $name;
+       	my $nameOriginal = $name;
 	$name =~ s/(.*)(\.yaml)/$1/g;
 	my $count = 1;
 	NAME:
 	my $test_name = "$name-$count.yaml";
-    my $last_name;
+       	my $last_name;
 	if (-e $test_name){
 		$last_name = $test_name;
-        $count++;
+		$count++;
 		goto NAME;        
 	} else {
-        if (length $last_name > 0){
-            return $last_name;
-        } else {
-            return $nameOriginal;
-        }
+		if (length $last_name > 0){
+			return $last_name;
+		} else {
+			return $nameOriginal;
+		}
 	}    
 }
 
@@ -390,9 +408,9 @@ sub start {
 	}
 	close $IN;
 	print "Computational detection of microRNA candidates\n";
-    #print "v.1.0 Mar 16, 2020\n";
+    	#print "v.1.0 Mar 16, 2020\n";
 	print "v.1.0 Feb 1, 2021\n";
-    print "Cristian A. Velandia-Huerto\n";
+	print "Cristian A. Velandia-Huerto, Jöerg Fallmann, Peter F. Stadler\n";
 	print "Bioinformatics Leipzig\n";
 	print "University of Leipzig\n";
 	print "\n";
