@@ -2,7 +2,7 @@ package miRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF read_genomes_paths create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final move_log_files);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF read_genomes_paths create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final);
 #modify_chr 
 
 use Moose::Role; #Set of common tools that miRNAture uses
@@ -1063,7 +1063,7 @@ sub print_error {
     my $text = shift;
     local $Term::ANSIColor::AUTORESET = 1;
     print BOLD RED "[ERROR] $text\n";
-    die "Bis bald!\n";
+    die "miRNAture failed to continue working due derected errors\nExiting...\n";
     return;
 }
 

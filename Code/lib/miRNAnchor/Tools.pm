@@ -227,7 +227,7 @@ sub include_subject_genome {
 sub setup_all_to_run_mirfix_group {
 	my ($location, $name, $MIRFIX_path, $current_dir, $gridengine, $code, $address, $tagSpe) = @_;
 	if (-e "$location/BaseFiles/${name}_genomes_list.txt" && !-z "$location/BaseFiles/${name}_genomes_list.txt"){ #Copied mirfix files, skip copy
-		print_process("$name-$code input files already copied");
+		print_process("RNA structure evaluation for: $name-$code");
 	} else {
         	print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
         	#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
@@ -385,22 +385,21 @@ sub check_if_file_exists {
 sub print_error {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
-	print BOLD RED "$text\n";
-	die;
+	print BOLD RED "[ERROR] $text\n";
 	return;
 }
 
 sub print_result {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
-	print BOLD GREEN "$text\n";
+	print BOLD GREEN "[RESULT] $text\n";
 	return;
 }
 
 sub print_process {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
-	print FAINT BLUE "$text\n";
+	print FAINT BLUE "[RESULT] $text\n";
 	return;
 }
 

@@ -8,6 +8,7 @@ use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
 use RNA;
+use File::Copy;
 use Bio::AlignIO;
 use Bio::SimpleAlign;
 use miRNAnchor::Check;
@@ -614,11 +615,11 @@ sub generate_output_files {
     generate_gff($shift->gff_ACCEPTED_file, \%positiveAccepted, \%info);
     generate_bed($shift->bed_ACCEPTED_file, \%positiveAccepted, \%info);
     #Genererate High Output
-    generate_gff($shift->gff_high_file, \%positiveHigh, \%info);
-    generate_bed($shift->bed_high_file, \%positiveHigh, \%info);
+    #generate_gff($shift->gff_high_file, \%positiveHigh, \%info);
+    #generate_bed($shift->bed_high_file, \%positiveHigh, \%info);
     #Genererate Medium Output
-    generate_gff($shift->gff_med_file, \%positiveMed, \%info);
-    generate_bed($shift->bed_med_file, \%positiveMed, \%info);
+    #generate_gff($shift->gff_med_file, \%positiveMed, \%info);
+    #generate_bed($shift->bed_med_file, \%positiveMed, \%info);
     #Genererate Low Output
     generate_gff($shift->gff_NO_file, \%negativeLow, \%info);
     generate_bed($shift->bed_NO_file, \%negativeLow, \%info);
@@ -675,6 +676,27 @@ sub generate_bed {
     }
     close $BED;
     return;
+}
+
+sub organise_mess {
+	my $shift = shift;
+	my $working_path = shift;
+	create_folders($working_path, "GFF3");
+	create_folders($working_path, "BED");
+	create_folders($working_path, "Additional_Support");
+	opendir DH, $working_path;
+	while (my $file = readdir DH) {
+		if ($file =~ /\.txt$/){
+			move("$working_path/$file", "$working_path/Additional_Support");
+		} elsif ($file =~ /\.gff3/){
+			move("$working_path/$file", "$working_path/GFF3");
+		} elsif ($file =~ /\.bed/){
+			move("$working_path/$file", "$working_path/BED");
+		} else {
+			;
+		}
+	}
+	return;
 }
 
 no Moose;

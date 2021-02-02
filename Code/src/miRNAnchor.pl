@@ -223,9 +223,7 @@ my $classification = miRNAnchor::Classify->new(
 );
 
 $classification->process_all_candidates; #Generate evaluation at STO align level
-# Consider here to delete the concatenated files from Check: all_accepted/all_dicarded
 $classification->generate_output_files; ## Finally create GFF3/BED files
-
-#$start_config->delete_temporal_folders($outTempAddress);
+$classification->organise_mess("$working_path/$address");
 
 exit;
