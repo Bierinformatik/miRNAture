@@ -5,8 +5,6 @@ specie_tag="Lach"
 specie_genome="$current/../Data/latimeria_chalumnae_genome.fa"
 specie_name="Latimeria_chalumnae"
 
-echo "$specie_tag $specie_genome $specie_name"
-
 workdir="$current/../Results"
 mode="Blast,HMM,Infernal,Other_CM,Final"
 strategy="5,6,ALL"

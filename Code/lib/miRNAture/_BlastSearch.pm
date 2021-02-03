@@ -356,7 +356,7 @@ sub writeBlastn {
 	open my $OUTTEMP, "> .blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh";
 	my $out_file_blast = "${specie}_$strategy.$ncrna.$query_tag.tab";
 	print $OUTTEMP "\#!\/bin\/bash\n";
-	print $OUTTEMP "$blast_path -db $genome -query $query_seq -num_threads 5 $parameters $out_path_blast/$out_file_blast\n";
+	print $OUTTEMP "$blast_path -db $genome -query $query_seq -num_threads 4 $parameters $out_path_blast/$out_file_blast\n";
 	close $OUTTEMP;
 	return;
 }

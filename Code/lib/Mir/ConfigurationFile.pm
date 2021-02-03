@@ -224,10 +224,7 @@ sub create_map_genome {
 		$num++;
 	}
 	# Generate new fasta with labels
-	if (!-e "$data_path/$name.new.fa" || -z "$data_path/$name.new.fa"){
-		print_error("The genome sequence was not found, please provide the correct path.");
-	}
-	open my $NEWFA, "> $data_path/$name.new.fa";
+	open my $NEWFA, "> $data_path/$name.new.fa" or die;
 	foreach my $defs(keys %NR) {
 		my $seq = $NR{$defs};
 		$seq =~ s/(.{60})/$1\n/g; #include jump each 60 char

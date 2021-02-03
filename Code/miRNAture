@@ -65,7 +65,7 @@ GetOptions (
 );
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
-pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0);
+pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
 
