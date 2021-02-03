@@ -157,6 +157,7 @@ if ($config_file->stage =~ /^homology$/){
 } else {
 	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise' or even better 'complete'.");
 }
+end_close();
 
 __END__
 

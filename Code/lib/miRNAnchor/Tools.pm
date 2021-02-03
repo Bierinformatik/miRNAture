@@ -2,7 +2,7 @@ package miRNAnchor::Tools;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(check_folder_files load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam);
+@EXPORT = qw(check_folder_files load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam end_close);
 
 use Moose::Role;
 use Data::Dumper;
@@ -396,6 +396,13 @@ sub print_result {
 	return;
 }
 
+sub print_end {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD BRIGHT_WHITE"[END] $text\n";
+	return;
+}
+
 sub print_process {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
@@ -461,5 +468,9 @@ sub create_folders {
     return;
 }
 
+sub end_close {
+	print_end("\n-¿Olvida usted algo?-\n ¡Ojalá!.\n\n  El emigrante. Luis Felipe Lornelí. (2005)\n");
+	return;
+}
 no Moose::Role;
 1;
