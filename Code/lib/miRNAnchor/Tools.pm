@@ -38,8 +38,6 @@ sub check_folder_files {
 sub load_genomes_location_file {
 	my $genome_list_file = shift;
 	open my $GENOMESPATH, "< $genome_list_file" or die;
-	#open my $GENOMESPATH, "< ../Data/genomes_MIRfix_list.txt"; #Retrieved from /scratch/fall/Ali_mirbase/run5 and included tunicates + RFAM downloaded genomes
-	#my %families;
 	my @complete_genomes_path;
 	while (<$GENOMESPATH>){
 		chomp;
@@ -53,7 +51,7 @@ sub load_genomes_location_file {
 	Usage: create_folder(FOLDER_TO_CREATE)
 	Function: Create folder from perl, using mkdir.
 	Returns: Create desired folder, with chmod 755.
-		
+
 =cut 
 
 sub create_folder {
@@ -69,7 +67,7 @@ sub create_folder {
 	Usage: create_folder_environment(FOLDER_TO_CREATE)
 	Function: Create folder from perl, using mkdir.
 	Returns: Create desired folder, with chmod 755.
-		
+
 =cut 
 
 sub create_folder_environment {
@@ -93,8 +91,8 @@ sub create_folder_environment {
 			$dir3 = "$working_path/$acc_RFAM/$folder";
 			create_folder($dir3);
 		}
-    } elsif ($mode eq "Subset"){
-        my @folders = ("BaseFiles","Families","Output"); 
+	} elsif ($mode eq "Subset"){
+		my @folders = ("BaseFiles","Families","Output"); 
 		foreach my $folder (@folders){
 			$dir3 = "$working_path/$acc_RFAM/$folder";
 			create_folder($dir3);
@@ -110,7 +108,7 @@ sub create_folder_environment {
 	Usage: copy_files(ORIGIN, DESTINITY)
 	Function: Copy files from Perl.
 	Returns: Copied file, in the indicated path.
-		
+
 =cut 
 
 sub copy_files {
@@ -122,9 +120,9 @@ sub copy_files {
 }
 
 sub copy_folders {
-    my ($path, $new) = @_;
-    dircopy($path, $new); # Copy $dir1 to $dir2 recursively
-    return;
+	my ($path, $new) = @_;
+	dircopy($path, $new); # Copy $dir1 to $dir2 recursively
+	return;
 }
 
 =head1 change_name
@@ -132,7 +130,7 @@ sub copy_folders {
 	Usage: copy_files(ORIGIN, DESTINITY)
 	Function: Copy files from Perl.
 	Returns: Copied file, in the indicated path.
-		
+
 =cut 
 
 sub change_name {
@@ -160,7 +158,7 @@ sub change_name {
 	Usage: create_genome_list_mirfix()
 	Function: Assign the list of genomes required to run MIRFix.
 	Returns: At the pointed out folder, a new created genome file is created.
-		
+
 =cut 
 
 sub create_genome_list_mirfix {
@@ -169,10 +167,6 @@ sub create_genome_list_mirfix {
 	my $outT = "$working_path/$destination/${name_tag}_genomes_list.txt";
 	open my $OUT6, ">> $outT" or die;
 	foreach my $ln (@candidates){
-        # DELETE
-        #if ($ln =~ m/\_mirbase\/Genomes\//){
-        #	$ln =~ s/\/scratch\//\/scr\/dick\//g;
-        #}
 		print $OUT6 "$ln\n";
 	}
 	close $OUT6;
@@ -187,14 +181,14 @@ sub create_genome_list_mirfix {
 =cut 
 
 sub filter_wrong_alignments  {
-    my $model = shift;
-    my @filtered = ("RF00929","RF00178", "RF00639", "RF00668", "RF00672", "RF00753", "RF00788", "RF00866", "RF00900", "RF00910", "RF00990", "RF01011", "RF01916");
-    foreach my $modelAvoid (@filtered){
-        if ($modelAvoid =~ /^$model$/){
-            return 2;
-        } 
-    }
-    return 0;
+	my $model = shift;
+	my @filtered = ("RF00929","RF00178", "RF00639", "RF00668", "RF00672", "RF00753", "RF00788", "RF00866", "RF00900", "RF00910", "RF00990", "RF01011", "RF01916");
+	foreach my $modelAvoid (@filtered){
+		if ($modelAvoid =~ /^$model$/){
+			return 2;
+		} 
+	}
+	return 0;
 }
 
 =head1 detect_multifamily_rfam
@@ -205,18 +199,18 @@ sub filter_wrong_alignments  {
 =cut 
 
 sub detect_multifamily_rfam {
-    my $model = shift;
-    my @filtered = ("RF00178", "RF00639", "RF00668", "RF00711");
-    foreach my $modelAvoid (@filtered){
-        if ($modelAvoid =~ /^$model$/){
-            return 1;
-        } 
-    }
-    return 0;
+	my $model = shift;
+	my @filtered = ("RF00178", "RF00639", "RF00668", "RF00711");
+	foreach my $modelAvoid (@filtered){
+		if ($modelAvoid =~ /^$model$/){
+			return 1;
+		} 
+	}
+	return 0;
 }
 
 sub include_subject_genome {
-    my ($working_path, $destination, $name_tag, $genome_path_list, $new_genome) = @_; 
+	my ($working_path, $destination, $name_tag, $genome_path_list, $new_genome) = @_; 
 	my $outT = "$working_path/$destination/${name_tag}_genomes_list.txt";
 	open my $OUT6, ">> $outT" or die;
 	print $OUT6 "$new_genome\n";
@@ -229,8 +223,7 @@ sub setup_all_to_run_mirfix_group {
 	if (-e "$location/BaseFiles/${name}_genomes_list.txt" && !-z "$location/BaseFiles/${name}_genomes_list.txt"){ #Copied mirfix files, skip copy
 		print_process("RNA structure evaluation for: $name-$code");
 	} else {
-        	print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
-        	#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
+		print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
 	}
 	##Parameters constructor
 	my $param_mirfix = miRNAnchor::ExternalPrograms->new(
@@ -244,8 +237,7 @@ sub setup_all_to_run_mirfix_group {
 		extension => "10",
 		log_level => "ERROR"
 	);
- 	my $parameters = $param_mirfix->build_parameters;	
-    #print "$parameters\n";
+	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){
 		#Run without SLURM
 		open my $OUTTIME, "> $location/time_$name.dat" or die;
@@ -262,7 +254,7 @@ sub setup_all_to_run_mirfix_group {
 sub write_mirfix_specific_family_individual {
 	my ($dir_now, $name, $param, $MIRFIX_path, $code, $outAddress, $tagSpe) = @_;
 	create_folder($dir_now); # Create base working dir
-    	create_folder("$dir_now/$outAddress"); #Create folder specific to specie
+	create_folder("$dir_now/$outAddress"); #Create folder specific to specie
 	create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to specie
 	my $OUTTEMPC;
 	if (-e "$outAddress/${name}_${code}.sh"){
@@ -280,10 +272,10 @@ sub write_mirfix_specific_family_individual {
 sub setup_all_to_run_mirfix_group_subset {
 	my ($location, $name, $MIRFIX_path, $current_dir, $gridengine, $code, $address, $tagSpe, $subset) = @_;
 	if (-e "$location/BaseFiles/${subset}_genomes_list.txt" && !-z "$location/BaseFiles/${subset}_genomes_list.txt"){ #Copied mirfix files, skip copy
-        print_process("$name-$code input files already copied");
+		print_process("$name-$code input files already copied");
 	} else {
-        	print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
-        	#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
+		print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
+		#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
 	}
 	##Parameters constructor
 	my $param_mirfix = miRNAnchor::ExternalPrograms->new(
@@ -297,8 +289,7 @@ sub setup_all_to_run_mirfix_group_subset {
 		extension => "10",
 		log_level => "ERROR"
 	);
- 	my $parameters = $param_mirfix->build_parameters;	
-    	#print "$parameters\n";
+	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){
 		#Run without SLURM
 		open my $OUTTIME, "> $location/time_$subset.dat" or die;
@@ -315,7 +306,7 @@ sub setup_all_to_run_mirfix_group_subset {
 sub write_mirfix_specific_family_individual_subset {
 	my ($dir_now, $name, $param, $MIRFIX_path, $code, $outAddress, $tagSpe, $subset) = @_;
 	create_folder($dir_now); # Create base working dir
-    create_folder("$dir_now/$outAddress"); #Create folder specific to specie
+	create_folder("$dir_now/$outAddress"); #Create folder specific to specie
 	create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to specie
 	my $OUTTEMPC;
 	if (-e "$outAddress/${name}_${code}_${tagSpe}_$subset.sh"){
@@ -332,10 +323,10 @@ sub write_mirfix_specific_family_individual_subset {
 
 sub run_mirfix_individual {
 	my ($name, $dir_now, $code,$outAddress,$tagSpe) = @_;	
-    my $short_spe = substr($tagSpe, 0, 3);
-    my $short = substr($name,-5);
-    $short = "${short_spe}${short}";
-    system "sbatch --job-name=${short} --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$dir_now/$outAddress/LOGs/out_${name}_${code}_${tagSpe}.out --error=$dir_now/$outAddress/LOGs/error_${name}_${code}_${tagSpe}.out $dir_now/$outAddress/${name}_${code}_${tagSpe}.sh &";	
+	my $short_spe = substr($tagSpe, 0, 3);
+	my $short = substr($name,-5);
+	$short = "${short_spe}${short}";
+	system "sbatch --job-name=${short} --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$dir_now/$outAddress/LOGs/out_${name}_${code}_${tagSpe}.out --error=$dir_now/$outAddress/LOGs/error_${name}_${code}_${tagSpe}.out $dir_now/$outAddress/${name}_${code}_${tagSpe}.sh &";	
 	#system "qsub -S /bin/sh -cwd -l h_vmem=4G -pe smp 5 -m bes -V -q normal.q -o $dir_now/$outAddress/LOGs/out_${name}_${code}.out -e $dir_now/$outAddress/LOGs/error_${name}_${code}.out $dir_now/$outAddress/${name}_${code}.sh &";
 	sleep(2); #I detected some delay on the sge system while I summited the job and it started to be recognized as job on job table
 	return;
@@ -343,7 +334,7 @@ sub run_mirfix_individual {
 
 sub run_mirfix_individual_subset {
 	my ($name, $dir_now, $code, $outAddress, $tagSpe, $subset) = @_;	
-    	system "sbatch --job-name=${subset}_${code}_${tagSpe}_$subset --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$dir_now/$outAddress/LOGs/out_${subset}_${code}_${tagSpe}_$subset.out --error=$dir_now/$outAddress/LOGs/error_${subset}_${code}_${tagSpe}_$subset.out $dir_now/$outAddress/${subset}_${code}_${tagSpe}_$subset.sh &";	
+	system "sbatch --job-name=${subset}_${code}_${tagSpe}_$subset --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$dir_now/$outAddress/LOGs/out_${subset}_${code}_${tagSpe}_$subset.out --error=$dir_now/$outAddress/LOGs/error_${subset}_${code}_${tagSpe}_$subset.out $dir_now/$outAddress/${subset}_${code}_${tagSpe}_$subset.sh &";	
 	#system "qsub -S /bin/sh -cwd -l h_vmem=4G -pe smp 5 -m bes -V -q normal.q -o $dir_now/$outAddress/LOGs/out_${name}_${code}.out -e $dir_now/$outAddress/LOGs/error_${name}_${code}.out $dir_now/$outAddress/${name}_${code}.sh &";
 	sleep(2); #I detected some delay on the sge system while I summited the job and it started to be recognized as job on job table
 	return;
@@ -351,15 +342,15 @@ sub run_mirfix_individual_subset {
 
 sub wait_slurm_process {
 	my $reference = shift;	
-    my $specie = shift;
-    $reference = substr($reference,-5);
-    my $short_spe = substr($specie, 0, 3);
-    $reference = "${short_spe}${reference}";
+	my $specie = shift;
+	$reference = substr($reference,-5);
+	my $short_spe = substr($specie, 0, 3);
+	$reference = "${short_spe}${reference}";
 	print "Waiting for the process on $reference\n";
-    if (length $reference > 8){
-        $reference = substr($reference, 0, 8);
-    }
-EVAL:
+	if (length $reference > 8){
+		$reference = substr($reference, 0, 8);
+	}
+	EVAL:
 	my $state_queue = `squeue | grep $reference`; #Capture state
 	my $state = 0;
 	if ($state_queue && length $state_queue > 0){
@@ -414,42 +405,42 @@ sub print_process {
 	Title: load_correspondence_models_rfam
 	Usage: load_correspondence_models_rfam(<path_miRNAture_code>);
 	Function: Sort all out to validate RFAM or other families into specific precalculated models. The main files
-        are located in the ~/miRNAture/Data/ folder: <mirbase_rfam_correspondence.txt> and <user_correspondence_families.txt>
-        that could be modified by the user to provide another relations.
+	are located in the ~/miRNAture/Data/ folder: <mirbase_rfam_correspondence.txt> and <user_correspondence_families.txt>
+	that could be modified by the user to provide another relations.
 	Returns: Change the corresponding validation family into the database table all_RFAM_*_Final.ncRNAs_homology.txt.db \
-            and fasta files.
+	    and fasta files.
 =cut
 
 sub load_correspondence_models_rfam {
-    my $base_path = shift;
-    my $models_file = "$base_path/Data/mirbase_rfam_correspondence.txt";
-    open my $IN, "< $models_file" or die "The file ~/miRNAture/Code/Data/mirbase_rfamv14-3_correspondence.txt is required to perform annotation of mature's.\n";
-    # <RFAM_ACC> <MIRBASE_ACC_FAMILY>
-    my %db;
-    while (<$IN>){
-        chomp;
-        my @all = split /\s+|\t/, $_;
-        $db{$all[0]} = $all[-1]; #Rfam->miRBase
-        $db{$all[-1]} = $all[-1]; #miRBase->miRBase
-        #TODO: include multiple families to test for the same homology model
-        #push @{$db{$all[0]}}, $all[-1]; #Rfam->miRBase
-        #push @{$db{$all[-1]}}, $all[-1]; #miRBase->miRBase
-    }
-    close $IN;
-    ## Here, the user modify the relation between CM models and the precalculated data
-    # that will annotate the mature sequences.
-    if (-e "$base_path/Data/user_correspondence_families.txt" && !-z "$base_path/Data/user_correspondence_families.txt"){
-        open my $IN2, "< $base_path/Data/user_correspondence_families.txt" or die "The file ~/miRNAture/Code/Data/user_correspondence_families.txt was broken.\n";
-        while (<$IN2>){
-            chomp;
-            my @all = split /\s+|\t/, $_;
-            $db{$all[0]} = $all[-1];
-            #TODO: Multiple families
-            #push @{$db{$all[0]}}, $all[-1];
-        }
-        close $IN2;
-    }
-    return \%db;
+	my $base_path = shift;
+	my $models_file = "$base_path/Data/mirbase_rfam_correspondence.txt";
+	open my $IN, "< $models_file" or die "The file ~/miRNAture/Code/Data/mirbase_rfamv14-3_correspondence.txt is required to perform annotation of mature's.\n";
+	# <RFAM_ACC> <MIRBASE_ACC_FAMILY>
+	my %db;
+	while (<$IN>){
+		chomp;
+		my @all = split /\s+|\t/, $_;
+		$db{$all[0]} = $all[-1]; #Rfam->miRBase
+		$db{$all[-1]} = $all[-1]; #miRBase->miRBase
+		#TODO: include multiple families to test for the same homology model
+		#push @{$db{$all[0]}}, $all[-1]; #Rfam->miRBase
+		#push @{$db{$all[-1]}}, $all[-1]; #miRBase->miRBase
+	}
+	close $IN;
+	## Here, the user modify the relation between CM models and the precalculated data
+	# that will annotate the mature sequences.
+	if (-e "$base_path/Data/user_correspondence_families.txt" && !-z "$base_path/Data/user_correspondence_families.txt"){
+		open my $IN2, "< $base_path/Data/user_correspondence_families.txt" or die "The file ~/miRNAture/Code/Data/user_correspondence_families.txt was broken.\n";
+		while (<$IN2>){
+			chomp;
+			my @all = split /\s+|\t/, $_;
+			$db{$all[0]} = $all[-1];
+			#TODO: Multiple families
+			#push @{$db{$all[0]}}, $all[-1];
+		}
+		close $IN2;
+	}
+	return \%db;
 }
 
 =head1 create_folders 
@@ -460,12 +451,12 @@ sub load_correspondence_models_rfam {
 =cut 
 
 sub create_folders {
-    my ($in, $new) = @_;
-    my $dir = "$in/$new";
-    if (!-d $dir){ #If DIR doesn't exists
-        mkdir($dir, 0755);
-    }
-    return;
+	my ($in, $new) = @_;
+	my $dir = "$in/$new";
+	if (!-d $dir){ #If DIR doesn't exists
+		mkdir($dir, 0755);
+	}
+	return;
 }
 
 sub end_close {

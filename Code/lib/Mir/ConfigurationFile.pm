@@ -78,8 +78,8 @@ has 'blast_queries_path' => (
 	is => 'ro',
 	isa => 'Path::Class::Dir',
 	coerce => 1,
-	lazy => 1, #Only called when attribute is accessed
-	default => sub { #Test if previously defined mode
+	lazy => 1, 
+	default => sub { 
 		my $shift =  shift;
 		my $mode = $shift->mode or die "Mode didn't specified\n";
 		if ($mode eq "BLAST"){
@@ -103,13 +103,6 @@ has 'current_folder' => (
 	coerce => 1,
 	required => 1,
 );
-
-#has 'mirfix_path' => (
-#	is => 'ro',
-#	isa => 'Path::Class::File',
-#	coerce => 1,
-#	required => 1,
-#);
 
 has 'mirfix_path' => (
     is => 'ro',
@@ -151,7 +144,7 @@ has 'repetition_rules' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
-    default => 'default,200,100',
+    	default => 'default,200,100',
 );
 
 sub _path_set {
@@ -370,8 +363,7 @@ sub read_final_file {
 
 sub read_last_file {
 	my $shift = shift;
-	#my $final_file = $shift->current_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
-	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
+	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml";
        	my $last_name = get_last_name($final_file);
 	my $final = YAML::Tiny->read($last_name);
 	return $final;

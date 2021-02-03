@@ -33,15 +33,13 @@ has 'output_folder' => (
 
 has 'path_hmm_models' => (
 	is => 'ro',
-	#isa => 'Path::Class::Dir',
 	isa => 'ArrayRef[Str]',
 	required => 1,
 );
 
 has 'path_covariance' => (
 	is => 'ro',
-    	#isa => 'Path::Class::Dir',	
-    	isa => 'ArrayRef[Str]',
+	isa => 'ArrayRef[Str]',
 	required => 1,
 );
 
@@ -79,7 +77,7 @@ has 'cmsearch_program_path' => (
 	required => 1,
 );
 
-with 'miRNAture::ToolBox'; #Use General tools role
+with 'miRNAture::ToolBox'; 
 with 'miRNAture::Cleaner';
 
 sub create_folders_hmm {

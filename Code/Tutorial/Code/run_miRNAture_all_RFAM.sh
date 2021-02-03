@@ -11,7 +11,7 @@ workdir="$current/../Results"
 mirfix_path="/home/bioinf/Proyects/MIRfix/scripts/MIRfix.py"
 mode="Blast,HMM,Infernal,Other_CM,Final"
 #strategy="1,2,3,4,9,10,ALL"
-strategy="9,10,ALL"
+strategy="5,6,ALL"
 blastQueriesFolder="$current/../Data/QueriesToTest"
 
 ### Copy the correct list of CM, temporarly Basic_files/all_cm_scores_rfam14-2_metazoa_no_coelacanth.txt

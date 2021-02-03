@@ -78,15 +78,14 @@ sub run_mirfix {
 	my $starttime = time_measure();
 	my $endCode = system "python3 $path $parameters";
 	if ($endCode != 0){
-        return 0;
-    }
-    my $final_time = total_time($starttime);
+		return 0;
+	}
+	my $final_time = total_time($starttime);
 	return $final_time;
 }
 
 sub clean_mirfix_logs {
 	my ($path_c, $out_path, $test) = @_;
-	#$test = RF00053_MI0012744
 	my $new_test = (split /\_/, $test)[0];
 	my $log = "$path_c/log_$new_test";
 	my $error = "$path_c/error_$new_test";

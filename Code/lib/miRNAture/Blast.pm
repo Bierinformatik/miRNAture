@@ -46,8 +46,8 @@ has 'makeblast_program_path' => (
 	coerce => 1,
 );
 
-with 'miRNAture::ToolBox'; #Import set of subroutines
-with 'miRNAture::BlastPrepareQueries'; #Subrotines to anlyze query sequences
+with 'miRNAture::ToolBox'; 
+with 'miRNAture::BlastPrepareQueries'; 
 
 sub create_folders_blast {
 	my $shift = shift;
@@ -56,12 +56,11 @@ sub create_folders_blast {
 }
 
 sub index_query_genome {
-    #my $shift = shift;
-    my ($genome, $makeblastpath) = @_;
+	#my $shift = shift;
+	my ($genome, $makeblastpath) = @_;
 	#Only create in case it doesn't exists
 	if (!-e $genome.".nhr"){
-        #make_blast_database($shift->genome_subject, $shift->makeblast_program_path->stringify);
-        make_blast_database($genome,$makeblastpath);
+		make_blast_database($genome,$makeblastpath);
 	} else {
 		;
 	}

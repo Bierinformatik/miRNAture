@@ -1,9 +1,5 @@
 package miRNAture::BlastPrepareQueries;
 
-#use Exporter;
-#@ISA = qw(Exporter);
-#@EXPORT = qw(detect_blast_queries);
-
 use Moose::Role;
 use Bio::SeqIO;
 with 'miRNAture::ToolBox'; #Import set of subroutines
@@ -23,7 +19,7 @@ sub detect_blast_queries {
 	my @fasta_files = check_folder_files($queriesFolder, "\.fa\$\|\.fasta\$\|\.fna\$"); #Look for fasta files in reported folder
 	my $numFiles = scalar @fasta_files;
 	if ($numFiles == 0){
-	    print_error("Have not found fasta files on the declared query(ies) folder");
+		print_error("Have not found fasta files on the declared query(ies) folder");
 	}
 	my $count = 1;
 	my $speciesTag = generate_tags($queriesFolder); #Return hash based on queries_description.txt file
@@ -37,7 +33,7 @@ sub detect_blast_queries {
 		}
 		my $sum = generate_map_file_and_sizes("$queriesFolder/$fastaF", $tag, $count); #combine all to create new headers, based on mapping and generated tag for specie
 		if ($sum =~ /^NA$/){ #Avoid to create map and sizes if exists
-            print_process("$fastaF has been processed and indexed");
+			print_process("$fastaF has been processed and indexed");
 			next;
 		} else {
 			$count += $sum; #Avoid duplicated mapped headers
@@ -75,7 +71,7 @@ sub generate_tags {
 		while (<$METADATA>){
 			chomp;
 			my @all = split /\t|\s+/, $_;
-            my $file = $all[0]; #snRNA.fasta
+			my $file = $all[0]; #snRNA.fasta
 			my $specie = "$all[-2] $all[-1]"; #Ciona intestinalis
 			my $tag = create_tag_specie($specie);
 			$tags{$file} = $tag;	
@@ -180,8 +176,8 @@ sub generate_map_file_and_sizes {
 sub check_fields_metadata_fasta {
 	my $line = shift;
 	my @all = split /\t|\s+/, $line;
-    my $scientific_name = "$all[-2] $all[-1]";
- 	my ($check1, $check2, $check3);
+	my $scientific_name = "$all[-2] $all[-1]";
+	my ($check1, $check2, $check3);
 	if ($all[0] =~ m/\.fa|\.fasta|\.fna/){
 		$check1 = 1;
 	} else {

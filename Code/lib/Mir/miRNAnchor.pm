@@ -20,7 +20,6 @@ sub include_folder_environment {
     my $config_file = shift;
     my $variables = shift;
     create_folders($shift->all_parameters->[3]->{"Default_folders"}->{"Output_folder"}, "miRNA_validation");
-    # all_RFAM_Latch_Final.ncRNAs_homology.txt.db
     my $database_file = $variables->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/all_RFAM_".$variables->[3]->{Specie_data}->{Tag}."_Final.ncRNAs_homology.txt.db";
     if (-e $database_file && !-z $database_file){
         $variables->[4]->{User_results}{Database_miRNA_file_result} = $database_file;
@@ -52,7 +51,6 @@ sub generate_file_mirnanchor {
 
 sub build_parameters_mirnanchor {
     my $variable = shift;
-    # my $dbfile = "all_RFAM_".$variable->[3]->{Specie_data}->{Tag}."_Final.ncRNAs_homology.txt.db";
     my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Specie_data"}->{"Old_Genome"}." -g ".$variable->[3]->{"Specie_data"}->{"Genome"}." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Specie_data"}->{"Tag"};
     return $parameters;
 }

@@ -145,7 +145,6 @@ sub clean_cache {
     } else {
 	    ;
     }
-    #move_results($shift,$variables);
     return;
 }
 

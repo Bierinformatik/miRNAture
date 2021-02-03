@@ -55,7 +55,7 @@ def clean_block_tail(strg_to_clean, symbol):
 def get_block_coord(complete_str, pattern):
     start = complete_str.find(pattern)
     length = len(pattern)
-    end = (start + length) - 1  # Lookin for array length, this is 0-based
+    end = (start + length) - 1  # Looking for array length, this is 0-based
     return(start, end)
 
 
@@ -106,11 +106,7 @@ def analize_consensus(str_string, family):
     eval_empty = evaluate_if_no_structure(str_string)
     length_str = len(str_string)
     if eval_empty == 1:
-        print("No_valid_NoStr")
-        #print(family + " does not have a valid Secondary structure:\n"
-        #      + str_string + "\n")
-        #outNoValidFile = open("no_valid_str.txt", "a+")
-        #outNoValidFile.write(family + "\n")
+        print("No_valid_NoStr") # Here the generated structure is only with .
         sys.exit()
     # We defined 5 blocks on a conserved str from miRNAs:
     # 5' complement, miR, loop, miR* and complement 3'
@@ -161,9 +157,8 @@ def convert_matching_positions(matching_positions, factor5, factor3):
 def validate_folding_miRNA(block5, block3):
     number_match_5p = count_matching_sites(block5, '(')
     number_match_3p = count_matching_sites(block3, ')')
-    if number_match_5p > 20 and number_match_3p > 20:
-        if number_match_5p == number_match_3p:  # Test if steem loop present
-            #temporal = generate_tuples_positions_matching(block5, block3)
+    if number_match_5p > 16 and number_match_3p > 16: # Based on Tarver et.al (2012) 
+        if number_match_5p == number_match_3p:
             temporal = "Valid_All"
         else:
             temporal = "No_valid_No_match"
@@ -174,16 +169,18 @@ def validate_folding_miRNA(block5, block3):
 
 if __name__ == '__main__':
     seq = sys.argv[1]
+    locations = sys.argv[2] # Most common Start5p and End3p over all matures
     if os.path.exists(seq):
         name = os.path.basename(seq)
         family = name.split(".")[0]
     else:
-        #print("The required file: " + seq + " did not exists!")
         sys.exit()
     align = AlignIO.read(seq, "stockholm")
     # Obtain information from secondary structure
     structure = align.column_annotations['secondary_structure']  # Obtain SStr
-    structure = structure[9:-9]
+    startConsMature = int(locations.split(",")[0])-1 
+    endConsMature = int(locations.split(",")[1])
+    structure = structure[startConsMature:endConsMature]
     # Obtain blocks from consensus miRNA
     (block5pComplement, mature5block, loop, mature3block,
      block3pComplement) = analize_consensus(structure, family)
@@ -192,12 +189,4 @@ if __name__ == '__main__':
     # Look mature matching and retrieve positions but not updated
     # respect to miRNA context
     matching_positions = validate_folding_miRNA(block5mature, block3mature)
-    # Only looking matching for the mature blocks
-    # Convert coordinates to real Secondary structure coordinates
-    #start5 = mature5block[0]
-    #start3 = mature3block[0]
-    #matching_positions_context = convert_matching_positions(matching_positions,
-    #                                                        start5, start3)
-    #print(family, structure, matching_positions + "\n" + block5mature + "\n" + block3mature)
-    #print(family + "\t" + structure + "\t" + matching_positions)
     print(matching_positions)

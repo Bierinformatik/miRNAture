@@ -38,7 +38,7 @@ has 'path_covariance' => (
 	is => 'ro',
 	isa => 'Path::Class::Dir',	
 	required => 1,
-        coerce => 1,
+	coerce => 1,
 );
 
 has 'bitscores_CM' => (
@@ -65,21 +65,21 @@ has 'cmsearch_program_path' => (
 	is => 'ro',
 	isa => 'Path::Class::File',	
 	required => 1,
-        coerce => 1,
+	coerce => 1,
 );
 
 sub create_folders_other {
 	my $shift = shift;
 	create_folders($shift->output_folder->stringify, "");
-	create_folders($shift->output_folder->stringify, $shift->subject_specie); #Create Final Folder
-	create_folders($shift->output_folder->stringify."/".$shift->subject_specie, "Final"); #Create Final Folder
+	create_folders($shift->output_folder->stringify, $shift->subject_specie);
+	create_folders($shift->output_folder->stringify."/".$shift->subject_specie, "Final");
 	return;
 }
 
 sub search_homology_other {
 	my $shift = shift;
-    my $zscore = shift;
-    my $minBitscore = shift;
+	my $zscore = shift;
+	my $minBitscore = shift;
 	searchOthershomology($shift, $zscore, $minBitscore);
 	return;
 }	
