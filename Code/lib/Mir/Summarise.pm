@@ -5,6 +5,7 @@ use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Data::Dumper;
 use Term::ANSIColor;
+use File::Copy;
 use lib "lib/miRNAture";
 use lib 'src/Statistics-R-0.34/lib';
 use Statistics::R;
@@ -26,6 +27,7 @@ sub generate_summary_file {
 	my $discarded = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/NO_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
 	my $out_summary_file = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/miRNAture_summary_".$shift->all_parameters->[3]->{Specie_data}->{Tag}.".txt";
 	calculate_summary_file($validatedStr, $validatedNoStr, $discarded, $out_summary_file);
+	get_final_output($variables);
 	return;
 }
 
@@ -166,6 +168,32 @@ sub process_table_small {
 	for (my $i=12; $i <= $number-1; $i += 3){
 		print $OUT "$label\t$$table[$i-1]\t$$table[$i-0]\n";	
 	}
+	return;
+}
+
+sub get_final_output {
+	my $shift = shift;
+	my $working_path = $shift->[4]->{"User_results"}{"Evaluation_results_folder"};
+	create_folders($working_path, "Tables");
+	create_folders($working_path, "Fasta");
+	create_folders($working_path, "MFE");
+	opendir DH, $working_path;
+	while (my $file = readdir DH) {
+		if ($file =~ /\.fasta$/){
+			move("$working_path/$file", "$working_path/Fasta");
+		} elsif ($file =~ /\.table/){
+			move("$working_path/$file", "$working_path/Tables");
+		} elsif ($file =~ /\.mfe/){
+			move("$working_path/$file", "$working_path/MFE");
+		} else {
+			;
+		}
+	}
+	my $tag = $shift->[3]->{Specie_data}{Tag};
+	my $gffAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/GFF3/miRNA_annotation_".$tag."_accepted_conf.gff3";
+	my $bedAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/BED/miRNA_annotation_".$tag."_accepted_conf.bed";
+	copy($gffAccepted, $working_path);
+	copy($bedAccepted, $working_path);
 	return;
 }
 

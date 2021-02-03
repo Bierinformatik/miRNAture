@@ -399,7 +399,7 @@ sub print_result {
 sub print_process {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
-	print FAINT BLUE "[RESULT] $text\n";
+	print FAINT BLUE "[PROCESS] $text\n";
 	return;
 }
 
