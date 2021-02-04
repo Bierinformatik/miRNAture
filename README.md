@@ -15,22 +15,22 @@ conservation patterns in a structure-annotated multiple sequence alignments.
 
 The **miRNAture** pipeline implements a workflow specific to animal microRNAs
 that automatizes homology search and validation steps.
-On the homology seach it combines two modes: sequence-homology by `blast` or/and 
+On the homology search it combines two modes: sequence-homology by `blast` or/and 
 `nhmmer` using query sequences or hidden markov models (HMMs), and structural 
 validation performed by the `INFERNAL` package, using covariance models (CMs).
-A merginng step produces a final list of homology candidates. Over those
+A merging step produces a final list of homology candidates. Over those
 candidates a _Mature annotation_ stage performs a correction of the position of
 mature sequences on the detected precursor and a structural evaluation 
 in terms of minimum free energy (MFE), precursor length, folding and the
 evaluation of anchored family specific-multiple secondary alignment 
 (using `MIRfix`). Final sanity checks are performed on the _Evaluation_ stage, 
 that reviews all the last mature annotation process, filtering the invalid candidates 
-at structure level and reporting valid candidates on GFF3/BED and FASTA files 
+at structure level and reporting valid candidates on GFF3/BED and fasta files 
 together with a summarize file that provides overall information about detected
 miRNA candidates and families.
 
 ### Input files
-The most important input file is a dna sequence. This could be a multifasta
+The most important input file is a DNA sequence. This could be a multifasta
 sequence (i.e. complete genome or group of particular sequences) that belongs
 from a common specie. Here I describe the general command line options to run
 **miRNAture** in its _complete_ mode:
@@ -41,14 +41,22 @@ from a common specie. Here I describe the general command line options to run
 Final predicted miRNAs will be written on the `<Output_dir>` indicated with the `-w` flag.
 The final candidates are described on the folder `Final_miRNA_evaliation/` as
 follows:
-`
+```
 Final_miRNA_evaluation/
-├── Fasta
-├── MFE
+├── Fasta/
+├── MFE/
 ├── miRNA_annotation_Lach_accepted_conf.bed
 ├── miRNA_annotation_Lach_accepted_conf.gff3
 ├── miRNAture_summary_Lach.txt
-└── Tables
-`
+└── Tables/
+```
+
+Inside the folder `Final_miRNA_evaluation/` will be created 3 folders containing their
+correspondent results: sequences in `fasta` format (`Fasta/`), minimum free energy and 
+lengths from described sequences (`MFE/`) and the supporting information ordered in tables
+for each annotated candidate (`Tables/`). Additionally, associated genomic positions 
+for the miRNA candidates are reported in `BED` and `GFF3` formats and a summary file 
+describes overall descriptive statistics from found miRNA families. 
+
 ### General workflow
 ![workflow](https://github.com/cavelandiah/miRNAture_v1/blob/main/miRNAture2.png "miRNAture") 
