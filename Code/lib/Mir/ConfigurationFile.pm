@@ -176,8 +176,11 @@ sub _size_set {
 
 sub generate_copy_genome {
 	my $shift = shift;
+	if (!-e $shift->output_folder){
+		print_error("Output folder did not exist. Please create it to run miRNAture.");
+	}
 	my $data_folder = $shift->output_folder->stringify."/TemporalFiles"; #Genome folder in Temporal Folder
-    create_folders($shift->output_folder->stringify, "TemporalFiles");
+    	create_folders($shift->output_folder->stringify, "TemporalFiles");
 	create_folders($data_folder, $shift->specie_name);
 	my $new_folder = $data_folder."/".$shift->specie_name;
 	my $new_genome_file = $data_folder."/".$shift->specie_name."/".$shift->specie_genome->basename.".new.fa"; # Name of the new genome

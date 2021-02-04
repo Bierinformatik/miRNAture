@@ -6,6 +6,7 @@ specie_genome="$current/../Data/latimeria_chalumnae_genome.fa"
 specie_name="Latimeria_chalumnae"
 
 workdir="$current/../Results"
+mkdir -p $workdir
 mode="Blast,HMM,Infernal,Other_CM,Final"
 strategy="5,6,ALL"
 blastQueriesFolder="$current/../Data/QueriesToTest"
