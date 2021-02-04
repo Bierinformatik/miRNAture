@@ -205,6 +205,13 @@ coelacanth sequences. The idea is to perform independently each of the stages,
 *homology-searches* and *detection of mature*, for demonstrative 
 purposes. In case that you require to run the complete pipeline, just adjust the
 parameter **-stage** to the *complete* option. 
+
+
+Homology search
+^^^^^^^^^^^^^^^
+
+As mentioned, we are going to execute the *homology-search* stage. To activate
+this stage in ``miRNAture`` please verify the flag value to be **-stage homology**.
 In brief, our *target* coelacanth sequences would be annotated using a set of
 miRNA *queries* that belong from the following chordate species, (V: vertebrata, T:
 tunicata and C:cephalochordata) and one echinoderm (E):
@@ -230,13 +237,16 @@ strategies.
 
 Then, just let it run typing::
 
-    $./run_miRNAture.sh
+    $./run_miRNAture.sh homology
 
 A long descriptive output will be printed on the screen. Keep an eye on the ``Results/``
-folder where the action is taking place.
+folder where the action is taking place. 
 
-Results
-=======
+   .. note:: Keep in mind that ``run_miRNAture.sh`` was created as an example to run ``miRNAture`` but it does not mean that is the only way to do that. Change it according your requirements.
+
+
+Homology search results
+^^^^^^^^^^^^^^^^^^^^^^^
 
 To refer directly to the results, type::
 
@@ -346,3 +356,42 @@ mir-105 family) and folding values (Bitscore: 13.4 and E-value 7.8), see file
 
 On the other side, ``miRNAture`` detected new candidates that currently are not
 reported on the genome annotation.
+
+Validation of miRNA candidates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An additional output was generated on the ``Final_results/`` folder and contained
+all the resulted fasta sequences from the last 228 hairpin candidates, organized
+by their Rfam family. Based on those regions, validated by sequence and
+structure homology, the idea is to evaluate the annotation of candidate *mature*
+regions that are contained in this hairpin-loop and validate their annotation
+with an additional layer, supported by the structural alignments of sequences
+selected from other organisms.
+
+To do that, please execute again the script::
+    
+    $./run_miRNAture.sh validate
+
+which essentially have the same input parameters, except for the ``-stage validation`` flag
+that was changed to tell ``miRNAture`` that the second stage have to be
+activated.
+
+In this step, each detected miRNA candidate were grouped by their Rfam miRNA family. 
+Based on this reference, previously calculated data from the family is retrieved. This 
+input data, required to perform the correction of the *mature* sequences using the
+``MIRfix`` program, was inferred as a product of this study [#f1]_ and
+comprises this set of files:
+    
+    * The set of Rfam hairpin sequences.
+    * The mature sequences annotated for each Rfam hairpin sequence.
+    * The genomes/contigs/sequences that contained the Rfam sequences.
+    * A mapping file, which explicity declares the relation between hairpin and
+      their mature sequences.
+
+For more details refer to the ``MIRfix`` `repository <https://github.com/Bierinformatik/MIRfix>`_ .
+Automatically, ``miRNAture`` structure all your data and generate the required
+input files to perform the *mature* annotation.
+
+.. rubric:: Footnotes
+
+.. [#f1] From the *seed* sequences from ``Rfam`` v.12.2 and additionally the sequences from ``Rfam`` and ``miRBase`` that reported *mature* sequences.
