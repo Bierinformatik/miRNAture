@@ -58,5 +58,7 @@ for each annotated candidate (`Tables/`). Additionally, associated genomic posit
 for the miRNA candidates are reported in `BED` and `GFF3` formats and a summary file 
 describes overall descriptive statistics from found miRNA families. 
 
-### General workflow
-![workflow](https://github.com/cavelandiah/miRNAture_v1/blob/main/miRNAture2.png "miRNAture") 
+For detailed instructions how to use **miRNAture** please refer to the Manual pages:
+
+    - In [this PDF](https://github.com/Bierinformatik/miRNAture/blob/main/miRNAture-Manual/latex/mirnature.pdf) version.
+    - Through your favorite explorer, open the `index.html` file located at `miRNAture-Manual/html/index.html`.
