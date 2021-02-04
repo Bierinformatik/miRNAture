@@ -23,7 +23,7 @@
     
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="miRNAture" href="includeme.html" /> 
+  <link rel="next" title="Tutorial" href="tutorial.html" /> 
   </head>
 
   <body>
@@ -38,22 +38,6 @@
   <div class="links">
     <navlinks class="can-hide">
 
-  
-    <div class="nav-item">
-      <a href="includeme.html#installation"
-         class="nav-link ">
-         installation
-      </a>
-    </div>
-  
-    <div class="nav-item">
-      <a href="#installation"
-         class="nav-link ">
-         Contents:
-      </a>
-    </div>
-  
-
 
 
     </navlinks>
@@ -67,22 +51,6 @@
           
           <navlinks>
             
-
-  
-    <div class="nav-item">
-      <a href="includeme.html#installation"
-         class="nav-link ">
-         installation
-      </a>
-    </div>
-  
-    <div class="nav-item">
-      <a href="#installation"
-         class="nav-link ">
-         Contents:
-      </a>
-    </div>
-  
 
 
 
@@ -99,33 +67,6 @@
     </div>
   </div>
 </div><div class="sidebar-links" role="navigation" aria-label="main navigation">
-  
-    <div class="sidebar-group">
-      <p class="caption">
-        <span class="caption-text"><a href="includeme.html#installation">installation</a></span>
-      </p>
-      <ul class="">
-        
-          <li class="toctree-l1 "><a href="tutorial.html" class="reference internal ">Tutorial</a>
-
-            
-          </li>
-
-        
-          <li class="toctree-l1 "><a href="license.html" class="reference internal ">License</a>
-
-            
-          </li>
-
-        
-          <li class="toctree-l1 "><a href="help.html" class="reference internal ">Need Help</a>
-
-            
-          </li>
-
-        
-      </ul>
-    </div>
   
     <div class="sidebar-group">
       <p class="caption">
@@ -163,14 +104,14 @@
   <ul class="breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
     
-    <li><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code></li>
+    <li>miRNAture</li>
   </ul>
   
 
   <ul class="page-nav">
   <li class="next">
-    <a href="includeme.html"
-       title="next chapter">miRNAture →</a>
+    <a href="tutorial.html"
+       title="next chapter">Tutorial →</a>
   </li>
 </ul>
   
@@ -178,20 +119,9 @@
 <hr>
           <div class="content" role="main">
             
-  <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">miRNAture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="includeme.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="includeme.html#strategy">Strategy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="includeme.html#installation">Installation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html#indices-and-tables">Indices and tables</a></li>
-</ul>
-</div>
-<div class="section" id="mirnature">
-<h1><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code><a class="headerlink" href="#mirnature" title="Permalink to this headline">¶</a></h1>
-<p>Computational detection of <em>bona fide</em> microRNAs.</p>
+  <div class="section" id="mirnature">
+<h1>miRNAture<a class="headerlink" href="#mirnature" title="Permalink to this headline">¶</a></h1>
+<p>Computational detection of microRNA candidates.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> is used to annotate homologs of metazoan microRNAs, discovered by means of
@@ -208,8 +138,8 @@ sequences.</p>
 <p>Current approaches to computational miRNA detection relies on homology relationships
 or detection of hairpin-loop candidates with lower folding energy. A complete set of
 tools to automatize this task have been assembled on <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>. This current
-approach combines two different sequence-homology modes, using <code class="docutils literal notranslate"><span class="pre">blastn</span></code> or <code class="docutils literal notranslate"><span class="pre">HMMer</span></code>, and
-a secondary structure validation step, performed by the <code class="docutils literal notranslate"><span class="pre">Infernal</span></code> package. Combination
+approach combines two different sequence-homology modes, using <code class="docutils literal notranslate"><span class="pre">blast</span></code> or <code class="docutils literal notranslate"><span class="pre">HMMer</span></code>, and
+a secondary structure validation step, performed by the <code class="docutils literal notranslate"><span class="pre">INFERNAL</span></code> package. Combination
 of different strategies and the modification of default covariance models, let <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>
 report not only the homology relationships, but also define positions of <em>mature</em> sequences
 and the correct miRNA annotation, supported by multiple family specific alignments.
@@ -218,7 +148,7 @@ Current workflow is depicted as follows:</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Download the source code or clone the miRNAture project located on <a class="reference external" href="https://github.com/Bierinformatik/miRNAture">Github</a>.
+<p>Download the source code or clone the miRNAture project located on <a class="reference external" href="https://github.com/cavelandiah/miRNAture">Github</a>.
 On the <code class="docutils literal notranslate"><span class="pre">Code/</span></code> folder execute the file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">activate_environment_conda</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
@@ -254,11 +184,11 @@ On the <code class="docutils literal notranslate"><span class="pre">Code/</span>
           <div class="page-nav">
             <div class="inner"><ul class="page-nav">
   <li class="next">
-    <a href="includeme.html"
-       title="next chapter">miRNAture →</a>
+    <a href="tutorial.html"
+       title="next chapter">Tutorial →</a>
   </li>
 </ul><div class="footer" role="contentinfo">
-      &#169; Copyright 2021, Cristian A. Velandia Huerto.
+      &#169; Copyright 2021, miRNAture.
     <br>
     Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.0 with <a href="https://github.com/romnnn/sphinx_press_theme">Press Theme</a>.
 </div>
