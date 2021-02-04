@@ -29,6 +29,16 @@ at structure level and reporting valid candidates on GFF3/BED and fasta files
 together with a summarize file that provides overall information about detected
 miRNA candidates and families.
 
+### Installation
+
+The easiest way to install **miRNAture** is through `conda`. To do so, please first install [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/). Then, you have to install dependencies which are nicely managed using [Mamba](https://github.com/mamba-org/mamba), just run:
+```
+conda install mamba -c conda-forge
+```
+Once installed, create the `mirnature` environment with the file `Code/miRNAture.yml`:
+- `mamba env create -n mirnature -f Code/miRNAture.yml`
+
+
 ### Input files
 The most important input file is a DNA sequence. This could be a multifasta
 sequence (i.e. complete genome or group of particular sequences) that belongs
