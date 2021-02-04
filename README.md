@@ -38,10 +38,9 @@ from a common specie. Here I describe the general command line options to run
 `./miRNAture -stage complete -speG <Target Genome> -speN <Specie_name> -speT <Tag_specie> -w <Output_dir> -m <Mode> (-str <Blast_strategy>) -blastq <Blast_queries_folder> -rep default,150,100`
 
 ### Output files
-A standard miRNA search will generate a detailed table of the final miRNA
-annotation on the subject sequence(s). This result will be complemented by the
-correspondent fasta sequences, not only from the reported hairpin, but from the
-predicted mature, miR and miR\*, sequences. 
+Final predicted miRNAs will be written on the `<Output_dir>` indicated with the `-w` flag.
+The final candidates are described on the folder `Final_miRNA_evaliation/` as
+follows:
 
 
 ### General workflow
