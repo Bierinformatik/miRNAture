@@ -5,16 +5,29 @@
 =========
 
 ### Description
-Current approaches to computational miRNA detection relies on homology
-relationships or detection of hairpin-loop candidates with lower folding energy.
-A complete set of tools to automatizate this task have been assembled on
-**miRNAture**. This current approach combines two different sequence-homology
-modes, using `blast` or `HMMer`, and a secondary structure validation step,
-performed by the `INFERNAL` package.  Combination of different
-strategies and the modification of default covariance models, let **miRNAture**
-report not only the homology relationships, but also define positions of mature
-sequences and the correct miRNA annotation, supported by multiple family
-specific alignments.
+
+Detection of miRNAs is a difficult problem due their small size limits the
+available information. Current sensitive methods as: parameter optimized
+`blast`, `nhmmer`, or `cmsearch` runs designed to increase sensitivity, but
+leading to an inevitable large number of false positives only detected by
+detailed analysis of specific features of typical miRNAs and/or analysis of
+conservation patterns in a structure-annotated multiple sequence alignments.
+
+The **miRNAture** pipeline implements a workflow specific to animal microRNAs
+that automatizes homology search and validation steps.
+On the homology seach it combines two modes: sequence-homology by `blast` or/and 
+`nhmmer` using query sequences or hidden markov models (HMMs), and structural 
+validation performed by the `INFERNAL` package, using covariance models (CMs).
+A merginng step produces a final list of homology candidates. Over those
+candidates a _Mature annotation_ stage performs a correction of the position of
+mature sequences on the detected precursor and a structural evaluation 
+in terms of minimum free energy (MFE), precursor length, folding and the
+evaluation of anchored family specific-multiple secondary alignment 
+(using `MIRfix`). Final sanity checks are performed on the _Evaluation_ stage, 
+that reviews all the last mature annotation process, filtering the invalid candidates 
+at structure level and reporting valid candidates on GFF3/BED and FASTA files 
+together with a summarize file that provides overall information about detected
+miRNA candidates and families.
 
 ### Input files
 The most important input file is a dna sequence. This could be a multifasta
@@ -22,7 +35,7 @@ sequence (i.e. complete genome or group of particular sequences) that belongs
 from a common specie. Here I describe the general command line options to run
 **miRNAture** in its _complete_ mode:
 
-`./miRNAture -stage complete -speG <Target Genome> -speN <Specie_name> -speT <Tag_specie> -w <Output_dir> -mfx <MIRFix_path> -m <Mode> (-str <Blast_strategy>) -pe <SLURM_activation> -blastq <Blast_queries_folder>`
+`./miRNAture -stage complete -speG <Target Genome> -speN <Specie_name> -speT <Tag_specie> -w <Output_dir> -m <Mode> (-str <Blast_strategy>) -blastq <Blast_queries_folder> -rep default,150,100`
 
 ### Output files
 A standard miRNA search will generate a detailed table of the final miRNA
