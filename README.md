@@ -41,7 +41,14 @@ from a common specie. Here I describe the general command line options to run
 Final predicted miRNAs will be written on the `<Output_dir>` indicated with the `-w` flag.
 The final candidates are described on the folder `Final_miRNA_evaliation/` as
 follows:
-
-
+`
+Final_miRNA_evaluation/
+├── Fasta
+├── MFE
+├── miRNA_annotation_Lach_accepted_conf.bed
+├── miRNA_annotation_Lach_accepted_conf.gff3
+├── miRNAture_summary_Lach.txt
+└── Tables
+`
 ### General workflow
 ![workflow](https://github.com/cavelandiah/miRNAture_v1/blob/main/miRNAture2.png "miRNAture") 
