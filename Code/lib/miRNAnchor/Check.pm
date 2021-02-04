@@ -423,7 +423,7 @@ sub check_blast_database {
 sub make_blast_database {
 	my $genome = shift;
 	my $param = "-in $genome -dbtype nucl -out $genome";
-	system "makeblastdb $param";
+	system "makeblastdb $param 2>/dev/null 1>/dev/null";
 	return;
 }
 
