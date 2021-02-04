@@ -60,5 +60,5 @@ describes overall descriptive statistics from found miRNA families.
 
 For detailed instructions how to use **miRNAture** please refer to the Manual pages:
 
-    * In [this PDF](https://github.com/Bierinformatik/miRNAture/blob/main/miRNAture-Manual/latex/mirnature.pdf) version.
+    * In this ![PDF](miRNAture-Manual/latex/mirnature.pdf) version.
     * Through your favorite explorer, open the `index.html` file located at `miRNAture-Manual/html/index.html`.
