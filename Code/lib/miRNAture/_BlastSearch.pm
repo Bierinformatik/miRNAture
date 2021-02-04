@@ -322,7 +322,7 @@ sub infer_data_queries {
 	while (<$METADATA>){
 		#tRNA.fasta	tRNA	Ciona intestinalis
 		chomp;
-		print "$_\n";
+		#print "$_\n";
 		my @all = split /\t|\s+/, $_;
 		$mol{$all[1]} = 1;
 		$specie{"$all[-2] $all[-1]"} = 1;
@@ -378,7 +378,7 @@ sub runBlastn {
 		$id = `ps aux | grep ${specie}_$strategy.$ncrna.$query_tag.sh | grep bash`;
 		$id = (split /\s+/,(split /\n/, $id)[0])[1];
 		#$id = `ps aux | grep ${specie}_$strategy.$ncrna.$query_tag.sh | grep "bash \./" |awk '{print \$2}'`;
-		print "$id\n";
+		#print "$id\n";
 		$id =~ s/(\d+)(\s*)/$1/g;
 	}
 	####

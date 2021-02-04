@@ -872,7 +872,7 @@ sub make_blast_database {
 	my ($genome, $makeblast_path) = @_;
 	my $param = "-in $genome -dbtype nucl -out $genome";
 	existenceProgram($makeblast_path);
-	system "$makeblast_path $param";
+	system "$makeblast_path $param 1> /dev/null";
 	return;
 }
 

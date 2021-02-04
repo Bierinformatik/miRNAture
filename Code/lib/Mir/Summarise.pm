@@ -120,14 +120,14 @@ sub calculate_summary_file {
     process_table_small($total_accepted_High, $OUT, "miRNA_loci_high");
 	print $OUT "## miRNA families:\nNumber_families_high\t$number_familiesHigh\n";
 	print $OUT "## Detail of miRNA loci:\n";
-	print $OUT "## Section\tmiRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
+	print $OUT "## Section\tmiRNA_Family\tACC\tLoci\tAvg_MFE\tAvg_LEN\n";
 	process_table($table_detail_loci_High, $OUT, "Detail_loci_high");
     print $OUT "## Medium confidence miRNAs ##\n";
     print $OUT "## miRNA loci:\n";
     process_table_small($total_accepted_Med, $OUT, "miRNA_loci_medium");
 	print $OUT "## miRNA families:\nNumber_families_medium\t$number_familiesMed\n";
 	print $OUT "## Detail of miRNA loci:\n";
-	print $OUT "## Section\tmiRNA_Family\tRFAM_ACC\tLoci\tAvg_MFE\tAvg_LEN\n";
+	print $OUT "## Section\tmiRNA_Family\tACC\tLoci\tAvg_MFE\tAvg_LEN\n";
 	process_table($table_detail_loci_Med, $OUT, "Detail_loci_medium");
 	print $OUT "##\n";
 	print $OUT "# Distribution of miRNA over the target genomic sequence:\n";

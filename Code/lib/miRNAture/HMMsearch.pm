@@ -96,9 +96,12 @@ sub runNhmmer {
 	foreach my $hmms_path_specific (@$path_hmm){
 		if (-e "$hmms_path_specific/$HMM.hmm"){
 			$param = "--cpu 8 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
+			system "$nhmmer_path $param 1> /dev/null";
+		} else {
+			next;
 		}
 	}
-	system "$nhmmer_path $param 1> /dev/null";
+	return;
 }
 
 sub obtainTrueCandidates {

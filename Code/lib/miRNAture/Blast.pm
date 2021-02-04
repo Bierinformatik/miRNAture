@@ -6,6 +6,7 @@ use Exporter;
 use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
+use miRNAture::ToolBox;
 
 has 'blast_str' => (
 	is => 'ro',
@@ -60,6 +61,7 @@ sub index_query_genome {
 	my ($genome, $makeblastpath) = @_;
 	#Only create in case it doesn't exists
 	if (!-e $genome.".nhr"){
+		print_process("Generating BLAST DB for genome");
 		make_blast_database($genome,$makeblastpath);
 	} else {
 		;

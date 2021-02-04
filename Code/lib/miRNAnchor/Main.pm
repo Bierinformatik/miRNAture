@@ -128,7 +128,7 @@ sub get_genome_validation_list {
 	# Check if file exists, if not create it 
 	if (!-e $out_genomes_file || -z $out_genomes_file){ #Check if file of genomes exists
 		if ($genomes_list){
-			print_process("The paths of the Rfam genomes are missing, the is no <all_genomes_list.txt> file, let's create it!");
+			print_process("The paths of the Rfam genomes are missing, the file <all_genomes_list.txt> is missing, let's create it!");
 			open (my $OUT, ">", $out_genomes_file) or die "Final list file can't opened\n";
 			foreach my $genome (@$genomes_list){
 				print $OUT $genome."\n";
