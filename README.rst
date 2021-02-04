@@ -30,7 +30,7 @@ report not only the homology relationships, but also define positions of *mature
 and the correct miRNA annotation, supported by multiple family specific alignments.
 Current workflow is depicted as follows:
 
-.. image:: ../../Manuscript/Figures/mirnature.png
+.. image:: ../../mirnature2.png
    :width: 600
 
 Installation

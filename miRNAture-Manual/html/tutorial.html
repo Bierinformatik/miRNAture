@@ -1,44 +1,142 @@
-
 <!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html >
   <head>
-    <meta charset="utf-8" />
-    <title>Tutorial &#8212; miRNAture Alpha documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="License" href="license.html" />
-    <link rel="prev" title="miRNAture" href="includeme.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Tutorial</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/romnnn_sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
 
-  </head><body>
-  
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="License" href="license.html" />
+  <link rel="prev" title="miRNAture" href="index.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <div class="home-link-container">
+      <router-link to="index.html" class="home-link">
+      
+        <span class="site-name">miRNAture</span>
+    </router-link>
+  </div>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
           
+          <navlinks>
+            
 
-          <div class="body" role="main">
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Search</span>
+    <div class="searchformwrapper">
+      <form autocomplete="off" class="search" action="search.html" method="get">
+        <input type="text" name="q" autocomplete="off" />
+        <input type="submit" value="Go" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#installation">Contents:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Tutorial</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#annotating-some-coelacanth-mirnas" class="reference internal">Annotating (some) coelacanth miRNAs</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="license.html" class="reference internal ">License</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="help.html" class="reference internal ">Need Help</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Tutorial</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="index.html"
+       title="previous chapter">← miRNAture</a>
+  </li>
+  <li class="next">
+    <a href="license.html"
+       title="next chapter">License →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
             
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="annotating-some-coelacanth-mirnas">
 <h2>Annotating (some) coelacanth miRNAs<a class="headerlink" href="#annotating-some-coelacanth-mirnas" title="Permalink to this headline">¶</a></h2>
-<div class="align-center figure" id="id1">
+<div class="align-center figure" id="id2">
 <a class="reference internal image-reference" href="_images/coel.jpg"><img alt="Coelacanth image" src="_images/coel.jpg" style="width: 320px; height: 116px;" /></a>
-<p class="caption"><span class="caption-text"><em>Latimeria chalumnae</em>. Source: <a class="reference external" href="https://upload.wikimedia.org/wikipedia/commons/f/fa/Latimeria_Chalumnae_-_Coelacanth_-_NHMW.jpg">Alberto Fernandez Fernandez / CC BY-SA</a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text"><em>Latimeria chalumnae</em>. Source: <a class="reference external" href="https://upload.wikimedia.org/wikipedia/commons/f/fa/Latimeria_Chalumnae_-_Coelacanth_-_NHMW.jpg">Alberto Fernandez Fernandez / CC BY-SA</a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
 <p>Throught this step-by-step tutorial you could make use of key options from
 <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> to annotate the <em>bona fide</em> miRNA complement on selected contigs
@@ -247,7 +345,11 @@ the script <code class="docutils literal notranslate"><span class="pre">run_miRN
 coelacanth sequences. The idea is to perform independently each of the stages,
 <em>homology-searches</em> and <em>detection of mature</em>, for demonstrative
 purposes. In case that you require to run the complete pipeline, just adjust the
-parameter <strong>-stage</strong> to the <em>complete</em> option.
+parameter <strong>-stage</strong> to the <em>complete</em> option.</p>
+<div class="section" id="homology-search">
+<h4>Homology search<a class="headerlink" href="#homology-search" title="Permalink to this headline">¶</a></h4>
+<p>As mentioned, we are going to execute the <em>homology-search</em> stage. To activate
+this stage in <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> please verify the flag value to be <strong>-stage homology</strong>.
 In brief, our <em>target</em> coelacanth sequences would be annotated using a set of
 miRNA <em>queries</em> that belong from the following chordate species, (V: vertebrata, T:
 tunicata and C:cephalochordata) and one echinoderm (E):</p>
@@ -271,14 +373,20 @@ concatenation with <code class="docutils literal notranslate"><span class="pre">
 concatenation and comparison with <code class="docutils literal notranslate"><span class="pre">ALL</span></code>, but feel free to choose more or less
 strategies.</p>
 <p>Then, just let it run typing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$./run_miRNAture.sh
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$./run_miRNAture.sh homology
 </pre></div>
 </div>
 <p>A long descriptive output will be printed on the screen. Keep an eye on the <code class="docutils literal notranslate"><span class="pre">Results/</span></code>
 folder where the action is taking place.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Keep in mind that <code class="docutils literal notranslate"><span class="pre">run_miRNAture.sh</span></code> was created as an example to run <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> but it does not mean that is the only way to do that. Change it according your requirements.</p>
 </div>
-<div class="section" id="results">
-<h3>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h3>
+</div></blockquote>
+</div>
+<div class="section" id="homology-search-results">
+<h4>Homology search results<a class="headerlink" href="#homology-search-results" title="Permalink to this headline">¶</a></h4>
 <p>To refer directly to the results, type:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ../Results/
 $ tree -L 1
@@ -388,7 +496,7 @@ all_RFAM_Latch_Final.ncRNAs_homology.txt &gt; predicted_miRNAture.bed
 <p>Next, just upload the track on the corresponding Genome Ensembl hub (as explained in more detail <a class="reference external" href="https://www.ensembl.org/info/website/upload/index.html">here</a>) as a Custom Track.</p>
 <p>Certainly, after uploading this miRNAs coordinates you would visualize this results:</p>
 <div class="align-center figure">
-<a class="reference internal image-reference" href="general_view.png"><img alt="Genome Browser Coel" src="general_view.png" style="width: 600px; height: 99px;" /></a>
+<a class="reference internal image-reference" href="_images/general_view.png"><img alt="Genome Browser Coel" src="_images/general_view.png" style="width: 600px; height: 99px;" /></a>
 </div>
 <p>This image corresponds to the region <code class="docutils literal notranslate"><span class="pre">JH126620.1:788915-822338</span></code>, which
 according to the Ensembl annotation, exists 4 miRNA genes
@@ -397,12 +505,12 @@ and two of mir-130 (ENSLACG00000020131, ENSLACG00000019975)</p>
 <p>Here, <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> detected the same families, with overlapping regions on the
 previously reported miRNAs on <em>L. chalumnae</em>.</p>
 <div class="align-center figure">
-<a class="reference internal image-reference" href="firstTwo.png"><img alt="Genome Browser Coel" src="firstTwo.png" style="width: 600px; height: 99px;" /></a>
+<a class="reference internal image-reference" href="_images/firstTwo.png"><img alt="Genome Browser Coel" src="_images/firstTwo.png" style="width: 600px; height: 99px;" /></a>
 </div>
 <p>And this is the second cluster, with two families, the overlapping is the same
 but in one miRNA the family prediction and the strand differ:</p>
 <div class="align-center figure">
-<a class="reference internal image-reference" href="secondTwo.png"><img alt="Genome Browser Coel" src="secondTwo.png" style="width: 600px; height: 99px;" /></a>
+<a class="reference internal image-reference" href="_images/secondTwo.png"><img alt="Genome Browser Coel" src="_images/secondTwo.png" style="width: 600px; height: 99px;" /></a>
 </div>
 <p>For that reason, those candidates required a complementary evaluation of their current detection and correct positioning of the <em>mature</em> miRNA sequences.
 As a final result, you could check that all the reported miRNAs on the contigs
@@ -415,88 +523,72 @@ mir-105 family) and folding values (Bitscore: 13.4 and E-value 7.8), see file
 <p>On the other side, <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> detected new candidates that currently are not
 reported on the genome annotation.</p>
 </div>
+<div class="section" id="validation-of-mirna-candidates">
+<h4>Validation of miRNA candidates<a class="headerlink" href="#validation-of-mirna-candidates" title="Permalink to this headline">¶</a></h4>
+<p>An additional output was generated on the <code class="docutils literal notranslate"><span class="pre">Final_results/</span></code> folder and contained
+all the resulted fasta sequences from the last 228 hairpin candidates, organized
+by their Rfam family. Based on those regions, validated by sequence and
+structure homology, the idea is to evaluate the annotation of candidate <em>mature</em>
+regions that are contained in this hairpin-loop and validate their annotation
+with an additional layer, supported by the structural alignments of sequences
+selected from other organisms.</p>
+<p>To do that, please execute again the script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$./run_miRNAture.sh validate
+</pre></div>
+</div>
+<p>which essentially have the same input parameters, except for the <code class="docutils literal notranslate"><span class="pre">-stage</span> <span class="pre">validation</span></code> flag
+that was changed to tell <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> that the second stage have to be
+activated.</p>
+<p>In this step, each detected miRNA candidate were grouped by their Rfam miRNA family.
+Based on this reference, previously calculated data from the family is retrieved. This
+input data, required to perform the correction of the <em>mature</em> sequences using the
+<code class="docutils literal notranslate"><span class="pre">MIRfix</span></code> program, was inferred as a product of this study <a class="footnote-reference brackets" href="#f1" id="id1">1</a> and
+comprises this set of files:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The set of Rfam hairpin sequences.</p></li>
+<li><p>The mature sequences annotated for each Rfam hairpin sequence.</p></li>
+<li><p>The genomes/contigs/sequences that contained the Rfam sequences.</p></li>
+<li><p>A mapping file, which explicity declares the relation between hairpin and
+their mature sequences.</p></li>
+</ul>
+</div></blockquote>
+<p>For more details refer to the <code class="docutils literal notranslate"><span class="pre">MIRfix</span></code> <a class="reference external" href="https://github.com/Bierinformatik/MIRfix">repository</a> .
+Automatically, <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> structure all your data and generate the required
+input files to perform the <em>mature</em> annotation.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>From the <em>seed</em> sequences from <code class="docutils literal notranslate"><span class="pre">Rfam</span></code> v.12.2 and additionally the sequences from <code class="docutils literal notranslate"><span class="pre">Rfam</span></code> and <code class="docutils literal notranslate"><span class="pre">miRBase</span></code> that reported <em>mature</em> sequences.</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 </div>
 
 
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">miRNAture</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">miRNAture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html#indices-and-tables">Indices and tables</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#annotating-some-coelacanth-mirnas">Annotating (some) coelacanth miRNAs</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html#contact">Contact</a></li>
-<li class="toctree-l1"><a class="reference internal" href="help.html">Need Help</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="includeme.html">miRNAture</a><ul>
-      <li>Previous: <a href="includeme.html" title="previous chapter">miRNAture</a></li>
-      <li>Next: <a href="license.html" title="next chapter">License</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="index.html"
+       title="previous chapter">← miRNAture</a>
+  </li>
+  <li class="next">
+    <a href="license.html"
+       title="next chapter">License →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2021, miRNAture.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.0 with <a href="https://github.com/romnnn/sphinx_press_theme">Press Theme</a>.
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+            </div>
+          </div>
+      </page>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Cristian A. Velandia Huerto.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/tutorial.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
     
-
     
   </body>
 </html>
