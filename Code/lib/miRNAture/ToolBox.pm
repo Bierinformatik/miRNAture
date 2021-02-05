@@ -6,7 +6,12 @@ use Exporter;
 
 use Moose::Role; 
 use File::Copy; 
-use Bio::DB::Fasta;
+#use Bio::DB::Fasta;
+BEGIN {
+	local $SIG{__WARN__} = sub {};
+	require Bio::DB::Fasta;
+	Bio::DB::->import();
+}
 use Bio::Seq;
 use Bio::SeqIO;
 use RNA;
@@ -355,7 +360,7 @@ sub getSequencesFasta {
 	my $dbCHR;
 	# Look if exists index
 	if (!-e $genome || -z $genome){
-		$dbCHR = Bio::DB::Fasta->new($genome, reindex=>1);
+		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
 	} else {
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
 	}
@@ -584,7 +589,7 @@ sub getSequencesFasta_final {
 	my $dbCHR;
 	# Look if exists index
 	if (!-e $genome || -z $genome){
-		$dbCHR = Bio::DB::Fasta->new($genome, reindex=>1);
+		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
 	} else {
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
 	}

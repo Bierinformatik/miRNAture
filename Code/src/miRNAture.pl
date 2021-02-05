@@ -12,7 +12,6 @@ use strict;
 use warnings;
 use Data::Dumper;
 use POSIX qw(strftime);
-use Bio::Index::Fasta;
 use Getopt::Long qw(HelpMessage GetOptionsFromArray);
 use Pod::Usage;
 use Cwd qw(getcwd realpath);
