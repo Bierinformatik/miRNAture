@@ -1,4 +1,4 @@
-package Main::miRNAture;
+package Bio::miRNAture;
 
 use v5.26.2;
 use strict;
