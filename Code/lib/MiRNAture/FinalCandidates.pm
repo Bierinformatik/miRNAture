@@ -1,4 +1,4 @@
-package miRNAture::FinalCandidates;
+package MiRNAture::FinalCandidates;
 
 use Moose;
 use MooseX::Types::Path::Class;
@@ -86,10 +86,10 @@ has 'repetition_rules' => (
     default => 'default,200,100',
 );
 
-with 'miRNAture::ToolBox'; #Import set of subroutines
-with 'miRNAture::Merging';
-with 'miRNAture::Evaluate';
-with 'miRNAture::Cleaner';
+with 'MiRNAture::ToolBox'; #Import set of subroutines
+with 'MiRNAture::Merging';
+with 'MiRNAture::Evaluate';
+with 'MiRNAture::Cleaner';
 
 sub create_folders_final {
 	my $shift = shift;

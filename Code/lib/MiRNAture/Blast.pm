@@ -1,4 +1,4 @@
-package miRNAture::Blast;
+package MiRNAture::Blast;
 use Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(index_query_genome detect_blast_queries);
@@ -6,7 +6,7 @@ use Exporter;
 use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
-use miRNAture::ToolBox;
+use MiRNAture::ToolBox;
 
 has 'blast_str' => (
 	is => 'ro',
@@ -47,8 +47,8 @@ has 'makeblast_program_path' => (
 	coerce => 1,
 );
 
-with 'miRNAture::ToolBox'; 
-with 'miRNAture::BlastPrepareQueries'; 
+with 'MiRNAture::ToolBox'; 
+with 'MiRNAture::BlastPrepareQueries'; 
 
 sub create_folders_blast {
 	my $shift = shift;

@@ -1,4 +1,4 @@
-package miRNAnchor::Main;
+package MiRNAnchor::Main;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -63,7 +63,7 @@ has 'tag_spe_query' => (
 	required => 1,
 );
 
-with 'miRNAnchor::Tools';
+with 'MiRNAnchor::Tools';
 
 sub recognize_families_homology {
 	my $shift = shift;

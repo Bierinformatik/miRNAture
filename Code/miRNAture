@@ -1,16 +1,8 @@
 #!/usr/bin/env perl
 
-#######################
-## Cristian A. Velandia
-# miRNAture
-# Sun 15 Mar 2020 12:55:22 PM CET
-# run as:
-# ./miRNAture <parameters>
-#####################
-
 use strict;
 use warnings;
-use Data::Dumper;
+
 use POSIX qw(strftime);
 use Getopt::Long qw(HelpMessage GetOptionsFromArray);
 use Pod::Usage;
@@ -24,7 +16,7 @@ use Mir::miRNAture;
 use Mir::miRNAnchor;
 use Mir::Eval;
 use Mir::Summarise;
-use miRNAnchor::Tools;
+use MiRNAnchor::Tools;
 
 ### Input data
 my $mode = ""; #run mode

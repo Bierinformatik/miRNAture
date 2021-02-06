@@ -1,4 +1,4 @@
-package miRNAture::Merging;
+package MiRNAture::Merging;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -6,7 +6,7 @@ use Exporter;
 use Moose::Role;
 use Data::Dumper;
 use File::Basename;
-use miRNAture::ToolBox;
+use MiRNAture::ToolBox;
 use List::Util 'first';
 use Math::BigFloat;
 
@@ -16,7 +16,7 @@ my ($new_coord, $new_coord_bad);
 my ($MODE, $tto);
 my ($NAMES, $LEN, $OUT, $SPECIAL,$IN);
 
-with 'miRNAture::Evaluate';
+with 'MiRNAture::Evaluate';
 
 sub load_database_query {
 	my ($folder, $pattern, $specie) = @_;

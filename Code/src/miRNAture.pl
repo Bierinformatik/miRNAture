@@ -1,16 +1,7 @@
 #!/usr/bin/env perl
 
-#######################
-## Cristian A. Velandia
-# miRNAture
-# Fri Nov  8 11:17:31 CET 2019
-# run as:
-# ./miRNAture.pl --cmlist <CMLIST> --mode <MODE> --specie <SPE> --workdir <WORKDIR>
-#####################
-
 use strict;
 use warnings;
-use Data::Dumper;
 use POSIX qw(strftime);
 use Getopt::Long qw(HelpMessage GetOptionsFromArray);
 use Pod::Usage;
@@ -19,18 +10,18 @@ use YAML::Tiny;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
-use miRNAture::Evaluate; #Evaluation CMsearch
-use miRNAture::ConfigFile; #Analyse configuration file class
-use miRNAture::Blast;
-use miRNAture::_BlastSearch;
-use miRNAture::BlastPrepareQueries;
-use miRNAture::HMMsearch; #HMM subroutine library
-use miRNAture::ToolBox;
-use miRNAture::HMM;
-use miRNAture::CM;
-use miRNAture::Others;
-use miRNAture::FinalCandidates;
-use miRNAture::LogFile;
+use MiRNAture::Evaluate; #Evaluation CMsearch
+use MiRNAture::ConfigFile; #Analyse configuration file class
+use MiRNAture::Blast;
+use MiRNAture::_BlastSearch;
+use MiRNAture::BlastPrepareQueries;
+use MiRNAture::HMMsearch; #HMM subroutine library
+use MiRNAture::ToolBox;
+use MiRNAture::HMM;
+use MiRNAture::CM;
+use MiRNAture::Others;
+use MiRNAture::FinalCandidates;
+use MiRNAture::LogFile;
 
 ### Input data
 my $nameC = ""; #cmlist file
@@ -91,7 +82,7 @@ print_process("Processing: $name\t$name_specie");
 my $input_line = join " ", @original_ARGV; 
 
 ##Create Configuration and Log File
-my $configuration_file = miRNAture::ConfigFile->new(
+my $configuration_file = MiRNAture::ConfigFile->new(
     tag => $tag, 
     list_file => $nameC,
     data_folder => $data_folder,
@@ -99,7 +90,7 @@ my $configuration_file = miRNAture::ConfigFile->new(
 $configuration_file->include_running_mode($mode);
 %genomes = $configuration_file->read_genomes_paths();
 
-my $log_file = miRNAture::LogFile->new(
+my $log_file = MiRNAture::LogFile->new(
     log_file_input => "$work_folder/LOGs/miRNAture_homology_log_${specie}_${mode}_$tag.log",
     command_line => $input_line,		
 );
@@ -157,7 +148,7 @@ if (exists $genomes{$specie}){
         for (my $i = 0; $i<=$#strategy; $i++){
             print_process("Running on strategy $strategy[$i]");
             my $start_blast_str = time;
-            my $blast_experiment = miRNAture::_BlastSearch->new(
+            my $blast_experiment = MiRNAture::_BlastSearch->new(
                 blast_str => $strategy[$i],
                 output_folder => "$work_folder/Blast",
                 query_folder => $blastQueriesFolder,
@@ -195,7 +186,7 @@ if (exists $genomes{$specie}){
         while (<$LIST>){ #In this case, list is the CM names
             chomp;
             #print_process("Running on $specie\t$_");
-            my $hmm_experiment = miRNAture::HMM->new(
+            my $hmm_experiment = MiRNAture::HMM->new(
                 hmm_model => $_,	
                 genome_subject => $genomes{$specie},
                 subject_specie => $specie,
@@ -223,7 +214,7 @@ if (exists $genomes{$specie}){
             chomp;
             next if $_ !~ /^RF/;
             #print_process("Running on $specie\t$_");
-            my $cm_experiment = miRNAture::CM->new(
+            my $cm_experiment = MiRNAture::CM->new(
                 cm_model => $_,
                 genome_subject => $genomes{$specie},
                 subject_specie => $specie,
@@ -248,7 +239,7 @@ if (exists $genomes{$specie}){
         while (<$LIST>){ #In this case, list is the CM names
             chomp;
             next if $_ =~ /^RF/;
-            my $other_experiment = miRNAture::Others->new(
+            my $other_experiment = MiRNAture::Others->new(
                 cm_model => $_,
                 genome_subject => $genomes{$specie},
                 subject_specie => $specie,
@@ -303,7 +294,7 @@ if ($configuration_file->mode eq "Final"){
         # Refill hashes with both score files
         ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
     }
-    my $final_candidates = miRNAture::FinalCandidates->new(
+    my $final_candidates = MiRNAture::FinalCandidates->new(
         blast_results => $blast_output,
         hmm_results => $hmm_output,
         infernal_results => $infernal_output,

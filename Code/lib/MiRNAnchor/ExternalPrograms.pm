@@ -1,4 +1,4 @@
-package miRNAnchor::ExternalPrograms;
+package MiRNAnchor::ExternalPrograms;
 
 use Exporter;
 @ISA = qw(Exporter);

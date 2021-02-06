@@ -1,10 +1,10 @@
-package miRNAture::HMM;
+package MiRNAture::HMM;
 
 use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
 
-with 'miRNAture::HMMsearch';
+with 'MiRNAture::HMMsearch';
 
 has 'hmm_model' => (
 	is => 'ro',
@@ -77,8 +77,8 @@ has 'cmsearch_program_path' => (
 	required => 1,
 );
 
-with 'miRNAture::ToolBox'; 
-with 'miRNAture::Cleaner';
+with 'MiRNAture::ToolBox'; 
+with 'MiRNAture::Cleaner';
 
 sub create_folders_hmm {
 	my ($shift, $work_folder) = @_;

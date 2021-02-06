@@ -1,4 +1,4 @@
-package miRNAture::LogFile;
+package MiRNAture::LogFile;
 
 use Exporter;
 @ISA = qw(Exporter);

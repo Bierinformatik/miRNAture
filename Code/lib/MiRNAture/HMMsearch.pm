@@ -1,14 +1,14 @@
-package miRNAture::HMMsearch;
+package MiRNAture::HMMsearch;
 
 use Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(searchHomologyHMM cmsearch_specific_sequence define_final_CMs runNhmmer obtainTrueCandidates update_coordinates_to_genome check_format_input_header);
 use Moose::Role;
 use Data::Dumper;
-use miRNAture::ToolBox;
-with 'miRNAture::Merging';
-with 'miRNAture::ToolBox';
-with 'miRNAture::Evaluate';
+use MiRNAture::ToolBox;
+with 'MiRNAture::Merging';
+with 'MiRNAture::ToolBox';
+with 'MiRNAture::Evaluate';
 
 my %len;
 

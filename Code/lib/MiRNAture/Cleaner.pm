@@ -1,4 +1,4 @@
-package miRNAture::Cleaner;
+package MiRNAture::Cleaner;
 
 use Moose::Role;
 use Data::Dumper;

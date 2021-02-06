@@ -1,4 +1,4 @@
-package miRNAnchor::Validate;
+package MiRNAnchor::Validate;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -8,9 +8,9 @@ use Moose::Role;
 use Data::Dumper;
 use File::Copy;
 use JSON;
-use miRNAnchor::Check;
+use MiRNAnchor::Check;
 
-with 'miRNAnchor::Tools';
+with 'MiRNAnchor::Tools';
 
 sub process_query_fasta_specific {
 	my ($fasta_query_path, $family, $working_path, $tag) = @_;

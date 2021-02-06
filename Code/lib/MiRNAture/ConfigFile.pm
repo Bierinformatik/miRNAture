@@ -1,4 +1,4 @@
-package miRNAture::ConfigFile;
+package MiRNAture::ConfigFile;
 
 use Moose;
 use MooseX::Types::Path::Class;

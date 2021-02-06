@@ -1,8 +1,8 @@
-package miRNAture::BlastPrepareQueries;
+package MiRNAture::BlastPrepareQueries;
 
 use Moose::Role;
 use Bio::SeqIO;
-with 'miRNAture::ToolBox'; #Import set of subroutines
+with 'MiRNAture::ToolBox'; #Import set of subroutines
 
 =head1 detect_blast_queries
 	Title: detect_blast_queries

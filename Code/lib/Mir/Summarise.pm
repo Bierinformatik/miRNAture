@@ -6,11 +6,11 @@ use YAML::Tiny;
 use Data::Dumper;
 use Term::ANSIColor;
 use File::Copy;
-use lib "lib/miRNAture";
+use lib "lib/MiRNAture";
 use lib 'src/Statistics-R-0.34/lib';
 use Statistics::R;
 
-with 'miRNAture::ToolBox';
+with 'MiRNAture::ToolBox';
 
 has 'all_parameters' => (
 	is => 'ro',

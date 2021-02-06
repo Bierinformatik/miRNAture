@@ -3,11 +3,10 @@ package Mir::ConfigurationFile;
 use Moose;
 use MooseX::Types::Path::Class;
 use YAML::Tiny;
-use Data::Dumper;
 use Bio::SeqIO;
-use lib "lib/miRNAture";
+use lib "lib/MiRNAture";
 
-with 'miRNAture::ToolBox';
+with 'MiRNAture::ToolBox';
 
 has 'stage' => (
 	is => 'ro',

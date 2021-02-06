@@ -1,4 +1,4 @@
-package miRNAture::_BlastSearch_BlockDetection;
+package MiRNAture::_BlastSearch_BlockDetection;
 
 use Moose::Role;
 use Data::Dumper;

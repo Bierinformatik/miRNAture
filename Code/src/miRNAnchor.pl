@@ -1,27 +1,19 @@
 #!/usr/bin/env perl
 
-#######################
-## Cristian A. Velandia
-# miRNAnchor
-# Fri 06 Mar 2020 04:16:20 PM CET
-# run as:
-# ./miRNAnchor.pl -c $workingpath -m $mirfix_path -o $results -e $pre_calculated_data -p 0
-#####################
-
 use strict;
 use warnings;
-use Data::Dumper;
+
 use Getopt::Long 'HelpMessage';
 use Pod::Usage;
 use Cwd qw(getcwd);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
-use miRNAnchor::Main;
-use miRNAnchor::Tools;
-use miRNAnchor::Validate;
-use miRNAnchor::Check;
-use miRNAnchor::Classify;
+use MiRNAnchor::Main;
+use MiRNAnchor::Tools;
+use MiRNAnchor::Validate;
+use MiRNAnchor::Check;
+use MiRNAnchor::Classify;
 
 ### Input data
 my $miRNA_fasta_path = ""; #Path of fasta sequences from candidates grouped by RFAM family
@@ -54,7 +46,7 @@ GetOptions (
     man => \$man,
 ) or pod2usage(2);
 
-my $start_config = miRNAnchor::Main->new (
+my $start_config = MiRNAnchor::Main->new (
     current_dir => $current_dir,
     fasta_sequences => $miRNA_fasta_path,
     mirfix_path => $MIRFIX_path,
@@ -182,7 +174,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
     }
     %all = ();
     ##### Checkup 
-    my $family_check = miRNAnchor::Check->new(
+    my $family_check = MiRNAnchor::Check->new(
         final_miRNA_database => $final_miRNA_table,
         source_miRNAs_fasta => $miRNA_fasta_path,
         output_folder => $working_path."/".$address."/".$start_config->tag_spe_query."/".$rfam_defined_models,
@@ -200,7 +192,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
     $family_check->concatenate_results("$working_path/$address", $start_config->tag_spe_query); #all_accepted/all_discarded
 }
 
-my $classification = miRNAnchor::Classify->new(
+my $classification = MiRNAnchor::Classify->new(
     database_mirnas => $final_miRNA_table,
     output_folder => $working_path."/".$address."/".$start_config->tag_spe_query,
     current_dir => $current_dir,

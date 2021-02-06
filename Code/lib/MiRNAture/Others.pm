@@ -1,13 +1,13 @@
-package miRNAture::CM;
+package MiRNAture::Others;
 
 use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
 
-with 'miRNAture::CMsearch';
-with 'miRNAture::ToolBox';
-with 'miRNAture::Evaluate';
-with 'miRNAture::Cleaner';
+with 'MiRNAture::Othersearch';
+with 'MiRNAture::ToolBox';
+with 'MiRNAture::Evaluate';
+with 'MiRNAture::Cleaner';
 
 has 'cm_model' => (
 	is => 'ro',
@@ -36,8 +36,9 @@ has 'output_folder' => (
 
 has 'path_covariance' => (
 	is => 'ro',
-	isa => 'ArrayRef[Str]',
+	isa => 'Path::Class::Dir',	
 	required => 1,
+	coerce => 1,
 );
 
 has 'bitscores_CM' => (
@@ -67,17 +68,19 @@ has 'cmsearch_program_path' => (
 	coerce => 1,
 );
 
-sub create_folders_cm {
+sub create_folders_other {
 	my $shift = shift;
 	create_folders($shift->output_folder->stringify, "");
-	create_folders($shift->output_folder->stringify, $shift->subject_specie); #Create Final Folder
-	create_folders($shift->output_folder->stringify."/".$shift->subject_specie, "Final"); #Create Final Folder
+	create_folders($shift->output_folder->stringify, $shift->subject_specie);
+	create_folders($shift->output_folder->stringify."/".$shift->subject_specie, "Final");
 	return;
 }
 
-sub search_homology_CM {
-	my ($shift, $zscore, $minBitscore) = @_;
-	searchCMhomology($shift, $zscore,$minBitscore);
+sub search_homology_other {
+	my $shift = shift;
+	my $zscore = shift;
+	my $minBitscore = shift;
+	searchOthershomology($shift, $zscore, $minBitscore);
 	return;
 }	
 

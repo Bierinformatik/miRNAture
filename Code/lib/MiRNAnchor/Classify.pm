@@ -1,4 +1,4 @@
-package miRNAnchor::Classify;
+package MiRNAnchor::Classify;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -11,9 +11,9 @@ use RNA;
 use File::Copy;
 use Bio::AlignIO;
 use Bio::SimpleAlign;
-use miRNAnchor::Check;
+use MiRNAnchor::Check;
 
-with 'miRNAnchor::Tools';
+with 'MiRNAnchor::Tools';
 
 has 'database_mirnas' => (
 	is => 'rw',

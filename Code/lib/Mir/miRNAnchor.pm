@@ -5,9 +5,9 @@ use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Data::Dumper;
 use Term::ANSIColor;
-use lib "lib/miRNAture";
+use lib "lib/MiRNAture";
 
-with 'miRNAture::ToolBox';
+with 'MiRNAture::ToolBox';
 
 has 'all_parameters' => (
     is => 'ro',

@@ -1,4 +1,4 @@
-package miRNAnchor::Check;
+package MiRNAnchor::Check;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -12,7 +12,7 @@ use Bio::Tools::Run::StandAloneBlast;
 
 my %mappedCoordinates; #Mapped coordinates back to genome
 
-with 'miRNAnchor::Tools';
+with 'MiRNAnchor::Tools';
 
 has 'source_miRNAs_fasta' => (
 	is => 'ro',
@@ -161,10 +161,10 @@ sub check_candidate {
 
 sub validate_secondary_structure_alignment {
 	my ($sto, $current_dir, $positionsBest) = @_;
-	my $result = system("$current_dir/lib/miRNAnchor/evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
+	my $result = system("$current_dir/lib/MiRNAnchor/evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
 	my $evaluation_result;
 	if ($result == 0){ #Success!
-		$evaluation_result = `$current_dir/lib/miRNAnchor/evaluate_conserved_str.py $sto $positionsBest 2>&1`;
+		$evaluation_result = `$current_dir/lib/MiRNAnchor/evaluate_conserved_str.py $sto $positionsBest 2>&1`;
 		chomp $evaluation_result;
 	} else { #Failed to read the file, didn't generated
 		$evaluation_result = "NA";

@@ -1,4 +1,4 @@
-package miRNAture::ToolBox;
+package MiRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -15,12 +15,12 @@ BEGIN {
 use Bio::Seq;
 use Bio::SeqIO;
 use RNA;
-use miRNAture::ValidationCM;
+use MiRNAture::ValidationCM;
 use Data::Dumper;
 use Term::ANSIColor qw(:constants); 
 use YAML::Tiny;
 
-with 'miRNAture::Evaluate'; #Load tool subroutines
+with 'MiRNAture::Evaluate'; #Load tool subroutines
 
 =head1 evaluate_input_flags 
     Title: evaluate_input_flags 
@@ -951,7 +951,7 @@ sub infer_data_from_cm {
 		if ($acc eq "NA"){
 			$acc = $name;
 		}
-		my $inferred_scores_cm = miRNAture::ValidationCM->new(
+		my $inferred_scores_cm = MiRNAture::ValidationCM->new(
 			name_model => $name,
 			length_model => $length,
 			acc_model => $acc,

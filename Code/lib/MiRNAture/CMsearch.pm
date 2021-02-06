@@ -1,10 +1,10 @@
-package miRNAture::CMsearch;
+package MiRNAture::CMsearch;
 
 use Moose::Role;
 use Data::Dumper;
-with 'miRNAture::CMsearch';
-with 'miRNAture::ToolBox';
-with 'miRNAture::Evaluate';
+with 'MiRNAture::CMsearch';
+with 'MiRNAture::ToolBox';
+with 'MiRNAture::Evaluate';
 
 sub searchCMhomology {
 	my ($shift, $zscore,$minBitscore) = @_;

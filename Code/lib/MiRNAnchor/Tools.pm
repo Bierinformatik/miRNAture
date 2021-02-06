@@ -1,4 +1,4 @@
-package miRNAnchor::Tools;
+package MiRNAnchor::Tools;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -9,7 +9,7 @@ use Data::Dumper;
 use File::Copy;
 use File::Copy::Recursive qw(dircopy);
 use Term::ANSIColor qw(:constants); 
-use miRNAnchor::ExternalPrograms;
+use MiRNAnchor::ExternalPrograms;
 
 =head1 check_folder_files 
 	Title: check_folder_files
@@ -226,7 +226,7 @@ sub setup_all_to_run_mirfix_group {
 		print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
 	}
 	##Parameters constructor
-	my $param_mirfix = miRNAnchor::ExternalPrograms->new(
+	my $param_mirfix = MiRNAnchor::ExternalPrograms->new(
 		cores => "20",
 		output_path => "$location/Output/",
 		families_path => "$location/Families/",
@@ -278,7 +278,7 @@ sub setup_all_to_run_mirfix_group_subset {
 		#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
 	}
 	##Parameters constructor
-	my $param_mirfix = miRNAnchor::ExternalPrograms->new(
+	my $param_mirfix = MiRNAnchor::ExternalPrograms->new(
 		cores => "20",
 		output_path => "$location/Output/",
 		families_path => "$location/Families/",

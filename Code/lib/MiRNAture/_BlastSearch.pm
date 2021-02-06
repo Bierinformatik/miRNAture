@@ -1,10 +1,10 @@
-package miRNAture::_BlastSearch;
+package MiRNAture::_BlastSearch;
 
 use Moose;
 use Data::Dumper;
 use List::MoreUtils;
-use miRNAture::_BlastSearch_ResolveBlastMergings;
-with 'miRNAture::HMMsearch';
+use MiRNAture::_BlastSearch_ResolveBlastMergings;
+with 'MiRNAture::HMMsearch';
 
 has 'blast_str' => (
 	is => 'ro',
@@ -121,11 +121,11 @@ has 'makeblast_program_path' => (
 	coerce => 1
 );
 
-with 'miRNAture::ToolBox'; 
-with 'miRNAture::BlastPrepareQueries';
-with 'miRNAture::_BlastSearch_ResolveBlastMergings';
-with 'miRNAture::_BlastSearch_BlockDetection';
-with 'miRNAture::Cleaner';
+with 'MiRNAture::ToolBox'; 
+with 'MiRNAture::BlastPrepareQueries';
+with 'MiRNAture::_BlastSearch_ResolveBlastMergings';
+with 'MiRNAture::_BlastSearch_BlockDetection';
+with 'MiRNAture::Cleaner';
 
 sub searchHomologySequenceBlast {
 	my $shift = shift;
@@ -161,7 +161,7 @@ sub searchHomologySequenceBlast {
 sub searchHomologyBlast {
 	my ($shift, $molecules, $query_species, $families, $files_relation, $Zscore, $minBitscore) = @_;
 	my @id_running; # Save the id of running infernal processes
-	my $result_blast_experiment = miRNAture::_BlastSearch->new(
+	my $result_blast_experiment = MiRNAture::_BlastSearch->new(
 		blast_str => $shift->blast_str, 
 		output_folder => $shift->output_folder,
 		query_folder => $shift->query_folder,

@@ -1,4 +1,4 @@
-package miRNAture::Evaluate;
+package MiRNAture::Evaluate;
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -8,7 +8,7 @@ use Moose::Role; #Set of common tools that miRNAture uses
 use Data::Dumper;
 use File::Basename;
 use List::Util 'first';
-with 'miRNAture::ToolBox';
+with 'MiRNAture::ToolBox';
 
 my $DIR;
 my (%names_r, %names_r_inverse, %bitscores, %lengs, %families_names, %len_other);

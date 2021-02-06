@@ -1,4 +1,4 @@
-package miRNAture::_BlastSearch_ResolveBlastMergings;
+package MiRNAture::_BlastSearch_ResolveBlastMergings;
 
 use Moose::Role;
 use Data::Dumper;

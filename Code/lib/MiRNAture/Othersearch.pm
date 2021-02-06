@@ -1,9 +1,9 @@
-package miRNAture::Othersearch;
+package MiRNAture::Othersearch;
 
 use Moose::Role;
 use Data::Dumper;
 
-with 'miRNAture::ToolBox';
+with 'MiRNAture::ToolBox';
 
 sub searchOthershomology {
 	my $shift = shift;
