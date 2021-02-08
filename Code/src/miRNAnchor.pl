@@ -60,7 +60,7 @@ my $start_config = MiRNAnchor::Main->new (
     tag_spe_query => $tag_specie
 );
 
-my $db_models_relation = load_correspondence_models_rfam($current_dir, $user_data); #Load databases correspondence to do validation.
+my $db_models_relation = load_correspondence_models_rfam("$RFAM_mirbase_source/../", $user_data); #Load databases correspondence to do validation.
 $start_config->check_existence_folder_output;
 my $genomes_file = $start_config->get_genome_validation_list;
 $start_config->recognize_families_homology($db_models_relation); #Include in final files the annotation family
