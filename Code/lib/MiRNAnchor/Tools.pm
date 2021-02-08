@@ -413,6 +413,7 @@ sub print_process {
 
 sub load_correspondence_models_rfam {
 	my $base_path = shift;
+	my $user_path = shift;
 	my $models_file = "$base_path/Data/mirbase_rfam_correspondence.txt";
 	open my $IN, "< $models_file" or die "The file ~/miRNAture/Code/Data/mirbase_rfamv14-3_correspondence.txt is required to perform annotation of mature's.\n";
 	# <RFAM_ACC> <MIRBASE_ACC_FAMILY>
@@ -427,19 +428,17 @@ sub load_correspondence_models_rfam {
 		#push @{$db{$all[-1]}}, $all[-1]; #miRBase->miRBase
 	}
 	close $IN;
-	## Here, the user modify the relation between CM models and the precalculated data
-	# that will annotate the mature sequences.
-	if (-e "$base_path/Data/user_correspondence_families.txt" && !-z "$base_path/Data/user_correspondence_families.txt"){
-		open my $IN2, "< $base_path/Data/user_correspondence_families.txt" or die "The file ~/miRNAture/Code/Data/user_correspondence_families.txt was broken.\n";
-		while (<$IN2>){
-			chomp;
-			my @all = split /\s+|\t/, $_;
-			$db{$all[0]} = $all[-1];
-			#TODO: Multiple families
-			#push @{$db{$all[0]}}, $all[-1];
-		}
-		close $IN2;
-	}
+	if (length $user_path !~ /^NO$/){
+		if (-e "$user_path/user_correspondence_families.txt" && !-z "$user_path/user_correspondence_families.txt"){
+			open my $IN3, "< $user_path/user_correspondence_families.txt" or die "The file $user_path/user_correspondence_families.txt is broken, please create it\n<ModelACC> <miRBase_ACC>\n\n";
+			while (<$IN3>){
+			       	chomp;
+			       	my @all = split /\s+|\t/, $_;
+			       	$db{$all[0]} = $all[-1];
+		       	}
+		       	close $IN3;
+	       	}
+       	}
 	return \%db;
 }
 

@@ -36,9 +36,8 @@ has 'output_folder' => (
 
 has 'path_covariance' => (
 	is => 'ro',
-	isa => 'Path::Class::Dir',	
+	isa => 'ArrayRef[Str]',
 	required => 1,
-	coerce => 1,
 );
 
 has 'bitscores_CM' => (

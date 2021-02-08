@@ -127,6 +127,18 @@ has 'parallel' => (
 	required => 1
 );
 
+has 'user_folder' => (
+    is => 'ro',
+    isa => 'Maybe[Str|Path::Class::File]',
+    required => 0,
+    lazy => 1,
+    default => sub {
+        my $shift = shift;
+        return;
+        },
+    trigger => \&_folder_set,
+);
+
 has 'model_list' => (
     is => 'ro',
     isa => 'Maybe[Str|Path::Class::File]',
@@ -145,6 +157,19 @@ has 'repetition_rules' => (
 	required => 1,
     	default => 'default,200,100',
 );
+
+sub _folder_set {
+    my ($self) = @_;
+    if (!$self->user_folder){
+	    return;
+    }
+    if (length $self->mirfix_path > 0){
+        $self->{user_folder} = $self->user_folder;
+    } else {
+        ; 
+    }
+    return;
+}
 
 sub _path_set {
     my ($self) = @_;
@@ -344,6 +369,10 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Other_CM_folder"} = $shift->current_folder->stringify."/Data/Other_CM";
 	$yaml->[3]->{Default_folders}{"Other_HMM_folder"} = $shift->current_folder->stringify."/Data/Other_HMM";
 	$yaml->[3]->{Default_folders}{"HMM_folder"} = $shift->current_folder->stringify."/Data/RFAM_14-4/HMMs"; #Modified Lach
+	$yaml->[3]->{Default_folders}{"User_folder"} = $shift->user_folder;
+	$yaml->[3]->{Default_folders}{"User_CM_folder"} = $shift->user_folder."/CMs";
+	$yaml->[3]->{Default_folders}{"User_HMM_folder"} = $shift->user_folder."/HMMs";
+
 	$yaml->[3]->{Default_folders}{"Basic_files_miRNAture"} = $shift->current_folder->stringify."/Data/Basic_files";
 	$yaml->[3]->{Default_folders}{"List_cm_miRNAs"} = $shift->model_list; 
 	$yaml->[3]->{Default_folders}{"Blast_queries"} = $shift->blast_queries_path->stringify;

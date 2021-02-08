@@ -18,7 +18,7 @@ sub searchHomologyHMM {
 		create_folders($outHMM,$specie);#Create folder specific to specie
 	}
 	runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
-	my @result_files = check_folder_files("$outHMM/$specie", "tab");
+	my @result_files = check_folder_files("$outHMM/$specie", "\.tab");
 	my $new_out = "$outHMM/$specie";
 	obtainTrueCandidates($specie, $new_out, $hmm);
 	if (!-e "$outHMM/$specie/$specie.$hmm.tab.true.table" || -z "$outHMM/$specie/$specie.$hmm.tab.true.table"){
@@ -107,7 +107,10 @@ sub runNhmmer {
 sub obtainTrueCandidates {
 	my ($specie, $out_path, $hmm_query) = @_;
 	my $threshold_hmm = 0.01;
-	open my $IN, "< $out_path/$specie.$hmm_query.tab" or die;
+	if (!-e "$out_path/$specie.$hmm_query.tab"){
+		return;
+	}
+	open my $IN, "< $out_path/$specie.$hmm_query.tab";
 	open my $OUTTTRUE, "> $out_path/$specie.$hmm_query.tab.true.table" or die;
 	open my $OUTFALSE, "> $out_path/$specie.$hmm_query.tab.false.table" or die;
 	while (<$IN>){

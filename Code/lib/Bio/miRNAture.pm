@@ -73,6 +73,10 @@ Experiment tag. Will help to identify the generated files along miRNA output fil
 
 Target list of CMs to be searched on subject genome/sequences. If not indicated, miRNAture will run all RFAM v14.4 metazoan miRNA models.
 
+=item -usrM <PATH>
+
+Directory with additional hidden markov (HMMs) or covariance models (CMs) provided by the user.
+
 =item -w <OUT_PATH>
 
 Working directory path to write all miRNAture results.
