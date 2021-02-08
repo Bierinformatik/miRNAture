@@ -208,7 +208,6 @@ Setup number of maximum loci number that will be evaluated by the mature's annot
 
 This flag is blast mode specific. It corresponds to blast strategies that would be used to search miRNAs. It must be indicated along with -m I<Blast> flag. 
 
-
 =item -stage <'homology','validation','evaluation','summarise','complete'>
 
 Selects the stage to be run on miRNAture. The options are: 'homology', 'validation', 'evaluation', 'summarise' or 'complete'.
@@ -228,6 +227,10 @@ Experiment tag. Will help to identify the generated files along miRNA output fil
 =item -sublist <FILE_WITH_CM_NAMES>
 
 Target list of CMs to be searched on subject genome/sequences. If not indicated, miRNAture will run all RFAM v14.4 metazoan miRNA models.
+
+=item -usrM <PATH>
+
+Directory with additional hidden markov (HMMs) or covariance models (CMs) provided by the user.
 
 =item -w <OUT_PATH>
 

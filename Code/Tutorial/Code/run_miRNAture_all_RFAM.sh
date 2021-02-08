@@ -24,4 +24,4 @@ cd $current/../../../Code/
 #miRNAture -stage summarise -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0
 
 # Run miRNAture complete
-./miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100 #-usrM $user_models
+./miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100 -usrM $user_models
