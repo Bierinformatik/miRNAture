@@ -32,6 +32,7 @@ my $current_path = getcwd;
 my $stagesRun = "";
 my $mirfix_path = "";
 my $path_blast_queries = "";
+my $user_folder = "";
 my $help;
 my $man;
 my %opts;
@@ -48,6 +49,7 @@ GetOptions (
 	'blastQueriesFolder|blstq=s' => \$path_blast_queries,
 	'stage|stg=s' => \$stagesRun,
 	'repetition_cutoff|rep=s' => \$rep_cutoff,
+	'user_models|usrM=s' => \$user_folder,
 	'help|h' => \$help,
 	 man => \$man,
 	'parallel|pe=i' => \$parallel_run,
@@ -74,6 +76,7 @@ my $config_file = Mir::ConfigurationFile->new (
 	repetition_rules => $rep_cutoff,
 	blast_strategy => \@strategy,
 	blast_queries_path => $path_blast_queries,
+	user_folder => $user_folder,
 	parallel => $parallel_run
 );
 $config_file->start;

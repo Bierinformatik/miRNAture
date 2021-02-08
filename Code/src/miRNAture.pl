@@ -39,13 +39,13 @@ my $rep_cutoff = ""; # Homology cutoff to speed-up the searches
 
 my $help = 0; 
 my $man = 0;
-my $cm_model_others = ""; #Possible path to new CMs != from RFAM ones
+my @cm_model_others = ""; #Possible path to new CMs != from RFAM ones
 my @original_ARGV = @ARGV;
 my @strategy;
 GetOptions (
     'cmlist|l=s' => \$nameC,
-    'cmpath|cmp=s{2}' => \@path_cm,
-    'hmmpath|hmmp=s{2}' => \@path_hmm,
+    'cmpath|cmp=s{3}' => \@path_cm,
+    'hmmpath|hmmp=s{3}' => \@path_hmm,
     'mode|m=s' => \$mode,
     'specie|spe=s' => \$specie,
     'specie_name|n_spe=s' => \$name_specie,
@@ -57,7 +57,7 @@ GetOptions (
     'blast_queries|blstq=s' => \$blastQueriesFolder,
     'data_folder|data=s' => \$data_folder,
     'parallel|pe=i' => \$parallel_run,
-    'new_models|nmodels=s' => \$cm_model_others,
+    'new_models|nmodels=s{2}' => \@cm_model_others,
 ) or pod2usage(2);
 @strategy = split (/,/, join(',',@strategy));
 #pod2usage(1) if $help;
@@ -111,22 +111,30 @@ my ($blast_output, $hmm_output, $infernal_output, $other_output);
 ##Load basic databases
 my $basicFiles = "$data_folder/Basic_files";
 my ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names);
-if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs.
-    if (!-e "$basicFiles/all_other_scores.txt" || -z "$basicFiles/all_other_scores.txt"){
-        infer_data_from_cm($cm_model_others, $basicFiles); #Here miRNAture generates the score's file: all_Other_scores.txt in the new CM folder.
+my $user_data_path = $configuration_mirnature->[3]->{Default_folders}{"User_folder"};
+
+# Infer user scores
+if (length $user_data_path > 0){ #If path defined check that exists scores file
+       	if (!-e "$user_data_path/all_user_scores.txt" || -z "$user_data_path/all_user_scores.txt"){ #Don't exist, infer
+	       	print_process("Inferring scores from your miRNA CMs");
+	       	infer_data_from_cm("$user_data_path/CMs", $user_data_path, "all_user_scores.txt"); #Here miRNAture generates the score's file: all_Other_scores.txt in the new CM folder.
+      	}
+}
+
+if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs and mirbase.
+    if (length $user_data_path > 0){ #If path defined check that exists scores file
+	    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, $user_data_path);
+    } else { #Only with miRNAture models
+	    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("mirbase", $basicFiles, $user_data_path); 
     }
-    #if (!-e "$data_folder/new_cm.list" || -z "$data_folder/new_cm.list"){ ###The user should provide list of CMs, or in another case, it would be inferred from cm_folder.
-    if (!$nameC){ #Check list file is empty, then infer from CM
-        infer_list_from_cm($cm_model_others, $data_folder);
-        $nameC = "$data_folder/new_cm.list";
-    } else {
-        ;#$nameC = "$data_folder/new_cm.list";
-    }
-    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
 } elsif ($mode =~ m/Infernal/) { #Here get all the scores from RFAM database
-    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
-} else { #Here get all the scores from RFAM database
-    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
+    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, $user_data_path); 
+} else { #Here get all the scores from RFAM
+	if (length $user_data_path > 0){ #If path defined check that exists scores file
+		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 
+	} else {
+		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("JoinedN", $basicFiles, $user_data_path); 
+	}
 }
 
 ## Start all
@@ -164,7 +172,8 @@ if (exists $genomes{$specie}){
                 blast_program_path => $configuration_mirnature->[2]->{Program_locations}->{blastn},
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
                 makeblast_program_path => $configuration_mirnature->[2]->{Program_locations}->{makeblastdb},
-                models_list => $configuration_mirnature->[3]->{Default_folders}->{List_cm_miRNAs}
+                models_list => $configuration_mirnature->[3]->{Default_folders}->{List_cm_miRNAs},
+		user_data => $user_data_path,
             );	
             if ($blast_experiment->blast_str =~ /^\d+$/){
                 my ($id_process_running, $molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast; #Run all blastn jobs, returns array by Str
@@ -244,8 +253,8 @@ if (exists $genomes{$specie}){
                 genome_subject => $genomes{$specie},
                 subject_specie => $specie,
                 output_folder => $outOther,
-                path_covariance => $cm_model_others, #New path of CM provided by the user
-                bitscores_CM => $bitscores, # Maybe not?
+                path_covariance => \@cm_model_others, 
+                bitscores_CM => $bitscores, 
                 length_CM => $len_r,
                 names_CM => $names_r,
                 families_names_CM => $families_names,
@@ -292,8 +301,12 @@ if ($configuration_file->mode eq "Final"){
     ###
     if ($other_output){
         # Refill hashes with both score files
-        ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, 1); #Last parameter indicates that all the hashes have to be returned.
-    }
+	if (length $user_data_path > 0){ #If path defined check that exists scores file
+		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 
+	} else {
+		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("JoinedN", $basicFiles, $user_data_path); 
+	}
+}
     my $final_candidates = MiRNAture::FinalCandidates->new(
         blast_results => $blast_output,
         hmm_results => $hmm_output,

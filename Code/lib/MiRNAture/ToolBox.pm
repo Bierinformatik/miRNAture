@@ -517,9 +517,11 @@ sub getSequencesFasta {
 			push @{ $final_seq{$tmp[2]}{$output_nucleotide->id}}, $output_nucleotide->seq;
 		} elsif ($mode == 5){
 			# Only at the end table of homology, evaluate if exists strand overlapping candidates. 
-			if ($tmp[2] =~ /\-/){ #Some CMs has this additional thing, just report the name: MIPF0000001-100-Mammalia-F -> MIPF0000001
-				my @temp = split /\-/, $tmp[2];
-				$tmp[2] = $temp[0];
+			if ($tmp[2] =~ /\-/){ #Some CMs has this additional thing, just report the name: MIPF0000001-100-Mammalia-F -> MIPF0000001, Only modify mirbase references with additions
+				if ($tmp[2] =~ /^MIPF/){
+					my @temp = split /\-/, $tmp[2];
+					$tmp[2] = $temp[0];
+				}
 			}
 			$_ = join "\t", @tmp; #Modified id of the family withouth dashes
 			if ($frame =~ /^\-$|^\+$/){
@@ -921,19 +923,20 @@ sub classify_2rd_align_results {
 }
 
 sub infer_data_from_cm {
-	my ($new_cm_folder, $basic_files) = @_;
+	my ($new_cm_folder, $basic_files, $name) = @_;
 	my @all_cm_models = check_folder_files($new_cm_folder, "\.cm"); #All files must end at '.cm'
 	my %complete_cm_information;
 	my $IN;
-	open my $OUT, ">> $basic_files/all_other_scores.txt" or die "The table with all CMs scores, cannot be created at $new_cm_folder\n";
+	open my $OUT, "> $basic_files/$name" or die "The table with all CMs scores, cannot be created at $new_cm_folder\n";
 	#RF00006    34.00   96  Vault   misc_RNA
 	foreach my $file (@all_cm_models){
-		my $complete_path = $new_cm_folder.$file;
+		my $complete_path = $new_cm_folder."/".$file;
+		next if $file !~ /\.cm$/;
 		open $IN, "< $complete_path" or die;
 		my ($length, $name);
-		my $family = "Unknown_RNA"; #This family does not have identity
+		my $family = "miRNA"; #This family does not have identity
 		my $acc = "NA";
-		my $score = 1;
+		my $score = 0;
 		while (<$IN>){
 			chomp;
 			if ($_ =~ /^NAME\s/){
@@ -951,14 +954,7 @@ sub infer_data_from_cm {
 		if ($acc eq "NA"){
 			$acc = $name;
 		}
-		my $inferred_scores_cm = MiRNAture::ValidationCM->new(
-			name_model => $name,
-			length_model => $length,
-			acc_model => $acc,
-			score_model => $score,
-			family_model => $family	
-		);
-		my $new_line_cm_families = $inferred_scores_cm->acc_model."\t".$inferred_scores_cm->score_model."\t".$inferred_scores_cm->length_model."\t".$inferred_scores_cm->name_model."\t".$inferred_scores_cm->family_model;	
+		my $new_line_cm_families = "$acc\t$score\t$length\t$name\t$family";
 		print $OUT "$new_line_cm_families\n";
 	}
 	close $OUT;
@@ -992,7 +988,7 @@ sub cmsearch {
 		my $param = "--cpu 5 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm/${nameCMFinal} $genome";
 		system "$cmsearch_path $param 1> /dev/null";
 	} else {
-		print_result("The $path_cm/${nameCMFinal} is empty or not exists!");
+		;
 	}
 	return;
 }

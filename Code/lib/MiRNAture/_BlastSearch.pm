@@ -121,6 +121,13 @@ has 'makeblast_program_path' => (
 	coerce => 1
 );
 
+has 'user_data' => (
+	is => 'ro',
+	isa => 'Path::Class::File',	
+	required => 0,
+	coerce => 1
+);
+
 with 'MiRNAture::ToolBox'; 
 with 'MiRNAture::BlastPrepareQueries';
 with 'MiRNAture::_BlastSearch_ResolveBlastMergings';
@@ -135,7 +142,7 @@ sub searchHomologySequenceBlast {
 	create_folders($shift->current_directory,".blastTemp/");
 	create_folders($shift->current_directory,".blastTemp/LOGs");
 	# Load both score files, from RFAM and others
-	my $families = index_ncRNA_families($shift->data_folder."/Basic_files/all_RFAM_scores.txt", $shift->data_folder."/Basic_files/all_other_scores.txt"); #Create groups of ncRNA families from CMs
+	my $families = index_ncRNA_families($shift->data_folder."/Basic_files/all_RFAM_scores.txt", $shift->data_folder."/Basic_files/all_other_scores.txt", $shift->user_data."/all_user_scores.txt"); #Create groups of ncRNA families from CMs
 	my ($molecules, $query_species, $files_relation) = infer_data_queries($shift->query_folder); #Based on metafile, infer query species and molecules
 	foreach my $molecule (@$molecules){ #Each fasta file provided by the user
 		foreach my $queryS (@$query_species){
@@ -294,11 +301,12 @@ sub blast_strategies {
 }
 
 sub index_ncRNA_families {
-	my ($fileRFAM, $fileOthers) = @_;
+	my ($fileRFAM, $fileOthers, $fileUser) = @_;
 	my %families;
-	my @score_files = ("$fileRFAM", "$fileOthers");
+	my @score_files = ("$fileRFAM", "$fileOthers","$fileUser");
 	foreach my $file (@score_files){
-		open my $FAMS, "< $file" or die "Please provide the families_ncRNAs file\n";
+		next if (!-e $file);
+		open my $FAMS, "< $file";
 		while (<$FAMS>){
 			chomp;
 			my @all = split /\s+|\t/, $_;

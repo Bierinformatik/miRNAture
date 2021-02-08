@@ -25,6 +25,7 @@ my $origin_genome = ""; #Path of the genome from the subject specie
 my $original_genome = ""; #Path of the original genome to perform blast mapping
 my $final_miRNA_table = ""; #miRNA table database generate by miRNAture
 my $tag_specie = "";
+my $user_data = "";
 my $help = 0; 
 my $man = 0;
 
@@ -42,6 +43,7 @@ GetOptions (
     'original_genome|og=s' => \$original_genome,
     'table_database|db=s' => \$final_miRNA_table,
     'tag_specie|tag=s' => \$tag_specie,
+    'user_models|usrM=s' => \$user_data,
     'help|h' => \$help,
     man => \$man,
 ) or pod2usage(2);
@@ -58,7 +60,7 @@ my $start_config = MiRNAnchor::Main->new (
     tag_spe_query => $tag_specie
 );
 
-my $db_models_relation = load_correspondence_models_rfam($current_dir); #Load databases correspondence to do validation.
+my $db_models_relation = load_correspondence_models_rfam($current_dir, $user_data); #Load databases correspondence to do validation.
 $start_config->check_existence_folder_output;
 my $genomes_file = $start_config->get_genome_validation_list;
 $start_config->recognize_families_homology($db_models_relation); #Include in final files the annotation family
