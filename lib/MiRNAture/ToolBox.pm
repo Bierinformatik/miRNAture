@@ -34,8 +34,10 @@ sub evaluate_input_flags {
 	#cmlist file, mode run, out folder, parallel mode.
 	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $repetition_threshold) = @_;
 	# Evaluate the existence of list of CM models
+	my $name = $nameC;
+	$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 	if (!-z $nameC && -e $nameC){ #This is a file, must exists and must be non-zero
-		print_process("The $nameC covariance list will be used");
+		print_process("The $name covariance list will be used");
 	} else {
 		print_process("The default covariance list will be used");
 	}

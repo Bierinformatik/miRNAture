@@ -4,9 +4,12 @@ requirements
 Tutorial/Code/LOGS/
 Tutorial/Code/OLD/
 Tutorial/Data/latimeria_chalumnae_genome.fa.*
+Tutorial/Results
 Tutorial/Results.tar.gz
 Tutorial/Data/QueriesToTest/*.map
 Tutorial/Data/QueriesToTest/*new*
+Tutorial/Code/.blastTemp
+share/Data/RFAM_14-4/rfam_models_list_COMPLETE
 
 # Module::Build
 _build/
