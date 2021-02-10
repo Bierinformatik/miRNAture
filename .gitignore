@@ -9,6 +9,7 @@ Tutorial/Results.tar.gz
 Tutorial/Data/QueriesToTest/*.map
 Tutorial/Data/QueriesToTest/*new*
 Tutorial/Code/.blastTemp
+shareALL/
 share/Data/RFAM_14-4/rfam_models_list_COMPLETE
 
 # Module::Build

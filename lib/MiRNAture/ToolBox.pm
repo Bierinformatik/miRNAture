@@ -6,7 +6,6 @@ use Exporter;
 
 use Moose::Role; 
 use File::Copy; 
-#use Bio::DB::Fasta;
 BEGIN {
 	local $SIG{__WARN__} = sub {};
 	require Bio::DB::Fasta;

@@ -9,7 +9,6 @@ use Pod::Usage;
 use YAML::Tiny;
 use Term::ANSIColor;
 use Cwd qw(getcwd);
-use File::Share ':all';
 
 use lib "lib";
 use Mir::ConfigurationFile;
@@ -23,6 +22,7 @@ use MiRNAnchor::Tools;
 my $mode = ""; #run mode
 my @strategy;
 my $specie_genome_path = ""; #target specie genomes
+my $data_path = ""; # Pre-calculated data from miRNAture
 my $work_folder = ""; #output folder
 my $name_specie = ""; #Scientific name of specie
 my $specie_tag = ""; #Label of specie
@@ -44,6 +44,7 @@ GetOptions (
 	'specie_tag|speT=s' => \$specie_tag,
 	'subset_models|sublist=s' => \$subset_models,
 	'workdir|w=s' => \$work_folder,
+	'datadir|dataF=s' => \$data_path,
 	'mirfix_path|mfx=s' => \$mirfix_path,
 	'mode|m=s' => \$mode,
 	'strategy|str=s' => \@strategy,
@@ -63,7 +64,6 @@ pod2usage ( -verbose => 2 ) if $man;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
-my $data_path = read_data_share();
 
 my $config_file = Mir::ConfigurationFile->new (
 	stage => $stagesRun,

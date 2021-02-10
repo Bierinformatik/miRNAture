@@ -8,7 +8,6 @@ use Moose::Role;
 use Data::Dumper;
 use File::Copy;
 use File::Copy::Recursive qw(dircopy);
-use File::Share ':all';
 use Term::ANSIColor qw(:constants); 
 use MiRNAnchor::ExternalPrograms;
 
@@ -458,11 +457,11 @@ sub create_folders {
 	}
 	return;
 }
-sub read_data_share {
-	my $data_location = dist_dir('Bio-miRNAture');
-	print "$data_location\n";
-	return $data_location;
-}
+#sub read_data_share {
+#	my $data_location = dist_dir('Bio-miRNAture');
+#	print "$data_location\n";
+#	return $data_location;
+#}
 
 sub end_close {
 	print_end("\n-¿Olvida usted algo?-\n ¡Ojalá!.\n\n  El emigrante. Luis Felipe Lornelí. (2005)\n");

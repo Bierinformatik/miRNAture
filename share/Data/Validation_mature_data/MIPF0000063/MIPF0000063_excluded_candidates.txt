@@ -1,1 +1,0 @@
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModelsHighConfidence/MIPF0000063/BaseFiles/MIPF0000063.mappingtest.txt	MI0005035

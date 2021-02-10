@@ -1,4 +1,0 @@
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Bos_taurus/Bos_taurus.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Gorilla_gorilla/Gorilla_gorilla.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Sus_scrofa/Sus_scrofa.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Tupaia_chinensis/Tupaia_chinensis.fasta

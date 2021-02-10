@@ -1,6 +1,0 @@
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000116/BaseFiles/MIPF0000116.mappingtest.txt	MI0002815
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000116/BaseFiles/MIPF0000116.mappingtest.txt	MI0002816
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000116/BaseFiles/MIPF0000116.mappingtest.txt	MI0006133
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000116/BaseFiles/MIPF0000116.mappingtest.txt	MI0008558
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000116/BaseFiles/MIPF0000116.mappingtest.txt	MI0020846
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Results/HumanModels/MIPF0000116/BaseFiles/MIPF0000116.mappingtest.txt	MI0030653

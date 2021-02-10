@@ -22,7 +22,6 @@ my $builder = Module::Build->new(
 		'Pod::Usage' => 1.69,
 		'Cwd' =>  3.75,
 		'FindBin' => 1.51,
-		'File::Share' => 0.25,
 		'Exporter' => 5.72,
 		'File::Basename' => 2.85,
 		'File::Copy' => 2.32,
@@ -41,7 +40,6 @@ my $builder = Module::Build->new(
 	},
 	script_files => [qw(script/miRNAture script/miRNAture.pl script/miRNAnchor.pl script/evaluate_conserved_str.py)],
 	add_to_cleanup => [ 'Bio-miRNAture-*' ],
-	share_dir => 'share',
 );
 
 $builder->create_build_script();
