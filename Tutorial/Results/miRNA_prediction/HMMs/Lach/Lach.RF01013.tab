@@ -1,0 +1,15 @@
+# target name        accession  query name           accession  hmmfrom hmm to alifrom  ali to envfrom  env to  sq len strand   E-value  score  bias  description of target
+#------------------- ---------- -------------------- ---------- ------- ------- ------- ------- ------- ------- ------- ------ --------- ------ ----- ---------------------
+Lach2                -          RF01013              RF01013         10      66 1081068 1081120 1081062 1081138 3032515    +         6.7   10.4   0.8  -
+Lach1                -          RF01013              RF01013          9      86 1459278 1459197 1459293 1459190 5981458    -         8.9   10.0   3.9  -
+Lach1                -          RF01013              RF01013         45      85 2627098 2627139 2627085 2627145 5981458    +           9   10.0   0.3  -
+#
+# Program:         nhmmer
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF01013.hmm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/nhmmer --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Lach.RF01013.tab --noali -Z 18.030074 --cpu 8 /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF01013.hmm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 14:02:20 2021
+# [ok]

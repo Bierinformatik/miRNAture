@@ -1,0 +1,18 @@
+# target name        accession  query name           accession  hmmfrom hmm to alifrom  ali to envfrom  env to  sq len strand   E-value  score  bias  description of target
+#------------------- ---------- -------------------- ---------- ------- ------- ------- ------- ------- ------- ------- ------ --------- ------ ----- ---------------------
+Lach1                -          RF00669              RF00669          6      70 4748399 4748466 4748394 4748475 5981458    +         3.8   11.1   1.8  -
+Lach2                -          RF00669              RF00669          3      53 2280074 2280023 2280075 2280016 3032515    -         4.9   10.7   0.3  -
+Lach2                -          RF00669              RF00669         12      28 2398474 2398490 2398472 2398511 3032515    +         5.1   10.7   1.0  -
+Lach1                -          RF00669              RF00669          4      53 5638725 5638778 5638720 5638787 5981458    +         6.6   10.3   1.1  -
+Lach2                -          RF00669              RF00669         19      71  412437  412492  412432  412501 3032515    +         7.1   10.2   0.3  -
+Lach1                -          RF00669              RF00669         12      38 3405689 3405715 3405680 3405735 5981458    +         7.3   10.2   2.5  -
+#
+# Program:         nhmmer
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF00669.hmm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/nhmmer --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Lach.RF00669.tab --noali -Z 18.030074 --cpu 8 /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF00669.hmm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 14:01:35 2021
+# [ok]

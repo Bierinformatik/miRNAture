@@ -1,0 +1,19 @@
+# target name        accession  query name           accession  hmmfrom hmm to alifrom  ali to envfrom  env to  sq len strand   E-value  score  bias  description of target
+#------------------- ---------- -------------------- ---------- ------- ------- ------- ------- ------- ------- ------- ------ --------- ------ ----- ---------------------
+Lach2                -          RF00933              RF00933         10      66 1047626 1047558 1047628 1047546 3032515    -       0.094   16.7   1.4  -
+Lach2                -          RF00933              RF00933         40      73  101696  101665  101717  101660 3032515    -         3.1   11.8   1.7  -
+Lach1                -          RF00933              RF00933          5      58  908259  908204  908263  908185 5981458    -         4.7   11.2   1.0  -
+Lach2                -          RF00933              RF00933         25      71 2597552 2597593 2597532 2597597 3032515    +         5.5   11.0   0.0  -
+Lach2                -          RF00933              RF00933         18      73 1178083 1178138 1178069 1178142 3032515    +         5.8   10.9   3.6  -
+Lach2                -          RF00933              RF00933         17      54 2467273 2467310 2467269 2467330 3032515    +           6   10.9   0.0  -
+Lach2                -          RF00933              RF00933         33      71 2270099 2270132 2270079 2270135 3032515    +           7   10.7   0.0  -
+#
+# Program:         nhmmer
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF00933.hmm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/nhmmer --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Lach.RF00933.tab --noali -Z 18.030074 --cpu 8 /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF00933.hmm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 14:02:09 2021
+# [ok]

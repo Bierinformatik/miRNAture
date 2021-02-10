@@ -1,0 +1,18 @@
+#target name                accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#-------------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+Lach1.-.5870480.5870654.464 -         mir-2004             RF03562    cm        1       98       44      133      +    no    1 0.38   0.0   43.4   9.9e-07 !   -
+Lach2.-.2778949.2779109.743 -         mir-2004             RF03562    cm        1       98       24      116      +    no    1 0.43   0.0   28.3    0.0075 !   -
+Lach1.-.3653154.3653318.379 -         mir-2004             RF03562    cm        1       98       69      162      +    no    1 0.41   0.0   23.6      0.11 ?   -
+Lach1.-.4342884.4343059.403 -         mir-2004             RF03562    cm        1       98       56      141      +    no    1 0.36   0.0   23.5      0.13 ?   -
+Lach2.+.2652515.2652770.593 -         mir-2004             RF03562    cm        1       98       41      113      +    no    1 0.42   0.0   22.4      0.23 ?   -
+Lach1.+.298939.299108.15    -         mir-2004             RF03562    cm        1       98       42      139      +    no    1 0.38   0.0   16.2       8.9 ?   -
+#
+# Program:         cmsearch
+# Version:         1.1.2 (July 2016)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF03562.cm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/cmsearch -Z 9.015037 --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/Lach_5.miRNA.RF03562.tab --noali --notrunc --toponly --cpu 8 --nohmmonly /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF03562.cm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 13:59:24 2021
+# [ok]

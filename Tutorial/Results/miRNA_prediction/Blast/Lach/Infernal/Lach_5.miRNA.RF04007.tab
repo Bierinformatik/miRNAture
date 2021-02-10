@@ -1,0 +1,26 @@
+#target name                accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#-------------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+Lach1.-.5870480.5870654.464 -         mir-8489             RF04007    cm        1       90       45      132      +    no    1 0.39   0.0   64.7   1.1e-13 !   -
+Lach1.+.5870476.5870644.232 -         mir-8489             RF04007    cm        1       90       48      135      +    no    1 0.39   0.0   62.9   3.7e-13 !   -
+Lach1.-.22755.22956.241     -         mir-8489             RF04007    cm        1       90       70      158      +    no    1 0.30   0.8   36.3   1.1e-05 !   -
+Lach2.-.2652508.2652781.739 -         mir-8489             RF04007    cm        1       90      147      232      +    no    1 0.38   0.0   33.0   9.6e-05 !   -
+Lach1.+.5812721.5812897.229 -         mir-8489             RF04007    cm        1       90       62      150      +    no    1 0.29   1.5   32.7   0.00012 !   -
+Lach2.+.2652515.2652770.593 -         mir-8489             RF04007    cm        1       90       34      114      +    no    1 0.42   0.0   31.2   0.00031 !   -
+Lach2.-.816992.817180.647   -         mir-8489             RF04007    cm        1       90       64      137      +    no    1 0.28   0.1   27.1    0.0043 !   -
+Lach1.+.22754.22944.3       -         mir-8489             RF04007    cm       17       74       62      119      +    no    1 0.29   0.0   25.2     0.015 ?   -
+Lach2.+.816991.817180.499   -         mir-8489             RF04007    cm       23       68       64      109      +    no    1 0.28   0.0   24.1     0.031 ?   -
+Lach1.-.4606115.4606285.416 -         mir-8489             RF04007    cm        1       90       10       77      +    no    1 0.24   0.8   18.5       1.1 ?   -
+Lach2.-.204623.204727.619   -         mir-8489             RF04007    cm        1       90       25       96      +    no    1 0.36   0.0   18.1       1.5 ?   -
+Lach1.-.5888249.5888367.467 -         mir-8489             RF04007    cm        1       90       31       86      +    no    1 0.30   0.0   17.3       2.5 ?   -
+Lach1.+.4606147.4606302.179 -         mir-8489             RF04007    cm        1       90       71      122      +    no    1 0.25   0.0   16.0       5.8 ?   -
+Lach2.+.2229078.2229228.567 -         mir-8489             RF04007    cm        1       90       43      130      +    no    1 0.35   0.0   15.9         6 ?   -
+#
+# Program:         cmsearch
+# Version:         1.1.2 (July 2016)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF04007.cm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/cmsearch -Z 9.015037 --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/Lach_5.miRNA.RF04007.tab --noali --notrunc --toponly --cpu 8 --nohmmonly /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF04007.cm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 14:00:06 2021
+# [ok]

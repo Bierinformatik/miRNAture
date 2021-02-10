@@ -1,0 +1,14 @@
+#target name                accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#-------------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+Lach1.+.2956556.2956713.125 -         mir-190              RF00672    cm        1       89       77      112      +    no    1 0.39   0.0   17.6       2.4 ?   -
+Lach2.-.1669574.1669731.695 -         mir-190              RF00672    cm        1       89       15      104      +    no    1 0.32   0.0   15.6         9 ?   -
+#
+# Program:         cmsearch
+# Version:         1.1.2 (July 2016)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF00672.cm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/cmsearch -Z 9.015037 --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/Lach_5.miRNA.RF00672.tab --noali --notrunc --toponly --cpu 8 --nohmmonly /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF00672.cm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 13:57:59 2021
+# [ok]

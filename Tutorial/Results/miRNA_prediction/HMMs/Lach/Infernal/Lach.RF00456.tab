@@ -1,0 +1,16 @@
+#target name                            accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#-------------------------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+Lach1.-.4888421.4888527.RF00456.1.88.90 -         mir-34               RF00456    cm        1       90       13       97      +    no    1 0.47   0.0   58.6   3.5e-12 !   -
+Lach1.-.4886563.4886668.RF00456.3.85.90 -         mir-34               RF00456    cm        1       90       15       94      +    no    1 0.47   0.0   54.4   5.5e-11 !   -
+Lach1.+.4888417.4888532.RF00456.5.83.90 -         mir-34               RF00456    cm        1       90       17       99      +    no    1 0.46   0.0   44.5   3.7e-08 !   -
+Lach1.+.4886563.4886672.RF00456.6.83.90 -         mir-34               RF00456    cm        1       90       14       93      +    no    1 0.46   0.0   42.9     1e-07 !   -
+#
+# Program:         cmsearch
+# Version:         1.1.2 (July 2016)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF00456.cm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Infernal/../Lach.RF00456.tab.true.table.fasta
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/cmsearch -Z 9.015037 --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Infernal/Lach.RF00456.tab --noali --notrunc --toponly --cpu 5 --nohmmonly /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF00456.cm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Infernal/../Lach.RF00456.tab.true.table.fasta 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 14:01:31 2021
+# [ok]

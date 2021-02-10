@@ -1,0 +1,58 @@
+---
+miRNAture:
+  Author: 'Cristian A. Velandia-Huerto, Joerg Fallmann, Peter F. Stadler'
+  Date: 'Feb 1 2021'
+  Version: v.1.0
+---
+Data_user:
+  Hostname: unknownd89c6795a673
+  Running_date: 'Wed Feb 10 13:57:37 CET 2021'
+  User: bioinf
+---
+Program_locations:
+  MIRfix: /home/bioinf/anaconda3/envs/mirnature/bin/MIRfix.py
+  RNAalifold: /home/bioinf/anaconda3/envs/mirfix/bin/RNAalifold
+  blastn: /home/bioinf/anaconda3/envs/mirnature/bin/blastn
+  clustalo: /home/bioinf/anaconda3/envs/mirnature/bin/clustalo
+  cmbuild: /home/bioinf/anaconda3/envs/mirnature/bin/cmbuild
+  cmcalibrate: /home/bioinf/anaconda3/envs/mirnature/bin/cmcalibrate
+  cmsearch: /home/bioinf/anaconda3/envs/mirnature/bin/cmsearch
+  makeblastdb: /home/bioinf/anaconda3/envs/mirnature/bin/makeblastdb
+  miRNAnchor: /home/bioinf/perl5/bin/miRNAnchor.pl
+  miRNAture: /home/bioinf/perl5/bin/miRNAture.pl
+  nhmmer: /home/bioinf/anaconda3/envs/mirnature/bin/nhmmer
+---
+Default_folders:
+  Basic_files_miRNAture: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/Basic_files
+  Blast_queries: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Data/QueriesToTest
+  CM_folder: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs
+  Current_dir: /home/bioinf/Desktop/miRNAture/Tutorial/Code
+  Data_folder: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data
+  HMM_folder: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs
+  List_cm_miRNAs: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/rfam_models_list.txt
+  Other_CM_folder: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/Other_CM
+  Other_HMM_folder: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/Other_HMM
+  Output_folder: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results
+  Pre_calculated_validation_data: /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/Validation_mature_data
+  User_CM_folder: /CMs
+  User_HMM_folder: /HMMs
+  User_folder: ''
+Homology_options:
+  Blast_strategies:
+    - '5'
+    - '6'
+    - ALL
+  Mode: Blast,HMM,Infernal,Other_CM,Final
+  Parallel: '0'
+  Repetition_threshold: default,150,100
+Specie_data:
+  Database_names_genome: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.map
+  Genome: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa
+  Genome_length: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa.len
+  Name: Latimeria_chalumnae
+  Old_Genome: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Data/latimeria_chalumnae_genome.fa
+  Tag: Lach
+---
+User_results:
+  Output_miRNAture_folder: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction
+  miRNAture_program: /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/mirnature_run_Lach_Blast,HMM,Infernal,Other_CM,Final.sh

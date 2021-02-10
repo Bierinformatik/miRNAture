@@ -1,0 +1,21 @@
+#target name                accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#-------------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+Lach1.+.4342897.4343030.166 -         mir-942              RF00997    cm        1       86       36      106      +    no    1 0.38   0.0   30.2   0.00088 !   -
+Lach2.+.2778955.2779105.598 -         mir-942              RF00997    cm        1       86       57      115      +    no    1 0.44   0.0   29.7    0.0012 !   -
+Lach2.-.2652508.2652781.739 -         mir-942              RF00997    cm        1       86      166      223      +    no    1 0.41   0.0   29.5    0.0014 !   -
+Lach2.-.2778949.2779109.743 -         mir-942              RF00997    cm        1       86       42      100      +    no    1 0.46   0.0   28.3    0.0029 !   -
+Lach1.-.4342884.4343059.403 -         mir-942              RF00997    cm        1       86       59      127      +    no    1 0.39   0.0   27.4    0.0051 !   -
+Lach1.-.298923.299083.252   -         mir-942              RF00997    cm        1       86       28       84      +    no    1 0.49   0.0   23.6     0.056 ?   -
+Lach2.-.2457769.2457963.725 -         mir-942              RF00997    cm        1       86       66      149      +    no    1 0.42   0.0   20.8      0.31 ?   -
+Lach1.+.4301839.4301994.163 -         mir-942              RF00997    cm        1       86       24       58      +    no    1 0.60   0.0   19.8      0.59 ?   -
+Lach1.+.298939.299108.15    -         mir-942              RF00997    cm        1       86       47      133      +    no    1 0.40   0.0   18.8       1.1 ?   -
+#
+# Program:         cmsearch
+# Version:         1.1.2 (July 2016)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF00997.cm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/cmsearch -Z 9.015037 --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/Lach_5.miRNA.RF00997.tab --noali --notrunc --toponly --cpu 8 --nohmmonly /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs/RF00997.cm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/Blast/Lach/Infernal/../Lach_5.miRNA.tab.db.location.blocks.coord.fasta 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 13:58:37 2021
+# [ok]

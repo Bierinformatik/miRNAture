@@ -63,6 +63,7 @@ pod2usage ( -verbose => 2 ) if $man;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
+my $data_path = read_data_share();
 
 my $config_file = Mir::ConfigurationFile->new (
 	stage => $stagesRun,
@@ -70,6 +71,7 @@ my $config_file = Mir::ConfigurationFile->new (
 	specie_tag => $specie_tag,
 	specie_genome => $specie_genome_path,
 	output_folder => $work_folder,
+	data_path => $data_path,
 	current_folder => $current_path,
 	model_list => $subset_models,
 	mirfix_path => $mirfix_path,
@@ -89,7 +91,6 @@ if ($config_file->stage =~ /^summarise$/){
 	#but read the last one created.
 	$variables = $config_file->read_last_file;
 } else {
-	my $data_path = $config_file->read_data_share;
 	$config_file->create_config_file;
 	$config_file->write_header;
 	$config_file->write_config_file($data_path);

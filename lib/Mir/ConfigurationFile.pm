@@ -4,7 +4,7 @@ use Moose;
 use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Bio::SeqIO;
-use File::Share ':all';
+#use File::Share ':all';
 
 use lib "lib/MiRNAture";
 
@@ -52,6 +52,13 @@ has 'specie_genome_new_database' => (
 	is => 'rw',
 	isa => 'Path::Class::File',
 	coerce => 1,
+);
+
+has 'data_path' => (
+	is => 'ro',
+	isa => 'Path::Class::Dir',
+	coerce => 1,
+	required => 1,
 );
 
 has 'mode' => (
@@ -148,7 +155,7 @@ has 'model_list' => (
     lazy => 1,
     default => sub {
         my $shift = shift;
-        return $shift->current_folder->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
+        return $shift->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
         },
     trigger => \&_size_set,
 );
@@ -189,14 +196,14 @@ sub _path_set {
 sub _size_set {
     my ( $self, $size, $old_size ) = @_;
     if (!$self->model_list){
-        $self->{model_list} = $self->current_folder->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
+        $self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
         return;
     }
     if (length $self->model_list > 0){
         $self->{model_list} = $self->model_list;
     } else {
-        $self->{model_list} = $self->current_folder->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
-    }
+        $self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
+}
     return;
 }
 
@@ -283,11 +290,11 @@ sub test_name {
 	}    
 }
 
-sub read_data_share {
-	my $data_location = dist_dir('Bio-miRNAture');
-	#print "$data_location\n";
-	return $data_location;
-}
+#sub read_data_share {
+#	my $data_location = dist_dir('Bio-miRNAture');
+#	#print "$data_location\n";
+#	return $data_location;
+#}
 
 sub create_config_file {
 	my $shift = shift;

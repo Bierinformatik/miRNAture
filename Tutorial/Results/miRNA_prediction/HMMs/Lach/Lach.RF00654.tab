@@ -1,0 +1,25 @@
+# target name        accession  query name           accession  hmmfrom hmm to alifrom  ali to envfrom  env to  sq len strand   E-value  score  bias  description of target
+#------------------- ---------- -------------------- ---------- ------- ------- ------- ------- ------- ------- ------- ------ --------- ------ ----- ---------------------
+Lach2                -          RF00654              RF00654         19      46 2157975 2158002 2157972 2158022 3032515    +        0.27   14.6   0.7  -
+Lach1                -          RF00654              RF00654         19      34  442762  442777  442755  442797 5981458    +         2.3   11.7   0.0  -
+Lach1                -          RF00654              RF00654         15      66 1620178 1620229 1620164 1620245 5981458    +         2.6   11.5   1.8  -
+Lach2                -          RF00654              RF00654         47      79 2332591 2332559 2332611 2332551 3032515    -         4.2   10.8   0.4  -
+Lach1                -          RF00654              RF00654         47      87 2958821 2958867 2958807 2958869 5981458    +         4.3   10.8   1.0  -
+Lach2                -          RF00654              RF00654         34      84 2805104 2805050 2805109 2805045 3032515    -         5.3   10.5   0.3  -
+Lach2                -          RF00654              RF00654         16      46 2959310 2959278 2959316 2959259 3032515    -         6.6   10.2   0.4  -
+Lach2                -          RF00654              RF00654          3      31 1687102 1687069 1687104 1687053 3032515    -         6.7   10.2   1.3  -
+Lach2                -          RF00654              RF00654         42      86 2449569 2449526 2449577 2449523 3032515    -         6.7   10.2   0.5  -
+Lach2                -          RF00654              RF00654         18      44 1339684 1339710 1339666 1339720 3032515    +         6.8   10.2   1.5  -
+Lach1                -          RF00654              RF00654         47      73 5024343 5024317 5024364 5024303 5981458    -         7.6   10.0   1.1  -
+Lach1                -          RF00654              RF00654          3      28  778409  778384  778411  778364 5981458    -         8.2    9.9   0.3  -
+Lach2                -          RF00654              RF00654         20      83  498581  498647  498580  498652 3032515    +         9.7    9.7   0.2  -
+#
+# Program:         nhmmer
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF00654.hmm
+# Target file:     /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa
+# Option settings: /home/bioinf/anaconda3/envs/mirnature/bin/nhmmer --tblout /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction/HMMs/Lach/Lach.RF00654.tab --noali -Z 18.030074 --cpu 8 /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs/RF00654.hmm /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/TemporalFiles/Latimeria_chalumnae/latimeria_chalumnae_genome.fa.new.fa 
+# Current dir:     /home/bioinf/Desktop/miRNAture/Tutorial/Code
+# Date:            Wed Feb 10 14:01:33 2021
+# [ok]

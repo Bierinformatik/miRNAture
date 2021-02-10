@@ -75,7 +75,7 @@ get_basic_files($configuration_mirnature->[3]->{Default_folders}->{Data_folder})
 my ($start_hmm, $start_other, $start_infernal, $start_blast);
 my %genomes;
 my $name = $nameC;
-$name =~ s/(\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
+$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 my $tag = ((strftime "%H%M%S%d%m%Y", localtime) + (int(rand(10)))); #Today date + random number 0..10.
 print_process("Processing: $name\t$name_specie");
 

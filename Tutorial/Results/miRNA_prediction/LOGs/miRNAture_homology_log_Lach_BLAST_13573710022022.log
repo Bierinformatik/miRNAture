@@ -1,0 +1,17 @@
+######
+###  miRNAture : search miRNAs against a sequence
+###  Authors: Cristian A. Velandia-Huerto, Jöerg Fallmann and Peter F. Stadler
+###  Version: v.1.0 Feb 1, 2021
+###  Bioinformatics Department, Universität Leipzig
+###  Freely distributed under a BSD open source license.
+######
+# User:bioinf
+# Host:unknownd89c6795a673
+# Start Time: Wed Feb 10 13:57:37 2021
+# Executed Command line: ./miRNAture.pl -l /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/rfam_models_list.txt -m BLAST -str 5,6,ALL -blstq /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Data/QueriesToTest -pe 0 -spe Lach -n_spe Latimeria_chalumnae -w /home/bioinf/Desktop/miRNAture/Tutorial/Code/../Results/miRNA_prediction -data /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data -cmp /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/CMs /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/Other_CM /CMs -hmmp /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/RFAM_14-4/HMMs /home/bioinf/perl5/lib/perl5/auto/share/dist/Bio-miRNAture/Data/Other_HMM /HMMs -rep default,150,100
+#
+# Running Mode: BLAST at Wed Feb 10 13:57:38 2021
+# Running time for strategy 5 : 166 s
+# Running time for strategy 6 : 61 s
+# Running time for strategy ALL : 0 s
+# Total time for BLAST : 227 s
