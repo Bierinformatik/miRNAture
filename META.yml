@@ -1,0 +1,100 @@
+---
+abstract: 'Computational detection of microRNA candidates'
+author:
+  - 'Cristian A Velandia Huerto <cristian@bioinf.uni-leipzig.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-miRNAture
+provides:
+  Bio::miRNAture:
+    file: lib/Bio/miRNAture.pm
+    version: v1.0.0
+  MiRNAnchor::Check:
+    file: lib/MiRNAnchor/Check.pm
+  MiRNAnchor::Classify:
+    file: lib/MiRNAnchor/Classify.pm
+  MiRNAnchor::ExternalPrograms:
+    file: lib/MiRNAnchor/ExternalPrograms.pm
+  MiRNAnchor::Main:
+    file: lib/MiRNAnchor/Main.pm
+  MiRNAnchor::Tools:
+    file: lib/MiRNAnchor/Tools.pm
+  MiRNAnchor::Validate:
+    file: lib/MiRNAnchor/Validate.pm
+  MiRNAture::Blast:
+    file: lib/MiRNAture/Blast.pm
+  MiRNAture::BlastPrepareQueries:
+    file: lib/MiRNAture/BlastPrepareQueries.pm
+  MiRNAture::CM:
+    file: lib/MiRNAture/CM.pm
+  MiRNAture::CMsearch:
+    file: lib/MiRNAture/CMsearch.pm
+  MiRNAture::Cleaner:
+    file: lib/MiRNAture/Cleaner.pm
+  MiRNAture::ConfigFile:
+    file: lib/MiRNAture/ConfigFile.pm
+  MiRNAture::Evaluate:
+    file: lib/MiRNAture/Evaluate.pm
+  MiRNAture::FinalCandidates:
+    file: lib/MiRNAture/FinalCandidates.pm
+  MiRNAture::HMM:
+    file: lib/MiRNAture/HMM.pm
+  MiRNAture::HMMsearch:
+    file: lib/MiRNAture/HMMsearch.pm
+  MiRNAture::LogFile:
+    file: lib/MiRNAture/LogFile.pm
+  MiRNAture::Merging:
+    file: lib/MiRNAture/Merging.pm
+  MiRNAture::Others:
+    file: lib/MiRNAture/Others.pm
+  MiRNAture::Othersearch:
+    file: lib/MiRNAture/Othersearch.pm
+  MiRNAture::ToolBox:
+    file: lib/MiRNAture/ToolBox.pm
+  Mir::ConfigurationFile:
+    file: lib/Mir/ConfigurationFile.pm
+  Mir::Eval:
+    file: lib/Mir/Eval.pm
+    version: v1.0.0
+  Mir::Summarise:
+    file: lib/Mir/Summarise.pm
+  Mir::miRNAnchor:
+    file: lib/Mir/miRNAnchor.pm
+  Mir::miRNAture:
+    file: lib/Mir/miRNAture.pm
+    version: v1.0.0
+  miRNAtureValidationCM:
+    file: lib/MiRNAture/ValidationCM.pm
+requires:
+  Cwd: '3.75'
+  Exporter: '5.72'
+  File::Basename: '2.85'
+  File::Copy: '2.32'
+  File::Copy::Recursive: '0.45'
+  File::Share: '0.25'
+  File::ShareDir: '1.00'
+  FindBin: '1.51'
+  Getopt::Long: '2.5'
+  JSON: '4.02'
+  List::MoreUtils: '0.428'
+  List::Util: '1.52'
+  Math::BigFloat: '1.999806'
+  Moose: '2.2011'
+  MooseX::Types::Path::Class: '0.09'
+  POSIX: '1.76'
+  Pod::Usage: '1.69'
+  Scalar::Util: '1.52'
+  Statistics::R: '0.34'
+  Term::ANSIColor: '4.06'
+  YAML::Tiny: '1.73'
+  perl: v5.26.2
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

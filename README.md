@@ -79,3 +79,12 @@ For detailed instructions how to use **miRNAture** please refer to the Manual pa
 
 * In this ![PDF](miRNAture-Manual/latex/mirnature.pdf) version.
 * Through your favorite explorer, open the `index.html` file located at `miRNAture-Manual/html/index.html`.
+
+### Precalculated datasets
+
+Pre-calculated data composed by miRNA CMs, HMMs and required input files to perform mature annotation has
+to be downloaded for the user to run the full pipeline. Available datasets are listed as follow:
+
+- Required data to re-annotate human miRNAs: include CMs and HMMs build from miRBase without human 
+sequences. Stored in Zenodo [here](https://zenodo.org/record/4531376#.YCQS8EMo_ys).
+	

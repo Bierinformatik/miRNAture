@@ -1,0 +1,36 @@
+# Specific files
+OLD/
+requirements
+Tutorial/Code/LOGS/
+Tutorial/Code/OLD/
+Tutorial/Data/latimeria_chalumnae_genome.fa.*
+Tutorial/Results
+Tutorial/Results.tar.gz
+Tutorial/Data/QueriesToTest/*.map
+Tutorial/Data/QueriesToTest/*new*
+Tutorial/Code/.blastTemp
+Datasets/
+Non_human_data_mirnature/
+
+# Module::Build
+_build/
+Build
+Build.bat
+
+### Perl ###
+!Build/
+.last_cover_stats
+/MYMETA.*
+*.o
+*.pm.tdy
+*.bs
+
+# ExtUtils::MakeMaker
+/blib/
+/_eumm/
+/*.gz
+/Makefile
+/Makefile.old
+/MANIFEST.bak
+/pm_to_blib
+/*.zip

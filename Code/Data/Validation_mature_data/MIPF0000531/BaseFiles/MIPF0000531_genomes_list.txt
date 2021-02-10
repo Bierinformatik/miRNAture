@@ -1,7 +1,0 @@
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Anolis_carolinensis/Anolis_carolinensis.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Bos_taurus/Bos_taurus.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Capra_hircus/Capra_hircus.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Danio_rerio/Danio_rerio.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Gorilla_gorilla/Gorilla_gorilla.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Ophiophagus_hannah/Ophiophagus_hannah.fasta
-/scr/k70san/bogota_unal/miRNAturePaper/Code/miRBase_Annotation/Data/FinalGenomes/Oryzias_latipes/Oryzias_latipes.fasta
