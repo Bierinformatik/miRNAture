@@ -11,6 +11,7 @@ Tutorial/Data/QueriesToTest/*new*
 Tutorial/Code/.blastTemp
 Datasets/
 Non_human_data_mirnature/
+miRNAture2.png
 
 # Module::Build
 _build/
