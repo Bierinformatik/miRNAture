@@ -164,7 +164,8 @@ has 'repetition_rules' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
-    	default => 'default,200,100',
+	lazy => 1,
+    	default => "default,200,100"
 );
 
 sub _folder_set {
@@ -402,7 +403,11 @@ sub write_config_file {
 	if ($shift->blast_strategy){
 		$yaml->[3]->{Homology_options}{"Blast_strategies"} = $shift->blast_strategy;
 	}
-	$yaml->[3]->{Homology_options}{Repetition_threshold} = $shift->repetition_rules;
+	if (length $shift->repetition_rules == 0){
+		$yaml->[3]->{Homology_options}{Repetition_threshold} = "default,200,100";
+	} else {
+		$yaml->[3]->{Homology_options}{Repetition_threshold} = $shift->repetition_rules;
+	}
 	$yaml->write($shift->config_file);
 	return;
 }

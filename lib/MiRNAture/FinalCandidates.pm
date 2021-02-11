@@ -83,7 +83,7 @@ has 'repetition_rules' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
-    default => 'default,200,100',
+    	default => 'default,200,100',
 );
 
 with 'MiRNAture::ToolBox'; #Import set of subroutines

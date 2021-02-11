@@ -64,22 +64,24 @@ sub evaluate_input_flags {
 	}
 	if ($repetition_threshold =~ /default/){
 		my @all = split /,/, $repetition_threshold; 
-		if ($all[0] eq "default"){
-			;
+		if ($all[0] eq "default" && $all[1] == 200 && $all[2] == 100){
+			return $repetition_threshold;
 		} else {
-			print_error("structure of -r is wrong");
+			print_error("structure of -r is wrong, to modify the parameters activate the 'relax' flag.");
 		}
 	} elsif ($repetition_threshold =~ /relax/){
 		my @all = split /\,/, $repetition_threshold;
 		if ($all[0] =~ m/relax/ && $all[1] >= 0 && $all[2] >= 0){
-			;
+			return $repetition_threshold;
 		} else {
-			print_error("structure of -r is wrong");
+			print_error("structure of -r is wrong. Passed parameters are inconsistent.");
 		}        
+	} elsif (length $repetition_threshold == 0){
+		$repetition_threshold = "default,200,100";
+		return $repetition_threshold;
 	} else {
 		print_error("Structure of -rep flag is malformed, did not identify the 'default' or 'relax' modes");
 	}
-	return;
 }
 
 =head1 get_basic_files

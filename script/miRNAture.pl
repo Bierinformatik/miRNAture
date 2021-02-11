@@ -35,7 +35,7 @@ my $work_folder = ""; #output folder
 my $name_specie = ""; #Scientific name of specie
 my $data_folder = "";
 my $parallel_run = "";
-my $rep_cutoff = ""; # Homology cutoff to speed-up the searches 
+my $rep_cutoff; # Homology cutoff to speed-up the searches 
 
 my $help = 0; 
 my $man = 0;
@@ -67,7 +67,7 @@ GetOptions (
 my $startComplete = time();
 my $current_dir = getcwd;
 #### Flags Evaluation
-evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run,$rep_cutoff);
+$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run,$rep_cutoff);
 my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$specie.yaml");
 ## Working Paths
 get_basic_files($configuration_mirnature->[3]->{Default_folders}->{Data_folder});

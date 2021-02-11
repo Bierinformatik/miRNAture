@@ -23,4 +23,4 @@ data_precalculated_folder="$current/Precalculated-Data-tutorial"
 #miRNAture -stage summarise -dataF $data_precalculated_folder -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0
 
 # Run miRNAture complete
-miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt -dataF $data_precalculated_folder -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep default,150,100 -usrM $user_models
+miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt -dataF $data_precalculated_folder -speG $specie_genome -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy -blastq $blastQueriesFolder -rep relax,150,100 -usrM $user_models
