@@ -28,4 +28,4 @@ dependencies:
   - r-base=3.5.1
   - r-dplyr=0.8.5
   - rmblast=2.9.0
-
+  - viennarna=2.4.17
