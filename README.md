@@ -31,16 +31,62 @@ miRNA candidates and families.
 
 ### Installation
 
-The easiest way to install **miRNAture** is through `conda`. To do so, please first install [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/). Then, you have to install dependencies which are nicely managed using [mamba](https://github.com/mamba-org/mamba), just run:
+The easiest way to install **miRNAture** is through `conda`. To do so, please first install
+[conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/).
+
+To speed up installation of dependencies and packages we suggest to use
+[mamba](https://github.com/mamba-org/mamba), for this just run:
+
 ```
 conda install mamba -c conda-forge
 ```
-Once installed, create the `mirnature` environment with the file `Code/miRNAture.yml`:
+
+You can use `mamba` as drop-in replacement for `conda` by simply replacing the call to `conda` with a call to
+`mamba`.
+
+
+#### Install via Conda
+
+To install **miRNAture** from `conda` in a specific `mirnature` environment simply run:
+
+```
+mamba create -n mirnature mirnature
+```
+
+if `mamba` is available, else run:
+
+```
+conda create -n mirnature mirnature
+```
+
+#### Manual install, resolve dependencies via Conda
+
+Create a `mirnature` `conda` environment with the file `miRNAture.yml`:
+
 ```
 mamba env create -n mirnature -f Code/miRNAture.yml`
 ```
 
+Activate the environment containing all dependencies:
+
+```
+conda activate mirnature
+```
+
+followed by the manual steps:
+
+```
+perl Build.PL
+./Build
+./Build test
+./Build install
+```
+
+which will install **miRNAture** in the `mirnature` `conda` environment.
+
+
 ### Input files
+
 The most important input file is a DNA sequence. This could be a multifasta
 sequence (i.e. complete genome or group of particular sequences) that belongs
 from a common specie. Here I describe the general command line options to run
@@ -55,6 +101,7 @@ conda activate mirnature
 ```
 
 ### Output files
+
 Final predicted miRNAs will be written on the `<Output_dir>` indicated with the `-w` flag.
 The final candidates are described on the folder `Final_miRNA_evaliation/` as
 follows:
