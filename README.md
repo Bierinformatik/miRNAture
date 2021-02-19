@@ -64,7 +64,7 @@ conda create -n mirnature mirnature
 Create a `mirnature` `conda` environment with the file `miRNAture.yml`:
 
 ```
-mamba env create -n mirnature -f Code/miRNAture.yml`
+mamba env create -n mirnature -f miRNAture.yml
 ```
 
 Activate the environment containing all dependencies:
@@ -89,15 +89,18 @@ which will install **miRNAture** in the `mirnature` `conda` environment.
 
 The most important input file is a DNA sequence. This could be a multifasta
 sequence (i.e. complete genome or group of particular sequences) that belongs
-from a common specie. Here I describe the general command line options to run
-**miRNAture** in its _complete_ mode:
+from a common specie. At the same time, previous to execute **miRNAture** a 
+_pre-calculated_ dataset (that contains default data as CMs, HMMs, and required 
+files to perform mature prediction) must be downloaded and correctly indicated in the
+command line options with the flag `-dataF`. To run **miRNAture** in its _complete_ mode
+just run as:
 
 ```
 # Activate the mirnature environment
 conda activate mirnature
 
 # Run miRNAture
-./miRNAture -stage complete -speG <Target Genome> -speN <Specie_name> -speT <Tag_specie> -w <Output_dir> -m <Mode> (-str <Blast_strategy>) -blastq <Blast_queries_folder> -rep default,150,100
+./miRNAture -stage complete -dataF <Precalculated_folder> -speG <Target Genome> -speN <Specie_name> -speT <Tag_specie> -w <Output_dir> -m <Mode> (-str <Blast_strategy>) -blastq <Blast_queries_folder> -rep default 
 ```
 
 ### Output files
