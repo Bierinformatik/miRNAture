@@ -22,7 +22,7 @@
     
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Tutorial" href="tutorial.html" /> 
+  <link rel="next" title="Introduction" href="introduction.html" /> 
   </head>
 
   <body>
@@ -69,9 +69,27 @@
   
     <div class="sidebar-group">
       <p class="caption">
-        <span class="caption-text"><a href="#installation">Contents:</a></span>
+        <span class="caption-text"><a href="#mirnature">Contents:</a></span>
       </p>
       <ul class="">
+        
+          <li class="toctree-l1 "><a href="introduction.html" class="reference internal ">Introduction</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="installation.html" class="reference internal ">Installation</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="strategy.html" class="reference internal ">Strategy</a>
+
+            
+          </li>
+
         
           <li class="toctree-l1 "><a href="tutorial.html" class="reference internal ">Tutorial</a>
 
@@ -109,8 +127,8 @@
 
   <ul class="page-nav">
   <li class="next">
-    <a href="tutorial.html"
-       title="next chapter">Tutorial →</a>
+    <a href="introduction.html"
+       title="next chapter">Introduction →</a>
   </li>
 </ul>
   
@@ -120,186 +138,70 @@
             
   <div class="section" id="mirnature">
 <h1>miRNAture<a class="headerlink" href="#mirnature" title="Permalink to this headline">¶</a></h1>
-<p>Computational detection of microRNA candidates.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>MicroRNAs (miRNAs) have been characterized as an important regulators
-in almost all animals and plants, as well as in unicellular eukaryotes <span id="id1">[<a class="reference internal" href="#id23"><span>11</span></a>]</span>.
-Since their discovery in 1993 <span id="id2">[<a class="reference internal" href="#id87"><span>10</span></a>]</span> and subsequently in their recognition as
-a biological entity later from 2000 <span id="id3">[<a class="reference internal" href="#id86"><span>14</span></a>]</span>, microRNAs were identified
-as key regulators on the temporal control of heterochronic genes on the nematode
-<em>Caenorhabditis elegans</em> and subsequently in another metazoan species <span id="id4">[<a class="reference internal" href="#id56"><span>12</span></a>]</span>.
-This recognition were complemented by a complete characterization of their
-typical features as: a stem-loop structure, well-conservation over multiple metazoan clades
-and typical expression patterns as an isolated locus or co-expression of polycistronic miRNA
-transcripts <span id="id5">[<a class="reference internal" href="#id89"><span>7</span></a>,<a class="reference internal" href="#id90"><span>8</span></a>,<a class="reference internal" href="#id91"><span>9</span></a>,<a class="reference internal" href="#id86"><span>14</span></a>]</span>.</p>
-<p>Now, metazoan miRNAs have been recognized as a conserved group of short ncRNAs,
-typically ~ 22 nt, with important roles as post-transcriptional regulators of the gene expression
-affecting a sizeable number of mRNAs and expressed in all developmental
-process and diseases <span id="id6">[<a class="reference internal" href="#id79"><span>2</span></a>]</span>. Their canonical biogenesis starts in the form of primary
-precursors (pri-miRNAs) transcribed from long non-coding RNAs or protein-coding transcripts,
-mostly from introns <span id="id7">[<a class="reference internal" href="#id88"><span>17</span></a>]</span>. Later, derived from hairpin-like precursors excised in
-the nucleus (pre-miRNAs), their acting form is subsequently further processed as
-miRNA/miRNA* duplexes on the cytoplasm and incorporated into the RISC complex.
-Target specificity is achieved by complementarity between the miR and mRNA sequence.
-(see more details in <span id="id8">[<a class="reference internal" href="#id79"><span>2</span></a>]</span>).</p>
-<p>Current classification of annotated miRNAs into families are available in miRBase <a class="footnote-reference brackets" href="#f1" id="id9">1</a> and
-mirGeneDB <a class="footnote-reference brackets" href="#f2" id="id10">2</a> databases. As an example, the human genome reported 1984 miRNA precursors in
-the miRBase v.22.1 <span id="id11">[<a class="reference internal" href="#id25"><span>6</span></a>]</span> and the corresponding mature products were estimated ~2300
-<span id="id12">[<a class="reference internal" href="#id24"><span>1</span></a>]</span>. Focusing on the <em>confidently canonical</em> miRNAs reported in <span id="id13">[<a class="reference internal" href="#id78"><span>4</span></a>]</span>,
-the number of miRNAs is 519. Those differences are explained on the basis of multiple
-<em>miRNA</em> detection methods as well as the intrinsic definitions to define a <em>canonical miRNA</em>.</p>
-<p>Despite the small size of the precursors (80-100 nt), sequence comparison
-methods are able to detected them, due a high level of sequence conservation
-<span id="id14">[<a class="reference internal" href="#id30"><span>13</span></a>]</span>. In one hand, it is important to point that the use of blast-based homology
-searches alone tend to produce false positives that require extensive curation, which relies
-on properties obtained from miRNAs <span id="id15">[<a class="reference internal" href="#id28"><span>15</span></a>]</span>. On the other hand, the
-inclusion of the consensus structure complements the homology search methods,
-for example using covariance models (CMs) <span id="id16">[<a class="reference internal" href="#id32"><span>3</span></a>,<a class="reference internal" href="#id66"><span>5</span></a>]</span>. The accuracy and
-sensitivity of CMs depends critically on the sequence alignment and the annotated consensus
-used to build the model. Those observations call for an integrated workflow to perform
-homology search and to evaluate their results in a consistent manner.</p>
-<p>In this computational approach, focused on the <em>canonical</em> miRNAs processed by Drosha and Dicer,
-we improve on ideas from MIRfix <span id="id17">[<a class="reference internal" href="#id27"><span>16</span></a>]</span> and integrate it with homology search.
-<code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> is used to identify and annotate homologs of metazoan microRNAs in a homology-based
-setting.</p>
-</div>
-<div class="section" id="strategy">
-<h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline">¶</a></h2>
-<p>Current approaches to computational miRNA detection relies on homology relationships
-or detection of hairpin-loop candidates with lower folding energy. A complete set of
-tools to automatize this task have been assembled on <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>. This current
-approach combines two different sequence-homology modes, using <code class="docutils literal notranslate"><span class="pre">blast</span></code> or <code class="docutils literal notranslate"><span class="pre">HMMer</span></code>, and
-a secondary structure validation step, performed by the <code class="docutils literal notranslate"><span class="pre">INFERNAL</span></code> package. Combination
-of different strategies and the modification of default covariance models, let <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code>
-report not only the homology relationships, but also define positions of <em>mature</em> sequences
-and the correct miRNA annotation, supported by multiple family specific alignments.
-Current workflow is depicted as follows:</p>
-<a class="reference internal image-reference" href="_images/mirnature3.png"><img alt="_images/mirnature3.png" src="_images/mirnature3.png" style="width: 600px;" /></a>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>The easiest way to install <strong>miRNAture</strong> is through <cite>conda</cite>. To do so, please first install
-Conda <a class="footnote-reference brackets" href="#conda" id="id18">3</a>.</p>
-<p>To speed up installation of dependencies and packages we suggest to use
-mamba <a class="footnote-reference brackets" href="#mamba" id="id19">4</a>, for this just run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">mamba</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
-</pre></div>
-</div>
-<p>You can use <cite>mamba</cite> as drop-in replacement for <cite>conda</cite> by simply replacing the call to <cite>conda</cite> with a call to
-<cite>mamba</cite>.</p>
-<p><em>Install via Conda</em></p>
-<p>To install <strong>miRNAture</strong> from <cite>conda</cite> in a specific <cite>mirnature</cite> environment simply run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">mirnature</span> <span class="n">mirnature</span>
-</pre></div>
-</div>
-<p>if <cite>mamba</cite> is available, else run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">mirnature</span> <span class="n">mirnature</span>
-</pre></div>
-</div>
-<p><em>Manual install, resolve dependencies via Conda</em></p>
-<p>Create a <cite>mirnature</cite> <cite>conda</cite> environment with the file <cite>miRNAture.yml</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">mirnature</span> <span class="o">-</span><span class="n">f</span> <span class="n">miRNAture</span><span class="o">.</span><span class="n">yml</span>
-</pre></div>
-</div>
-<p>Activate the environment containing all dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">mirnature</span>
-</pre></div>
-</div>
-<p>followed by the manual steps:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">perl</span> <span class="n">Build</span><span class="o">.</span><span class="n">PL</span>
-<span class="o">./</span><span class="n">Build</span>
-<span class="o">./</span><span class="n">Build</span> <span class="n">test</span>
-<span class="o">./</span><span class="n">Build</span> <span class="n">install</span>
-</pre></div>
-</div>
-<p>which will install <strong>miRNAture</strong> in the <cite>mirnature</cite> <cite>conda</cite> environment.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="strategy.html">Strategy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorial.html#annotating-some-coelacanth-mirnas">Annotating (some) coelacanth miRNAs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html#contact">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="help.html">Need Help</a></li>
 </ul>
 </div>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-<p class="rubric">Footnotes</p>
-<dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id9">1</a></span></dt>
-<dd><p><a class="reference external" href="https://www.mirbase.org/">https://www.mirbase.org/</a></p>
-</dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id10">2</a></span></dt>
-<dd><p><a class="reference external" href="https://www.mirgenedb.org/">https://www.mirgenedb.org/</a></p>
-</dd>
-<dt class="label" id="conda"><span class="brackets"><a class="fn-backref" href="#id18">3</a></span></dt>
-<dd><p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">https://docs.conda.io/projects/conda/en/latest/user-guide/install/</a></p>
-</dd>
-<dt class="label" id="mamba"><span class="brackets"><a class="fn-backref" href="#id19">4</a></span></dt>
-<dd><p><a class="reference external" href="https://github.com/mamba-org/mamba">https://github.com/mamba-org/mamba</a></p>
-</dd>
-</dl>
-<p id="id20"><dl class="citation">
-<dt class="label" id="id24"><span class="brackets"><a class="fn-backref" href="#id12">1</a></span></dt>
+<p id="id1"><dl class="citation">
+<dt class="label" id="id5"><span class="brackets">1</span></dt>
 <dd><p>Julia Alles, Tobias Fehlmann, Ulrike Fischer, Christina Backes, Valentina Galata, Marie Minet, Martin Hart, Masood Abu-Halima, Friedrich A Grässer, Hans-Peter Lenhof, Andreas Keller, and Eckart Meese. An estimate of the total number of true human miRNAs. <em>Nucleic Acids Res</em>, 47:3353–3364, 2019. <a class="reference external" href="https://doi.org/10.1093/nar/gkz097">doi:10.1093/nar/gkz097</a>.</p>
 </dd>
-<dt class="label" id="id79"><span class="brackets">2</span><span class="fn-backref">(<a href="#id6">1</a>,<a href="#id8">2</a>)</span></dt>
+<dt class="label" id="id60"><span class="brackets">2</span></dt>
 <dd><p>David P. Bartel. Metazoan microRNAs. <em>Cell</em>, 2018. <a class="reference external" href="https://doi.org/10.1016/j.cell.2018.03.006">doi:10.1016/j.cell.2018.03.006</a>.</p>
 </dd>
-<dt class="label" id="id32"><span class="brackets"><a class="fn-backref" href="#id16">3</a></span></dt>
+<dt class="label" id="id13"><span class="brackets">3</span></dt>
 <dd><p>S R Eddy and R Durbin. RNA sequence analysis using covariance models. <em>Nucleic Acids Res</em>, 22:2079–2088, 1994. <a class="reference external" href="https://doi.org/10.1093/nar/22.11.2079">doi:10.1093/nar/22.11.2079</a>.</p>
 </dd>
-<dt class="label" id="id78"><span class="brackets"><a class="fn-backref" href="#id13">4</a></span></dt>
+<dt class="label" id="id59"><span class="brackets">4</span></dt>
 <dd><p>Bastian Fromm, Tyler Billipp, Liam E. Peck, Morten Johansen, James E. Tarver, Benjamin L. King, James M. Newcomb, Lorenzo F. Sempere, Kjersti Flatmark, Eivind Hovig, and Kevin J. Peterson. A uniform system for the annotation of vertebrate microRNA genes and the evolution of the human microRNAome. <em>Ann. Rev. Genetics</em>, 49:213–242, 2015. <a class="reference external" href="https://doi.org/10.1146/annurev-genet-120213-092023">doi:10.1146/annurev-genet-120213-092023</a>.</p>
 </dd>
-<dt class="label" id="id66"><span class="brackets"><a class="fn-backref" href="#id16">5</a></span></dt>
+<dt class="label" id="id47"><span class="brackets">5</span></dt>
 <dd><p>Paul P. Gardner. The use of covariance models to annotate RNAs in whole genomes. <em>Briefings in Functional Genomics</em>, 8:444–450, 2009. <a class="reference external" href="https://doi.org/10.1093/bfgp/elp042">doi:10.1093/bfgp/elp042</a>.</p>
 </dd>
-<dt class="label" id="id25"><span class="brackets"><a class="fn-backref" href="#id11">6</a></span></dt>
+<dt class="label" id="id6"><span class="brackets">6</span></dt>
 <dd><p>A Kozomara, M Birgaoanu, and S Griffiths-Jones. miRBase: from microRNA sequences to function. <em>Nucleic Acids Res.</em>, 47:D155–D162, 2019. <a class="reference external" href="https://doi.org/10.1093/nar/gky1141">doi:10.1093/nar/gky1141</a>.</p>
 </dd>
-<dt class="label" id="id89"><span class="brackets"><a class="fn-backref" href="#id5">7</a></span></dt>
+<dt class="label" id="id70"><span class="brackets">7</span></dt>
 <dd><p>Mariana Lagos-Quintana, Reinhard Rauhut, Winfried Lendeckel, and Thomas Tuschl. Identification of novel genes coding for small expressed rnas. <em>Science</em>, 294(5543):853–858, 2001. URL: <a class="reference external" href="https://science.sciencemag.org/content/294/5543/853">https://science.sciencemag.org/content/294/5543/853</a>, <a class="reference external" href="https://arxiv.org/abs/https://science.sciencemag.org/content/294/5543/853.full.pdf">arXiv:https://science.sciencemag.org/content/294/5543/853.full.pdf</a>, <a class="reference external" href="https://doi.org/10.1126/science.1064921">doi:10.1126/science.1064921</a>.</p>
 </dd>
-<dt class="label" id="id90"><span class="brackets"><a class="fn-backref" href="#id5">8</a></span></dt>
+<dt class="label" id="id71"><span class="brackets">8</span></dt>
 <dd><p>Nelson C. Lau, Lee P. Lim, Earl G. Weinstein, and David P. Bartel. An abundant class of tiny rnas with probable regulatory roles in caenorhabditis elegans. <em>Science</em>, 294(5543):858–862, 2001. URL: <a class="reference external" href="https://science.sciencemag.org/content/294/5543/858">https://science.sciencemag.org/content/294/5543/858</a>, <a class="reference external" href="https://arxiv.org/abs/https://science.sciencemag.org/content/294/5543/858.full.pdf">arXiv:https://science.sciencemag.org/content/294/5543/858.full.pdf</a>, <a class="reference external" href="https://doi.org/10.1126/science.1065062">doi:10.1126/science.1065062</a>.</p>
 </dd>
-<dt class="label" id="id91"><span class="brackets"><a class="fn-backref" href="#id5">9</a></span></dt>
+<dt class="label" id="id72"><span class="brackets">9</span></dt>
 <dd><p>Rosalind C. Lee and Victor Ambros. An extensive class of small rnas in caenorhabditis elegans. <em>Science</em>, 294(5543):862–864, 2001. URL: <a class="reference external" href="https://science.sciencemag.org/content/294/5543/862">https://science.sciencemag.org/content/294/5543/862</a>, <a class="reference external" href="https://arxiv.org/abs/https://science.sciencemag.org/content/294/5543/862.full.pdf">arXiv:https://science.sciencemag.org/content/294/5543/862.full.pdf</a>, <a class="reference external" href="https://doi.org/10.1126/science.1065329">doi:10.1126/science.1065329</a>.</p>
 </dd>
-<dt class="label" id="id87"><span class="brackets"><a class="fn-backref" href="#id2">10</a></span></dt>
+<dt class="label" id="id68"><span class="brackets">10</span></dt>
 <dd><p>Rosalind C. Lee, Rhonda L. Feinbaum, and Victor Ambros. The c. elegans heterochronic gene &lt;em&gt;lin-4&lt;/em&gt; encodes small rnas with antisense complementarity to &lt;em&gt;lin-14&lt;/em&gt;. <em>Cell</em>, 75(5):843–854, Dec 1993. URL: <a class="reference external" href="https://doi.org/10.1016/0092-8674(93)90529-Y">https://doi.org/10.1016/0092-8674(93)90529-Y</a>, <a class="reference external" href="https://doi.org/10.1016/0092-8674(93)90529-Y">doi:10.1016/0092-8674(93)90529-Y</a>.</p>
 </dd>
-<dt class="label" id="id23"><span class="brackets"><a class="fn-backref" href="#id1">11</a></span></dt>
+<dt class="label" id="id4"><span class="brackets">11</span></dt>
 <dd><p>Yehu Moran, Maayan Agron, Daniela Praher, and Ulrich Technau. The evolutionary origin of plant and animal microRNAs. <em>Nat Ecol Evol</em>, 1:27, 2017. <a class="reference external" href="https://doi.org/10.1038/s41559-016-0027">doi:10.1038/s41559-016-0027</a>.</p>
 </dd>
-<dt class="label" id="id56"><span class="brackets"><a class="fn-backref" href="#id4">12</a></span></dt>
+<dt class="label" id="id37"><span class="brackets">12</span></dt>
 <dd><p>Amy E Pasquinelli, B J Reinhart, F Slack, M Q Martindale, M I Kuroda, B Maller, D C Hayward, E E Ball, B Degnan, P Müller, J Spring, A Srinivasan, M Fishman, J Finnerty, J Corbo, M Levine, P Leahy, Eric Davidson, and G. Ruvkun. Conservation of the sequence and temporal expression of let-7 heterochronic regulatory RNA. <em>Nature</em>, 408:86–89, 2000. <a class="reference external" href="https://doi.org/10.1038/35040556">doi:10.1038/35040556</a>.</p>
 </dd>
-<dt class="label" id="id30"><span class="brackets"><a class="fn-backref" href="#id14">13</a></span></dt>
+<dt class="label" id="id11"><span class="brackets">13</span></dt>
 <dd><p>N Price, R A Cartwright, N Sabath, D Graur, and R B Azevedo. Neutral evolution of robustness in drosophila microRNA precursors. <em>Mol Biol Evol</em>, 28:2115–2123, 2011. <a class="reference external" href="https://doi.org/10.1093/molbev/msr029">doi:10.1093/molbev/msr029</a>.</p>
 </dd>
-<dt class="label" id="id86"><span class="brackets">14</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>)</span></dt>
+<dt class="label" id="id67"><span class="brackets">14</span></dt>
 <dd><p>Brenda J. Reinhart, Frank J. Slack, Michael Basson, Amy E. Pasquinelli, Jill C. Bettinger, Ann E. Rougvie, H. Robert Horvitz, and Gary Ruvkun. The 21-nucleotide let-7 rna regulates developmental timing in caenorhabditis elegans. <em>Nature</em>, 403(6772):901–906, Feb 2000. URL: <a class="reference external" href="https://doi.org/10.1038/35002607">https://doi.org/10.1038/35002607</a>, <a class="reference external" href="https://doi.org/10.1038/35002607">doi:10.1038/35002607</a>.</p>
 </dd>
-<dt class="label" id="id28"><span class="brackets"><a class="fn-backref" href="#id15">15</a></span></dt>
+<dt class="label" id="id9"><span class="brackets">15</span></dt>
 <dd><p>J E Tarver, R S Taylor, M N Puttick, G T Lloyd, W Pett, B Fromm, B E Schirrmeister, D Pisani, K J Peterson, and P C J Donoghue. Well-annotated microRNAomes do not evidence pervasive miRNA loss. <em>Genome Biol Evol</em>, 10:1457–1470, 2018. <a class="reference external" href="https://doi.org/10.1093/gbe/evy096">doi:10.1093/gbe/evy096</a>.</p>
 </dd>
-<dt class="label" id="id27"><span class="brackets"><a class="fn-backref" href="#id17">16</a></span></dt>
+<dt class="label" id="id8"><span class="brackets">16</span></dt>
 <dd><p>Ali M. Yazbeck, Peter F. Stadler, Kifah Tout, and Jörg Fallmann. Automatic curation of large comparative animal microRNA data sets. <em>Bioinformatics</em>, 35:4553–4559, 2019. <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btz271">doi:10.1093/bioinformatics/btz271</a>.</p>
 </dd>
-<dt class="label" id="id88"><span class="brackets"><a class="fn-backref" href="#id7">17</a></span></dt>
+<dt class="label" id="id69"><span class="brackets">17</span></dt>
 <dd><p>Maximilian Zeidler, Alexander Hüttenhofer, Michaela Kress, and Kai K. Kummer. Intragenic micrornas autoregulate their host genes in both direct and indirect ways—a cross-species analysis. <em>Cells</em>, 2020. URL: <a class="reference external" href="https://www.mdpi.com/2073-4409/9/1/232">https://www.mdpi.com/2073-4409/9/1/232</a>, <a class="reference external" href="https://doi.org/10.3390/cells9010232">doi:10.3390/cells9010232</a>.</p>
 </dd>
 </dl>
@@ -311,8 +213,8 @@ mamba <a class="footnote-reference brackets" href="#mamba" id="id19">4</a>, for 
           <div class="page-nav">
             <div class="inner"><ul class="page-nav">
   <li class="next">
-    <a href="tutorial.html"
-       title="next chapter">Tutorial →</a>
+    <a href="introduction.html"
+       title="next chapter">Introduction →</a>
   </li>
 </ul><div class="footer" role="contentinfo">
       &#169; Copyright 2021, miRNAture.
