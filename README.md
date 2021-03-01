@@ -4,8 +4,6 @@
 [![License](https://img.shields.io/github/license/cavelandiah/miRNAture_v1)](https://github.com/cavelandiah/miRNAture_v1)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/mirnature/README.html)
 
-=========
-
 ## Description
 
 Detection of miRNAs is a difficult problem due their small size limits the
