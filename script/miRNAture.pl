@@ -60,20 +60,17 @@ GetOptions (
     'new_models|nmodels=s{2}' => \@cm_model_others,
 ) or pod2usage(2);
 @strategy = split (/,/, join(',',@strategy));
-#pod2usage(1) if $help;
-#pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-#pod2usage("$0: No options given.") if ((scalar @ARGV) == 0);
 
 my $startComplete = time();
-my $current_dir = getcwd;
 #### Flags Evaluation
 $rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run,$rep_cutoff);
 my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$specie.yaml");
+my $current_dir = $configuration_mirnature->[3]->{Default_folders}->{Output_folder}."/TemporalFiles"; #getcwd;
 ## Working Paths
 get_basic_files($configuration_mirnature->[3]->{Default_folders}->{Data_folder});
 
 my ($start_hmm, $start_other, $start_infernal, $start_blast);
-my %genomes;
+#my genomes;
 my $name = $nameC;
 $name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 my $tag = ((strftime "%H%M%S%d%m%Y", localtime) + (int(rand(10)))); #Today date + random number 0..10.
@@ -88,7 +85,9 @@ my $configuration_file = MiRNAture::ConfigFile->new(
     data_folder => $data_folder,
 );
 $configuration_file->include_running_mode($mode);
-%genomes = $configuration_file->read_genomes_paths();
+my $tag_spe = $configuration_mirnature->[3]->{"Specie_data"}->{"Tag"};
+my $genome_path = $configuration_mirnature->[3]->{"Specie_data"}->{"Genome"};
+my $genomes = $configuration_file->read_genomes_paths($tag_spe, $genome_path);
 
 my $log_file = MiRNAture::LogFile->new(
     log_file_input => "$work_folder/LOGs/miRNAture_homology_log_${specie}_${mode}_$tag.log",
@@ -141,8 +140,8 @@ if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs and mirba
 open my $LIST, "< $nameC" or die;
 print_process("Processing $specie");
 
-if (exists $genomes{$specie}){
-    my $genome_path_complete = $genomes{$specie};
+if (exists $$genomes{$specie}){
+    my $genome_path_complete = $$genomes{$specie};
     my ($Zvalue, $genome_size_bp) = calculate_Z_value($genome_path_complete, "Genome");
     my $minBitscore = calculate_minimum_bitscore($genome_size_bp);
     #print "$Zvalue and $genome_size_bp and $minBitscore\n";
@@ -151,7 +150,7 @@ if (exists $genomes{$specie}){
         write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
         $start_blast = time;
         detect_blast_queries($blastQueriesFolder);
-        index_query_genome($genomes{$specie}, $configuration_mirnature->[2]->{Program_locations}->{makeblastdb});
+        index_query_genome($$genomes{$specie}, $configuration_mirnature->[2]->{Program_locations}->{makeblastdb});
         create_folders("$work_folder", "Blast");
         for (my $i = 0; $i<=$#strategy; $i++){
             print_process("Running on strategy $strategy[$i]");
@@ -197,7 +196,7 @@ if (exists $genomes{$specie}){
             #print_process("Running on $specie\t$_");
             my $hmm_experiment = MiRNAture::HMM->new(
                 hmm_model => $_,	
-                genome_subject => $genomes{$specie},
+                genome_subject => $$genomes{$specie},
                 subject_specie => $specie,
                 output_folder => $outHMM,
                 path_hmm_models => \@path_hmm,
@@ -225,7 +224,7 @@ if (exists $genomes{$specie}){
             #print_process("Running on $specie\t$_");
             my $cm_experiment = MiRNAture::CM->new(
                 cm_model => $_,
-                genome_subject => $genomes{$specie},
+                genome_subject => $$genomes{$specie},
                 subject_specie => $specie,
                 output_folder => $outInfernal,
                 path_covariance => \@path_cm,
@@ -250,7 +249,7 @@ if (exists $genomes{$specie}){
             next if $_ =~ /^RF/;
             my $other_experiment = MiRNAture::Others->new(
                 cm_model => $_,
-                genome_subject => $genomes{$specie},
+                genome_subject => $$genomes{$specie},
                 subject_specie => $specie,
                 output_folder => $outOther,
                 path_covariance => \@cm_model_others, 

@@ -211,10 +211,12 @@ sub _size_set {
 sub generate_copy_genome {
 	my $shift = shift;
 	if (!-e $shift->output_folder){
-		print_error("Output folder did not exist. Please create it to run miRNAture.");
+        ##print_error("Output folder did not exist. Please create it to run miRNAture.");
+        print_process("Output folder not detected. Creating...");
+        create_folders($shift->output_folder, "");
 	}
 	my $data_folder = $shift->output_folder->stringify."/TemporalFiles"; #Genome folder in Temporal Folder
-    	create_folders($shift->output_folder->stringify, "TemporalFiles");
+    create_folders($shift->output_folder->stringify, "TemporalFiles");
 	create_folders($data_folder, $shift->specie_name);
 	my $new_folder = $data_folder."/".$shift->specie_name;
 	my $new_genome_file = $data_folder."/".$shift->specie_name."/".$shift->specie_genome->basename.".new.fa"; # Name of the new genome
@@ -354,9 +356,12 @@ sub obtain_paths_programs {
 	my $clustalo = collect_data("clustalo");
 	my $RNAalifold = collect_data("RNAalifold");
 	my $mirfix = collect_data("MIRfix.py");
-	my $mirnatureHomology = collect_data("miRNAture.pl");
-	my $mirnanchor = collect_data("miRNAnchor.pl");
-	return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix, $mirnatureHomology, $mirnanchor);
+    ###my $mirnatureHomology = collect_data("miRNAture.pl");
+    ###my $mirnanchor = collect_data("miRNAnchor.pl");
+    ##TEMPORAL
+    my $mirnatureHomology = "/homes/biertank/cristian/Projects/miRNAture_v1/script/miRNAture.pl";
+    my $mirnanchor = "/homes/biertank/cristian/Projects/miRNAture_v1/script/miRNAnchor.pl";
+    return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix, $mirnatureHomology, $mirnanchor);
 }
 
 sub collect_data {
@@ -458,7 +463,8 @@ sub start {
        	print "'  '  `--' `-'   `'   ''       ``-'`--`-'   `--' |.......|         |.......|\n";
 	print "Computational detection of microRNA candidates\n";
     	#print "v.1.0 Mar 16, 2020\n";
-	print "v.1.0 Feb 1, 2021\n";
+        #      "v.1.0 Feb 1, 2021\n";
+	print "v.1.0.1 Apr 30, 2021\n";
 	print "Cristian A. Velandia-Huerto, Jöerg Fallmann, Peter F. Stadler\n";
 	print "Bioinformatics Leipzig\n";
 	print "University of Leipzig\n";

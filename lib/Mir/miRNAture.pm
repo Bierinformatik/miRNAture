@@ -49,10 +49,10 @@ sub generate_file_mirnature {
         $outfile = test_name($outfile);
     }
     open (my $OUT, ">", "$outfile.sh");
-	open (my $GENOME_OUT, ">>", $variable->[3]->{"Default_folders"}->{"Data_folder"}."/genomes.txt");
+    ##open (my $GENOME_OUT, ">>", $variable->[3]->{"Default_folders"}->{"Data_folder"}."/genomes.txt");
 	my $header = "# miRNAture\n# ".$variable->[0]->{"miRNAture"}->{"Author"}."\n# ".$variable->[0]->{"miRNAture"}->{"Date"}."\n# ".$variable->[0]->{"miRNAture"}->{"Version"};
 	my $headerUser = "# Session data:\n# Hostname: ".$variable->[1]->{"Data_user"}->{"Hostname"}."\n# Date:".$variable->[1]->{"Data_user"}->{"Running_date"}."\n# User:".$variable->[1]->{"Data_user"}->{"User"}."\n# Program: miRNAture";
-	print $GENOME_OUT $variable->[3]->{"Specie_data"}->{"Tag"}."="."\"".$variable->[3]->{"Specie_data"}->{"Genome"}."\"\n";
+    ##print $GENOME_OUT $variable->[3]->{"Specie_data"}->{"Tag"}."="."\"".$variable->[3]->{"Specie_data"}->{"Genome"}."\"\n";
 	print $OUT "#!/bin/bash\n\n####\n$header\n####\n$headerUser\n####\n";
 	my $parameters = build_parameters_mirnature($variable);
 	my $mode = $variable->[3]->{"Homology_options"}->{"Mode"};
@@ -79,7 +79,7 @@ sub generate_file_mirnature {
 	$variable->[4]->{"User_results"}{"miRNAture_program"} = $outfile.".sh";
 	$variable->write($config_file);
 	close $OUT;
-	close $GENOME_OUT;
+    ##close $GENOME_OUT;
 	return;
 }
 
@@ -119,32 +119,52 @@ sub clean_cache {
     my $variables = shift;
     my $mode = shift;
     my $folder = $variables->[3]->{"Default_folders"}->{"Current_dir"}; 
+    my $foldert = $variables->[3]->{"Default_folders"}->{"Output_folder"}."/TemporalFiles"; 
     my $data_folder = $variables->[3]->{"Default_folders"}->{"Data_folder"}; 
+    my $index = $variables->[3]->{Specie_data}->{Old_Genome}.".index";
 
     print_process("Cleaning temporal files...");
     if ($mode =~ /^All$/){
-	    if (-e "$folder/.used_ids.txt"){
-		    system("rm $folder/.used_ids.txt");
+        ##if (-e "$folder/.used_ids.txt"){
+        ##    system("rm $folder/.used_ids.txt");
+        ##}
+        if (-e "$foldert/.blastTemp/"){
+            system("rm -r $foldert/.blastTemp/");
+        }
+        if (-e "$foldert/.infernalTemp/"){
+            system("rm -r $foldert/.infernalTemp/");
+        }
+	    if (-e "$foldert/.mirfixTempIndividual/"){
+		    system("rm -r $foldert/.mirfixTempIndividual/");
 	    }
-	    system("rm -r $folder/.blastTemp/");
-	    system("rm -r $folder/.infernalTemp/");
-	    if (-e "$folder/.mirfixTempIndividual/"){
-		    system("rm -r $folder/.mirfixTempIndividual/");
-	    }
-	    system("rm $data_folder/genomes.txt");
-	    system("rm $data_folder/Validation_mature_data/all_genomes_list.txt");
+        ##system("rm $data_folder/genomes.txt");
+        if (-e "$data_folder/Validation_mature_data/all_genomes_list.txt"){
+            system("rm $data_folder/Validation_mature_data/all_genomes_list.txt");
+        }
+        if (-e "$index"){
+            system("rm $index");
+        }
     } elsif ($mode =~ /^Homology/){
-	    if (-e "$folder/.used_ids.txt"){
-		    system("rm $folder/.used_ids.txt");
-	    }
-	    system("rm -r $folder/.blastTemp/");
-	    system("rm -r $folder/.infernalTemp/");
+        ##if (-e "$folder/.used_ids.txt"){
+        ##    system("rm $folder/.used_ids.txt");
+        ##}
+        if (-e "$foldert/.blastTemp/"){
+            system("rm -r $foldert/.blastTemp/");
+        }
+        if (-e "$foldert/.infernalTemp/"){
+            system("rm -r $foldert/.infernalTemp/");
+        }
+        if (-e "$index"){
+            system("rm $index");
+        }
     } elsif ($mode =~ /^Validation/){
-	    if (-e "$folder/.mirfixTempIndividual/"){
-		    system("rm -r $folder/.mirfixTempIndividual/");
+	    if (-e "$foldert/.mirfixTempIndividual/"){
+		    system("rm -r $foldert/.mirfixTempIndividual/");
 	    }
-	    system("rm $data_folder/genomes.txt");
-	    system("rm $data_folder/Validation_mature_data/all_genomes_list.txt");
+        ##system("rm $data_folder/genomes.txt");
+	    if (-e "$data_folder/Validation_mature_data/all_genomes_list.txt"){
+            system("rm $data_folder/Validation_mature_data/all_genomes_list.txt");
+        }
     } else {
 	    ;
     }

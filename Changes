@@ -1,5 +1,14 @@
 Revision history for Bio-miRNAture
 
+1.01    Apr 30 2021.
+        # Updates
+        - Support of multiple runs at the same time without I/O temporal files collision.
+        - Automatic creation of output folder declared on the -w flag.
+        # Corrected bugs
+        - Temporal file folders moved to TemporalFiles/ folder.
+        - Corrected cleaning of temporal files.
+        - Remove of genome.txt file and related functions.
+
 1.00    Feb 1 2021.
         First version, released on an unsuspecting world.
 

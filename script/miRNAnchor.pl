@@ -65,7 +65,13 @@ $start_config->check_existence_folder_output;
 my $genomes_file = $start_config->get_genome_validation_list;
 $start_config->recognize_families_homology($db_models_relation); #Include in final files the annotation family
 my $RFAM_families = $start_config->identify_RFAM_families;  #Identify families already with the corresponding validation family
-my $outTempAddress = ".mirfixTempIndividual";
+my $outTempAddress = "$working_path/TemporalFiles/.mirfixTempIndividual";
+if (-e $outTempAddress){
+    ;
+} else {
+    create_folder($outTempAddress);
+    create_folder("$outTempAddress/LOGs");
+}
 my $genome_location = load_genomes_location_file($genomes_file); #Load database genomes
 
 my %all = ();

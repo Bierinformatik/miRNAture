@@ -361,7 +361,7 @@ sub makeDatabaseQueryLen {
 sub writeBlastn {
 	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $specie, $out_path_blast, $dir_now, $blast_path) = @_;	
 	$genome =~ s/\"//g;
-	open my $OUTTEMP, "> .blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh";
+	open my $OUTTEMP, "> $dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh";
 	my $out_file_blast = "${specie}_$strategy.$ncrna.$query_tag.tab";
 	print $OUTTEMP "\#!\/bin\/bash\n";
 	print $OUTTEMP "$blast_path -db $genome -query $query_seq -num_threads 4 $parameters $out_path_blast/$out_file_blast\n";
@@ -526,7 +526,7 @@ sub write_cmsearch_specific_sequence_group {
 	create_folders("$dir_now/.infernalTemp","LOGs"); #Create folder specific to specie
 	existenceProgram($cmsearch_path);
 	#Dive_9.snRNA.pema.tab.db.location.fasta
-	open my $OUTTEMPC, "> .infernalTemp/${genome_tag}_$str.$molecule_query.sh";
+	open my $OUTTEMPC, "> $dir_now/.infernalTemp/${genome_tag}_$str.$molecule_query.sh";
 	print $OUTTEMPC "\#!\/bin\/bash\n";
 	# lacht_9.miRNA.ciro.tab.db.location.fasta
 	my $query_file = "$out_path_infernal/../${genome_tag}_$str.$molecule_query.tab.db.location.blocks.coord.fasta";

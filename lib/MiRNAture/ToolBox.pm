@@ -2,7 +2,7 @@ package MiRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF read_genomes_paths create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final);
 
 use Moose::Role; 
 use File::Copy; 
@@ -91,7 +91,7 @@ sub evaluate_input_flags {
 	  to run the prediction of miRNAs.
     Returns: Created environment in the current folder:
 	 Creates: Data/, Basic_files/ including the basic
-	 files to run the pipeline (genomes.txt and RFAM scores file).
+	 files to run the pipeline (RFAM scores file).
 =cut 
 
 sub get_basic_files {
@@ -112,15 +112,15 @@ sub get_basic_files {
 			copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
 			test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
 		}
-		if (-s "$basic_folder/genomes.txt"){
-			test_basic_file("$basic_folder/genomes.txt", "genomes");
-		} else {
-			;
+        ##if (-s "$basic_folder/genomes.txt"){
+        ##	test_basic_file("$basic_folder/genomes.txt", "genomes");
+        ##} else {
+        ##	;
 			#This file is generated automatically, so it must be on the folder. If not, is an error of miRNAture.
 			#print_process("The file: $data_folder/genomes.txt is missing, miRNAture will create it.");
 			#copy_files("Default_Data/genomes.txt", $basic_folder);
 			#test_basic_file("$basic_folder/genomes.txt", "genomes");
-		}
+        ##}
 	}
 	if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
 		copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
@@ -198,35 +198,33 @@ sub read_config_file {
 	return $final;
 }
 
-=head1 read_genomes_paths 
-    Title: read_genomes_paths 
-    Usage: read_genomes_paths(format_file, name_config_file);
-    Function: Fills up the path information table along all
-	  genomes. All of this information is retrieved from
-	  Data/Basic_files/genomes.txt file.
-    Returns: Hash with keys as Species tags, defined by the user, and values as paths. 
-=cut 
+##sub read_genomes_paths { #File
+##	my $name = shift;
+##	$name =~ s/(.*\/|\/.*\/)(.*)$/$2/g;
+##	open my $genomes_paths, "< Data/Basic_files/genomes.txt" or die "The file <Data/Basic_files/genomes.txt> does not exists\n"; 
+##	my $targetGenomes;
+##	my %genomes;
+##	while (<$genomes_paths>){
+##		chomp;
+##		next if ($_ =~ /^#|^$/); 
+##		my @splitline = split /\=/, $_;
+##		$splitline[1] =~ s/"//g;
+##		$genomes{$splitline[0]} = $splitline[1];
+##	}
+##	foreach my $keys (sort keys %genomes){
+##		$targetGenomes .= "$keys ";
+##	}
+##	$targetGenomes =~ s/(.*)(\s+)$/2\.$1/g; #add identification
+##	store_conf_file($targetGenomes, $name);
+##	return %genomes;
+##}
 
-sub read_genomes_paths { #File
-	my $name = shift;
-	$name =~ s/(.*\/|\/.*\/)(.*)$/$2/g;
-	open my $genomes_paths, "< Data/Basic_files/genomes.txt" or die "The file <Data/Basic_files/genomes.txt> does not exists\n"; 
-	my $targetGenomes;
-	my %genomes;
-	while (<$genomes_paths>){
-		chomp;
-		next if ($_ =~ /^#|^$/); 
-		my @splitline = split /\=/, $_;
-		$splitline[1] =~ s/"//g;
-		$genomes{$splitline[0]} = $splitline[1];
-	}
-	foreach my $keys (sort keys %genomes){
-		$targetGenomes .= "$keys ";
-	}
-	$targetGenomes =~ s/(.*)(\s+)$/2\.$1/g; #add identification
-	store_conf_file($targetGenomes, $name);
-	return %genomes;
-}
+#sub read_genomes_paths {
+#    my ($tag, $path) = @_;
+#    my %genomes; 
+#    $genomes{$tag} = $path;
+#    return \%genomes;
+#}
 
 =head1 create_folders 
     Title: create_folders 
@@ -584,6 +582,9 @@ sub getSequencesFasta {
 		print $DBFILE "H$reg\t$database{$reg}\n";
 	}
 	close $IN; close $DBFILE;
+    if ($mode == 1 || $mode == 5){
+        system("rm .used_ids.txt");
+    }
 	return;
 }
 
@@ -593,7 +594,7 @@ sub getSequencesFasta_final {
 	### First, index the genome
 	my $dbCHR;
 	# Look if exists index
-	if (!-e $genome || -z $genome){
+	if (!-e "$genome" || -z "$genome"){
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
 	} else {
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
@@ -762,6 +763,7 @@ sub get_header_name {
 }
 
 sub generate_key {
+    my $folder = shift;
 	FLAG:	
 	my $id = time() + int rand(10000); #entropy_source->get_int(12345);#time(); #+ rand(1000);
 	$id =~ s/(.*)(\..*)/$1/g;
@@ -775,7 +777,8 @@ sub generate_key {
 }
 
 sub generate_key_double {
-	FLAG:	
+	my $folder = shift;
+    FLAG:	
 	my $id = time() + int rand(10000); #entropy_source->get_int(12345);#time(); #+ rand(1000);
 	$id =~ s/(.*)(\..*)/$1/g;
 	my $exist = check_if_exists($id);
