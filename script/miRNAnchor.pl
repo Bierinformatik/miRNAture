@@ -62,7 +62,7 @@ my $start_config = MiRNAnchor::Main->new (
 
 my $db_models_relation = load_correspondence_models_rfam("$RFAM_mirbase_source/../", $user_data); #Load databases correspondence to do validation.
 $start_config->check_existence_folder_output;
-my $genomes_file = $start_config->get_genome_validation_list;
+my $genome_location = $start_config->get_genome_validation_list;
 $start_config->recognize_families_homology($db_models_relation); #Include in final files the annotation family
 my $RFAM_families = $start_config->identify_RFAM_families;  #Identify families already with the corresponding validation family
 my $outTempAddress = "$working_path/TemporalFiles/.mirfixTempIndividual";
@@ -72,7 +72,6 @@ if (-e $outTempAddress){
     create_folder($outTempAddress);
     create_folder("$outTempAddress/LOGs");
 }
-my $genome_location = load_genomes_location_file($genomes_file); #Load database genomes
 
 my %all = ();
 my @all_results;
@@ -101,7 +100,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
                 my $subset = "${rfam_defined_models}_${num}"; #Set Name
                 create_environment_detailed_subset($start_config->output_folder, $rfam_defined_models, $code_header, $address, $subset, $tag_specie);
                 copy_rfam_files_group_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $subset, $tag_specie);
-                create_genome_file_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genomes_file, $subset, $tag_specie);
+                create_genome_file_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $subset, $tag_specie);
                 process_query_fasta_group_subset($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $subset, $tag_specie); #Include subject fasta sequences
                 $specific_query_path = $start_config->output_folder."/$address/$tag_specie/$rfam_defined_models/$subset/$code_header";
                 include_subject_genome($specific_query_path, "BaseFiles", $subset, $genome_location, $start_config->subject_genome_path);
@@ -115,7 +114,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
         } else {
             create_environment_detailed($start_config->output_folder, $rfam_defined_models, $code_header, $address, $tag_specie);
             copy_rfam_files_group($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $tag_specie);
-            create_genome_file($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genomes_file, $tag_specie);
+            create_genome_file($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $tag_specie);
             process_query_fasta_group($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $tag_specie); #Include subject fasta sequences
             $specific_query_path = $start_config->output_folder."/$address/$tag_specie/$rfam_defined_models/$code_header";
             include_subject_genome($specific_query_path, "BaseFiles",$rfam_defined_models, $genome_location, $start_config->subject_genome_path);

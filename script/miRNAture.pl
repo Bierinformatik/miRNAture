@@ -126,7 +126,7 @@ if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs and mirba
     } else { #Only with miRNAture models
 	    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("mirbase", $basicFiles, $user_data_path); 
     }
-} elsif ($mode =~ m/Infernal/) { #Here get all the scores from RFAM database
+} elsif ($mode =~ m/INFERNAL/) { #Here get all the scores from RFAM database
     ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, $user_data_path); 
 } else { #Here get all the scores from RFAM
 	if (length $user_data_path > 0){ #If path defined check that exists scores file
