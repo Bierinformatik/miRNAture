@@ -374,10 +374,6 @@ sub perform_detection_repeated_loci {
 	foreach my $mirna_acc (sort keys %database){
 		my $candidates = $database{$mirna_acc};
 		my $number = scalar @$candidates;
-		if ($mode =~ /relax/){ #If relax: take all repeats and selects all candidates
-			$selection_number = $number;
-			$threshold_repeat = 0;
-		}
 		if ($number >= $threshold_repeat){ #Select those families that reported high number loci
 			my @sorted_bit = sort { $a->[7] <=> $b->[7] } @$candidates; #Organize by bitscore
 			my $selected = select_best_score_candidates(\@sorted_bit, $selection_number); #Select the top X candidates

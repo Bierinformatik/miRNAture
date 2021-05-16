@@ -426,20 +426,20 @@ sub read_final_file {
 sub read_last_file {
 	my $shift = shift;
 	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml";
-       	my $last_name = get_last_name($final_file);
+    my $last_name = get_last_name($final_file);
 	my $final = YAML::Tiny->read($last_name);
 	return $final;
 }
 
 sub get_last_name {
 	my $name = shift;
-       	my $nameOriginal = $name;
+    my $nameOriginal = $name;
 	$name =~ s/(.*)(\.yaml)/$1/g;
 	my $count = 1;
 	NAME:
 	my $test_name = "$name-$count.yaml";
-       	my $last_name;
-	if (-e $test_name){
+    my $last_name;
+	if (-e $test_name && !-z $test_name){
 		$last_name = $test_name;
 		$count++;
 		goto NAME;        
