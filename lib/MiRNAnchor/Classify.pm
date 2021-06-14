@@ -221,7 +221,7 @@ sub process_all_candidates {
 				print_error("There is an error in the syntax code $validStructure and $code");
 			}
 		} elsif (exists $$discardedDB{$code}){ #This miRNA was classified as discarted
-			print $DISCARTED "$$db_codes{$code}\tNA\tDISCARTED\tNA\tNA\tNA\tNA\n";	
+			print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\n";	
 		} else {
 			print $DISCARTED "$$db_codes{$code}\tNA\tCM_MODEL_DISCARDED\tNA\tNA\tNA\tNA\n";	
 		}
