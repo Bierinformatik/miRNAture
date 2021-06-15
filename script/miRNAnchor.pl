@@ -14,6 +14,7 @@ use MiRNAnchor::Tools;
 use MiRNAnchor::Validate;
 use MiRNAnchor::Check;
 use MiRNAnchor::Classify;
+use MiRNAture::ToolBox;
 
 ### Input data
 my $miRNA_fasta_path = ""; #Path of fasta sequences from candidates grouped by RFAM family
@@ -60,6 +61,7 @@ my $start_config = MiRNAnchor::Main->new (
     tag_spe_query => $tag_specie
 );
 
+my $configFile = read_config_file("$working_path/miRNAture_configuration_${tag_specie}.yaml"); #Read old config file
 my $db_models_relation = load_correspondence_models_rfam("$RFAM_mirbase_source/../", $user_data); #Load databases correspondence to do validation.
 $start_config->check_existence_folder_output;
 my $genome_location = $start_config->get_genome_validation_list;
@@ -207,6 +209,7 @@ my $classification = MiRNAnchor::Classify->new(
     discarted_mirnas => $working_path."/".$address."/all_discarded_".$tag_specie."_miRNAs.txt", # Concatenated pre-discarded
     mature_description => $working_path."/".$address."/all_mature_".$tag_specie."_miRNAs_description.txt", # Concatenated mature info
     precalculated_path => $RFAM_mirbase_source,
+    genome_specie => $original_genome,
     tag_spe_query => $tag_specie,
     accepted_file => $working_path."/".$address."/accepted_".$tag_specie.".miRNAs.txt", #Out accepted file
     accepted_noStr_file => $working_path."/".$address."/accepted_".$tag_specie."_noalign.txt", #Out accepted file with cand that destroyed alignment
@@ -221,7 +224,7 @@ my $classification = MiRNAnchor::Classify->new(
     bed_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.bed",
 );
 
-$classification->process_all_candidates; #Generate evaluation at STO align level
+$classification->process_all_candidates($configFile); #Generate evaluation at STO align level
 $classification->generate_output_files; ## Finally create GFF3/BED files
 $classification->organise_mess("$working_path/$address");
 

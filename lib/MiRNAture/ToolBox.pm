@@ -607,11 +607,11 @@ sub getSequencesFasta_final {
 		my $ids;
 		#H1595452937.0	JH127654.1	+.2	RF00929.3	1.4	77.5	486168.6	486267.7	33.8.8	0.0034.9	no.10	mir-574.1	77.2	9.3	Blast.4	ANCA.5	anca148294,anca148390.6	miRNA.7	2.8	18.9	-8.2	100.1
 		my @tmp = split /\s+|\t/, $_;
-		if ($tmp[6] < $tmp[7]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); #Coordinates from nhmmer output Chr,S,E
-		} else {
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); #Coordinates from nhmmer output Chr,S,E
-		}
+		if ($tmp[6] < $tmp[7]){ 
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
+        } else {
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
+        }
 		my $frame = $tmp[2]; #Strand
 		my $gene_name = "$tmp[0] $specie_name $tmp[11] stem-loop"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
 		my $output_nucleotide2 = Bio::Seq->new(
@@ -998,6 +998,7 @@ sub cmsearch {
 	}
 	return;
 }
+
 
 sub print_error {
 	my $text = shift;

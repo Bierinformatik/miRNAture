@@ -75,6 +75,16 @@ sub perform_evaluation {
 		}
 		my $fasta_file_out = getSequencesFasta_final($specie_name, $genome, $out_fasta, $input_table, $md);
 		my $file_measure = perform_measure_MFE($fasta_file_out);
+        ### Here evaluate again with corresponding CM but with a global flag.
+        # CM RFAM:
+        #my $cm_rfam = $variables->[3]->{"Default_folders"}{"CM_folder"};
+        # CM User
+        #my $cm_user = $variables->[3]->{"Default_folders"}{"User_CM_folder"};
+        #my $list_cms = concatenate_cms_paths($cm_rfam, $cm_user);
+        # Output data:
+        #my $out_folder = $variables->[4]->{"User_results"}{"Evaluation_results_folder"};
+        #my $truncated_scores_global = perform_global_evaluation_covariance($fasta_file_out, $list_cms, $out_folder, $specie_tag, $md); 
+        ###
 		if ($file_measure eq "NA"){
 			print_result("The generation of MFE scores for $md mode is not available, there are no candidates.");
 		} else {
