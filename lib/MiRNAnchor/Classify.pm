@@ -2,7 +2,7 @@ package MiRNAnchor::Classify;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(process_all_candidates);
+@EXPORT = qw(process_all_candidates, concatenate_cms_paths);
 
 use Moose;
 use MooseX::Types::Path::Class;
@@ -166,9 +166,13 @@ sub load_all_results {
 sub process_all_candidates {
 	my $shift = shift;
     my $variables = shift;
+    my $name_cm_db = shift;
 	my ($db_codes, $acceptedDB, $discardedDB) = load_all_results($shift); 
 	my $finalValidationPath = $shift->output_folder;
     my $specie_tag = $shift->tag_spe_query;
+    my $genome_path_complete = $variables->[3]->{Specie_data}{Old_Genome};
+    my ($Zvalue, $genome_size_bp) = calculate_Z_value($genome_path_complete, "Genome");
+    my $minBitscore = calculate_minimum_bitscore($genome_size_bp);
 	# Output files
 	open (my $ACCEPTED, ">", $shift->accepted_file) or die;
 	open (my $ACCEPTED_NOALIGN, ">", $shift->accepted_noStr_file) or die; 
@@ -209,21 +213,20 @@ sub process_all_candidates {
             ##### Extract final fasta and evaluate if truncated with global
             my $line = $$acceptedDB{$code};
             my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $specie_tag);
-            ### Here evaluate again with corresponding CM but with a global flag.
-            ## CM RFAM:
-            my $cm_rfam = $variables->[3]->{"Default_folders"}{"CM_folder"};
-            # Other CM:
-            my $cm_other = $variables->[3]->{"Default_folders"}{"Other_CM_folder"};
-            # CM User
-            my $cm_user = $variables->[3]->{"Default_folders"}{"User_CM_folder"};
             my $fam_sequence = (split /\s+|\t/, $line)[-2];
-            my $list_cms = concatenate_cms_paths($cm_rfam, $cm_user, $cm_other, $fam_sequence);
-            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $list_cms, $finalValidationPath, $specie_tag, $code, $fam_sequence); 
-            my $truncated_value;
-            if (exists $$truncated_scores_global{$code}{0}){
-                $truncated_value = $$truncated_scores_global{$code}{0}; # Get the best result in position 0.
+            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $specie_tag, $code, $fam_sequence); 
+            my ($truncated_value, $bitscore_global_value);
+            #Truncated value
+            if (exists $$truncated_scores_global{$code}{0}{Truncated}){
+                $truncated_value = $$truncated_scores_global{$code}{0}{Truncated}; # Get the best result in position 0.
             } else {
                 $truncated_value = "NotCalculated";
+            }
+            # Bitscore corrected
+            if (exists $$truncated_scores_global{$code}{0}{Score}){
+                $bitscore_global_value = $$truncated_scores_global{$code}{0}{Score}; # Get the best result in position 0.
+            } else {
+                $bitscore_global_value = -1;
             }
             ###
 			# Check the conserved SS is valid
@@ -244,27 +247,44 @@ sub process_all_candidates {
 				# Compare distances from annotated and corrected
 				my ($distanceStart, $distanceEnd, $distanceFinal) = compare_positions_miRNAs($new_data, $old_data);
                 if ($truncated_value eq "no"){ # Global align evaluation, not truncated
-                    if ($strDistance <= 7){
-                        print $ACCEPTED "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\n";	
-                    } else {
-                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\n";	
+                    if ($bitscore_global_value > $minBitscore){ #Look global score
+                        if ($strDistance <= 7){
+                            print $ACCEPTED "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\t$bitscore_global_value\n";	
+                        } else {
+                            print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\t$bitscore_global_value\n";	
+                        }
+                    } else { #Discard if global score is low
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
                     }
                 } else { # Truncated, in relation to the CM model
-                    print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\n";	
+                    # Evaluate the bitscore, have to be > log2 2N
+                    if ($bitscore_global_value > $minBitscore){ #Look global score
+                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\t$bitscore_global_value\n";	
+                    } else {
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
                 }
 			} elsif ($validStructure =~ m/^No_valid|^NA|^No_valid_No_match/){
                 if ($truncated_value eq "no"){ # Global align evaluation, not truncated
-                    print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\tNA\tNA\tNA\tNA\t$truncated_value\n"; 
+                    if ($bitscore_global_value > $minBitscore){ #Look global score
+                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n"; 
+                    } else {
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
                 } else {
-                    print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\n";	
+                    if ($bitscore_global_value > $minBitscore){ #Discuss this one. No valid str + truncated, but valid score
+                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n"; 
+                    } else {
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
                 }
 			} else {
 				print_error("There is an error in the syntax code $validStructure and $code");
 			}
 		} elsif (exists $$discardedDB{$code}){ #This miRNA was classified as discarted
-			print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\tNA\n";	
+			print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\tNA\tNA\n";	
 		} else {
-			print $DISCARTED "$$db_codes{$code}\tNA\tCM_MODEL_DISCARDED\tNA\tNA\tNA\tNA\tNA\n";	
+			print $DISCARTED "$$db_codes{$code}\tNA\tCM_MODEL_DISCARDED\tNA\tNA\tNA\tNA\tNA\tNA\n";	
 		}
 	}
 	close $ACCEPTED;
@@ -283,7 +303,7 @@ sub perform_global_evaluation_covariance {
         my $cm = $$pathsCM{$family};
         $outfile = cmsearch_global($family, $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
     } else {
-        print_error("CM is not available for global validation\n");
+        print_error("CM is $family not available for global validation\n");
     }
     # Here concatenate and classify the results if they are complete or not
     #my $outfile = concatenate_tab_files($outFolder, $specieT);
@@ -348,13 +368,31 @@ sub get_result_truncated_global {
     while (<$IN>){
         next if ($_ =~ /^#/);
         my @complete = split /\s+|\t/, $_;
-        $data{$complete[0]}{$count} = $complete[10];
+        $data{$complete[0]}{$count}{Truncated} = $complete[10]; #Truncated result
+        my $scoreB = $complete[14] - $complete[13]; # Bitscore - bias
+        $data{$complete[0]}{$count}{Score} = $scoreB; # Bitscore
         $count++;
     }
     return \%data;
 }
 
 sub concatenate_cms_paths {
+    my ($default, $user, $other) = @_;
+    my @paths;
+    my %final;
+    if (-d $default) {
+        push @paths, $default;
+    }
+    if (-d $other) {
+        push @paths, $other;
+    }
+    if (-d $user) {
+        push @paths, $user;
+    }
+    return \@paths;
+}
+
+sub concatenate_cms_paths_old {
     my ($default, $user, $other, $fam) = @_;
     my @paths;
     my %final;

@@ -144,7 +144,6 @@ if (exists $$genomes{$specie}){
     my $genome_path_complete = $$genomes{$specie};
     my ($Zvalue, $genome_size_bp) = calculate_Z_value($genome_path_complete, "Genome");
     my $minBitscore = calculate_minimum_bitscore($genome_size_bp);
-    #print "$Zvalue and $genome_size_bp and $minBitscore\n";
     if ($configuration_file->mode eq "BLAST"){
         print_process("Running Mode: ".$configuration_file->mode." searches");	
         write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");

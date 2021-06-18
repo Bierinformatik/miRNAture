@@ -2,7 +2,7 @@ package MiRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final infer_name_database_cm);
 
 use Moose::Role; 
 use File::Copy; 
@@ -928,6 +928,40 @@ sub classify_2rd_align_results {
 	return;
 }
 
+sub infer_name_database_cm {
+	my ($new_cm_folder) = @_;
+    my @all_models;
+	foreach my $path (@$new_cm_folder){
+        my @all_cm_models = check_folder_files($path, "\.cm"); #All files must end at '.cm'
+        foreach my $file (@all_cm_models){
+            my $complete =  "$path/$file";
+            push @all_models, $complete;
+        }
+    }
+	my %database;
+	my $IN;
+    # Read each CMs and collect its name, build DB
+	foreach my $file (@all_models){
+		next if $file !~ /\.cm$/;
+		open $IN, "< $file" or die;
+		my ($name, $acc);
+		while (<$IN>){
+			chomp;
+			if ($_ =~ /^NAME\s/){
+				$name = (split /\s+|\t/)[1];
+                $database{$name} = $file;
+			} elsif ($_ =~ /^ACC\s/){
+                $acc = (split /\s+|\t/)[1];
+                $database{$acc} = $file;
+            } else{
+				next;
+			}
+		}
+        close $IN;
+	}
+	return \%database;
+}
+
 sub infer_data_from_cm {
 	my ($new_cm_folder, $basic_files, $name) = @_;
 	my @all_cm_models = check_folder_files($new_cm_folder, "\.cm"); #All files must end at '.cm'
@@ -962,6 +996,7 @@ sub infer_data_from_cm {
 		}
 		my $new_line_cm_families = "$acc\t$score\t$length\t$name\t$family";
 		print $OUT "$new_line_cm_families\n";
+        close $IN;
 	}
 	close $OUT;
 	return;

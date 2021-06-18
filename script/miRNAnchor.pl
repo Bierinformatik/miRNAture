@@ -223,8 +223,16 @@ my $classification = MiRNAnchor::Classify->new(
     gff_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.gff3",
     bed_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.bed",
 );
-
-$classification->process_all_candidates($configFile); #Generate evaluation at STO align level
+### Build database CMs names
+## CM RFAM:
+my $cm_rfam = $configFile->[3]->{"Default_folders"}{"CM_folder"};
+# Other CM:
+my $cm_other = $configFile->[3]->{"Default_folders"}{"Other_CM_folder"};
+# CM User
+my $cm_user = $configFile->[3]->{"Default_folders"}{"User_CM_folder"};
+my $list_cms = concatenate_cms_paths($cm_rfam, $cm_user, $cm_other);
+my $name_cm_database = infer_name_database_cm($list_cms); 
+$classification->process_all_candidates($configFile, $name_cm_database); #Generate evaluation at STO align level
 $classification->generate_output_files; ## Finally create GFF3/BED files
 $classification->organise_mess("$working_path/$address");
 

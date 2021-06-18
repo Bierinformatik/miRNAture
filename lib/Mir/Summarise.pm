@@ -42,26 +42,26 @@ sub calculate_summary_file {
     if (-e $input_fileStr && !-z $input_fileStr){
         $R->run(qq`tabStr = read.table(file='$input_fileStr', h=F)`);
     } else {
-        $R->run(qq`tabStr = data.frame(matrix(,ncol=27, nrow=1))`);
+        $R->run(qq`tabStr = data.frame(matrix(,ncol=29, nrow=1))`);
         $R->run(qq`colnames(tabStr) = sub("X", "V", colnames(tabStr))`)
     }
     if (-e $input_fileNoStr && !-z $input_fileNoStr){
     	$R->run(qq`tabNoStr = read.table(file='$input_fileNoStr', h=F)`);
     } else {
-        $R->run(qq`tabNoStr = data.frame(matrix(,ncol=27, nrow=1))`);
+        $R->run(qq`tabNoStr = data.frame(matrix(,ncol=29, nrow=1))`);
         $R->run(qq`colnames(tabNoStr) = sub("X", "V", colnames(tabNoStr))`)
     }
     if (-e $input_discarded && !-z $input_discarded){
         $R->run(qq`tabDiscarded = read.table(file='$input_discarded', h=F)`);
     } else {
-        $R->run(qq`tabDiscarded = data.frame(matrix(,ncol=27, nrow=1))`);
+        $R->run(qq`tabDiscarded = data.frame(matrix(,ncol=29, nrow=1))`);
         $R->run(qq`colnames(tabDiscarded) = sub("X", "V", colnames(tabDiscarded))`)
     }
 	#Parsing and cleaning data
 	#Chr, Start, End, Strand, Family, MFE, Len,Homology_Method
-	$R->run(q`subsetDataStr = tabStr %>% select(c("V2","V7","V8","V3","V12","V4","V26","V27","V15"))`);
-	$R->run(q`subsetDataNoStr = tabNoStr %>% select(c("V2","V7","V8","V3","V12","V4","V26","V27","V15"))`);
-	$R->run(q`subsetDataDiscarded = tabDiscarded %>% select(c("V2","V7","V8","V3","V12","V4","V26","V27","V15"))`);
+	$R->run(q`subsetDataStr = tabStr %>% select(c("V2","V7","V8","V3","V12","V4","V28","V29","V15"))`);
+	$R->run(q`subsetDataNoStr = tabNoStr %>% select(c("V2","V7","V8","V3","V12","V4","V28","V29","V15"))`);
+	$R->run(q`subsetDataDiscarded = tabDiscarded %>% select(c("V2","V7","V8","V3","V12","V4","V28","V29","V15"))`);
 	#Column names
 	$R->run(q`colnames(subsetDataStr) = c("Chr", "Start", "End", "Strand", "Family", "ACC", "MFE", "LEN", "Homology_Method")`);
 	$R->run(q`colnames(subsetDataNoStr) = c("Chr", "Start", "End", "Strand", "Family", "ACC", "MFE", "LEN", "Homology_Method")`);
