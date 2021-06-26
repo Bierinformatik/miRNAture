@@ -302,7 +302,7 @@ sub calculate_Z_value {
 	}
 	my ($value, $value2);
 	existenceProgram("esl-seqstat");
-	$value = `esl-seqstat $genome | grep "#"`;
+	$value = `esl-seqstat --dna $genome | grep "#"`;
 	$value = (split /\s+/, $value)[-1];
 	$value2 = $value;
 	if ($mode eq "Genome"){

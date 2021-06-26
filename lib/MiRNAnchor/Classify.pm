@@ -746,7 +746,7 @@ sub generate_output_files {
 	open (my $POSITIVE, "<", $shift->accepted_file->stringify);
 	open (my $POSITIVE_NO_STR, "<", $shift->accepted_noStr_file->stringify);
 	open (my $DISCARDED, "<", $shift->discarded_file->stringify);
-	open (my $INFO, "<", $shift->mature_description);
+	open (my $INFO, "<", $shift->mature_description->stringify);
 	my (%info, %positiveHigh, %positiveMed, %positiveAccepted, %negativeLow);
 	#H1601739630	X	-	RF00711	1	90	45932312	45932381	17.0	0.0034	no	mir-449	90	10	Blast	ANCA,DARE,XELA,XETR	anca148299,anca148674,anca149012,dare322,dare719,xela37007,xetr2120,xetr2352	miRNA	1
 	#H1601747417	>patr-RF00711-42 H1601747417 Pan troglogytes mir-449 stem-loop H1601747417 MIMAT0041140/B1600189418/H1601747417 MIMAT0041140/B1600189418/H1601747417-star 10 31 45 67 RF00711 RF00711_1	Accepted	RF00711_1
@@ -881,13 +881,14 @@ sub organise_mess {
 	create_folders($working_path, "GFF3");
 	create_folders($working_path, "BED");
 	create_folders($working_path, "Additional_Support");
+    my $short_specie = $shift->tag_spe_query;
 	opendir DH, $working_path;
 	while (my $file = readdir DH) {
-		if ($file =~ /\.txt$/){
+		if ($file =~ /\.txt$/ && $file =~ /\_$short_specie/){
 			move("$working_path/$file", "$working_path/Additional_Support");
-		} elsif ($file =~ /\.gff3/){
+		} elsif ($file =~ /\.gff3/ && $file =~ /\_$short_specie/){
 			move("$working_path/$file", "$working_path/GFF3");
-		} elsif ($file =~ /\.bed/){
+		} elsif ($file =~ /\.bed/ && $file =~ /\_$short_specie/){
 			move("$working_path/$file", "$working_path/BED");
 		} else {
 			;
