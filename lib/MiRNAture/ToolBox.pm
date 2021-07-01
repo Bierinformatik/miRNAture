@@ -470,6 +470,11 @@ sub getSequencesFasta {
 			$tmp[4] = $exEnd;
 			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $specie_name_complete, $len_r);
 		} elsif ($mode == 4 || $mode == 5){ #Final Tables
+            if ($mode == 5){
+                my $extension_homology = 15; # Extension to the homology candidates
+                my $chr_length = $dbCHR->length("$tmp[0]");
+                ($tmp[5], $tmp[6]) = extendBlastnCoordinates($tmp[5], $tmp[6], 1, 0, 0, $chr_length, $extension_homology);
+            }
 			if ($tmp[6] > $tmp[5]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
 				$gen_seq = $dbCHR->seq( $tmp[0], $tmp[5], $tmp[6]); #Coordinates from nhmmer output Chr,S,E
 			} else {

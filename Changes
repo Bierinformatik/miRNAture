@@ -4,6 +4,9 @@ Revision history for Bio-miRNAture
         # Updates
         - Support of multiple runs at the same time without I/O temporal files collision.
         - Automatic creation of output folder declared on the -w flag.
+        - Inclusion of a global alignment to validate structural curated sequences in
+          comparison to reference covariance model.
+        - Extension of homology fasta sequences before structural validation with MIRfix.
         # Corrected bugs
         - Temporal file folders moved to TemporalFiles/ folder.
         - Corrected cleaning of temporal files.
