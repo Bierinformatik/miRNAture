@@ -213,8 +213,15 @@ sub process_all_candidates {
             ##### Extract final fasta and evaluate if truncated with global
             my $line = $$acceptedDB{$code};
             my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $specie_tag);
-            my $fam_sequence = (split /\s+|\t/, $line)[-2];
-            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $specie_tag, $code, $fam_sequence); 
+            #(split /\s+|\t/, $line)[-2]; # Homology Family
+            #(split /\s+|\t/, $line)[3];  # Structural Family
+            # Here evaluate, if exists, with structural family. If not, By the homology one.
+            my $fam_sequenceH = (split /\s+|\t/, $line)[-2]; # Homology
+            my $fam_sequenceS = (split /\s+|\t/, $line)[3]; # Structural
+            my @families_CMs = ();
+            push @families_CMs, $fam_sequenceS;
+            push @families_CMs, $fam_sequenceH;
+            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $specie_tag, $code, \@families_CMs); 
             my ($truncated_value, $bitscore_global_value);
             #Truncated value
             if (exists $$truncated_scores_global{$code}{0}{Truncated}){
@@ -299,9 +306,13 @@ sub perform_global_evaluation_covariance {
 	if (!-e $file || -z $file){
 		print_error("Sequence file to global evaluation not created\n");
 	} 
-    if (exists $$pathsCM{$family}){
-        my $cm = $$pathsCM{$family};
-        $outfile = cmsearch_global($family, $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
+    # $family[0]: Str,  $family[1] = Homology CM
+    if (exists $$pathsCM{"$$family[0]"}){ #Test with Structural CM.
+        my $cm = $$pathsCM{$$family[0]};
+        $outfile = cmsearch_global($$family[0], $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
+    } elsif (exists $$pathsCM{"$$family[1]"}){ # Test with homology CM.
+        my $cm = $$pathsCM{$$family[1]};
+        $outfile = cmsearch_global($$family[1], $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
     } else {
         print_error("CM is $family not available for global validation\n");
     }
