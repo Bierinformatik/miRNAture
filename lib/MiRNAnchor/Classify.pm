@@ -215,12 +215,12 @@ sub process_all_candidates {
             my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $specie_tag);
             #(split /\s+|\t/, $line)[-2]; # Homology Family
             #(split /\s+|\t/, $line)[3];  # Structural Family
-            # Here evaluate, if exists, with structural family. If not, By the homology one.
+            # Here evaluate, if exists, with homolgy family. If not, By the structural one.
             my $fam_sequenceH = (split /\s+|\t/, $line)[-2]; # Homology
             my $fam_sequenceS = (split /\s+|\t/, $line)[3]; # Structural
             my @families_CMs = ();
-            push @families_CMs, $fam_sequenceS;
             push @families_CMs, $fam_sequenceH;
+            push @families_CMs, $fam_sequenceS;
             my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $specie_tag, $code, \@families_CMs); 
             my ($truncated_value, $bitscore_global_value);
             #Truncated value
