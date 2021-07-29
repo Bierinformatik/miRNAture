@@ -100,7 +100,8 @@ has 'mature_description' => (
 
 sub process_fasta_sequences {
 	my $shift = shift;
-	my $fasta_query = (check_folder_files($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.*\.fasta"))[0];
+    #my $fasta_query = (check_folder_files($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.*\.fasta"))[0];
+	my $fasta_query = (check_folder_files($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.fasta"))[0];
 	my $fasta_candidates = read_fasta_results($shift->source_miRNAs_fasta."/".$fasta_query);
 	$shift->fasta_results($fasta_candidates);
 	my $accepted = $shift->accepted_file->stringify;
