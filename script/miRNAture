@@ -140,6 +140,24 @@ if ($config_file->stage =~ /^homology$/){
 	);
 	$summary_results->generate_summary_file($config_file->config_file, $variables);
 	$homology_searches->clean_cache($variables, "All");
+} elsif ($config_file->stage =~ /^no_homology$/){
+	my $validation_mirnas = Mir::miRNAnchor->new(
+		all_parameters => $variables
+	);
+	$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+	$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+	$validation_mirnas->run_miRNAnchor($variables);
+	my $evaluation_results = Mir::Eval->new(
+		all_parameters => $variables
+	);
+	$evaluation_results->create_folder_environment($config_file->config_file, $variables);
+	$evaluation_results->test_input_files($config_file->config_file, $variables);
+	$evaluation_results->perform_evaluation($variables); #Add MFE & final fasta
+	my $summary_results = Mir::Summarise->new(
+		all_parameters => $variables
+	);
+	$summary_results->generate_summary_file($config_file->config_file, $variables);
+	$homology_searches->clean_cache($variables, "All");
 } elsif ($config_file->stage =~ /^evaluation$/){
 	my $evaluation_results = Mir::Eval->new(
 		all_parameters => $variables
@@ -153,7 +171,7 @@ if ($config_file->stage =~ /^homology$/){
 	);
 	$summary_results->generate_summary_file($config_file->config_file, $variables);
 } else {
-	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise' or even better 'complete'.");
+	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise', 'no_homology' or even better 'complete'.");
 }
 end_close();
 

@@ -2,6 +2,7 @@ Revision history for Bio-miRNAture
 
 1.01    Apr 30 2021.
         # Updates
+        - Included 'no_homology' search mode to perform validations and subsequent analysis.
         - Support of multiple runs at the same time without I/O temporal files collision.
         - Automatic creation of output folder declared on the -w flag.
         - Inclusion of a global alignment (cmsearch -g) to validate structural curated sequences in
