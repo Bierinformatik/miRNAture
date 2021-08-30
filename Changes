@@ -9,6 +9,8 @@ Revision history for Bio-miRNAture
           comparison to reference covariance model (from structural evaluation if available or 
           used on the homology stage).
         - Extension of homology fasta sequences before structural validation with MIRfix.
+        - Search on genome intervals and not in the complete genome. MIRfix is faster looking for candidates and
+          re-mapping correct candidates is done on previous calculated genome regions.
         # Corrected bugs
         - Temporal file folders moved to TemporalFiles/ folder.
         - Corrected cleaning of temporal files.

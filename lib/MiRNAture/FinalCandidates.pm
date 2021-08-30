@@ -95,6 +95,8 @@ sub create_folders_final {
 	my $shift = shift;
 	create_folders($shift->output_folder,"Final_Candidates");#Create Final Folder	
 	create_folders($shift->output_folder."/Final_Candidates", "Fasta"); #Create Final fasta folder	
+    # Genomes folder to save genome intervals to be searched on mirfix:  <30-08-21, cavelandiah> #
+	create_folders($shift->output_folder."/Final_Candidates/Fasta", "Genomes"); #Create Final fasta folder	
 	return;
 }
 
@@ -132,6 +134,14 @@ sub create_final_report {
 sub get_fasta_sequences {
 	my $shift = shift;
 	getSequencesFasta($shift->subject_specie, $shift->genome_subject, "NA", $shift->output_folder->stringify."/Final_Candidates/Fasta/", "5", $shift->length_CM, $shift->names_CM, $shift->final_out_table->stringify, $shift->specie_name); #Header mode == 5 Final table
+	return;
+}
+
+sub get_small_genomes {
+    # Generate genome anchors from predicted miRNAs to be validated with MIRfix.
+    # This will extend reported coordinates +-300 nt.
+	my $shift = shift;
+    getSequencesFastaSubGenome($shift->specie_name, $shift->genome_subject, $shift->output_folder->stringify."/Final_Candidates/Fasta/Genomes", $shift->final_out_table);
 	return;
 }
 

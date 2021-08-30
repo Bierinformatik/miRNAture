@@ -323,6 +323,7 @@ if ($configuration_file->mode eq "Final"){
     $final_candidates->create_folders_final;
     $final_candidates->generate_final_output;
     $final_candidates->get_fasta_sequences;
+    $final_candidates->get_small_genomes;
     $final_candidates->generate_gff_homology;
     my $end = time(); 
     my $diff = $end - $startComplete;

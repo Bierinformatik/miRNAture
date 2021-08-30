@@ -593,6 +593,73 @@ sub getSequencesFasta {
 	return;
 }
 
+##############
+
+sub getSequencesFastaSubGenome {
+	my ($specie_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
+	my %final_seq;
+	### First, index the genome
+	my $dbCHR;
+	# Look if exists index
+	if (!-e "$genome" || -z "$genome"){
+		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
+	} else {
+		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
+	}
+	##
+    # Here read the .db file which already included +-15nt:  <30-08-21, cavelandiah> #
+	open my $IN, "< $input_table.db" or die;
+	my ($gen_seq);
+    my $extension_genome = 250; # Extension to the homology candidates
+	while (<$IN>){
+		chomp;
+		my $ids;
+        #H1625790349	S104	+	MIPF0000079	1	88	271598	271735	33.8	0.00099	no	mir-145	88	0	Infernal	Infernal	mir-145	miRNA	RF00675
+		my @tmp = split /\s+|\t/, $_;
+        my $chr_length = $dbCHR->length("$tmp[1]");
+        ($tmp[6], $tmp[7]) = extendBlastnCoordinates($tmp[6], $tmp[7], 1, 0, 0, $chr_length, $extension_genome);
+		if ($tmp[6] < $tmp[7]){ 
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
+        } else {
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
+        }
+		my $frame = $tmp[2]; #Strand
+		my $gene_name = "$tmp[0] $specie_name $tmp[11] $tmp[1]#$tmp[6]#$tmp[7]"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
+		my $output_nucleotide2 = Bio::Seq->new(
+			-seq        => $gen_seq,
+			-id         => $gene_name,
+			#-display_id => $gene_name,
+			-alphabet   => 'dna'
+		);
+        # In case was detected in forward strand, just report as a genome in 5'->3'
+        # because MIRfix will search in both strands
+        #if ($frame eq "-") {
+        #	$output_nucleotide2 = $output_nucleotide2->revcom();
+        #}
+		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
+	}
+	close $IN;
+	my $outfileF = "$out_fasta/${specie_name}_subgenome.fasta";
+	open my $OUTFILE, ">> $outfileF";
+	foreach my $ids (sort keys %final_seq){
+		my $idsm = $ids;
+		print $OUTFILE ">$idsm\n";
+		my $all = $final_seq{$ids};
+		foreach my $sq (@$all){
+			if (!$sq){
+				print_error("The sequence for $ids is empty");
+			}
+			$sq = uc($sq);
+			$sq =~ s/(.{60})/$1\n/g;
+			print $OUTFILE "$sq\n";
+		}
+	}
+	close $OUTFILE;
+	return $outfileF;
+}
+
+#############
+
 sub getSequencesFasta_final {
 	my ($specie_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
 	my %final_seq;
@@ -643,7 +710,7 @@ sub getSequencesFasta_final {
 			}
 			$sq = uc($sq);
 			$sq =~ s/T/U/g;
-			$sq =~ s/(.{60})/$1\n/g;
+            $sq =~ s/(.{60})/$1\n/g;
 			print $OUTFILE "$sq\n";
 		}
 	}

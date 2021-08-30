@@ -55,7 +55,10 @@ sub build_parameters_mirnanchor {
     if (length $variable->[3]->{Default_folders}->{User_folder} > 0){
 	    $data_user = $variable->[3]->{Default_folders}->{User_folder};
     }
-    my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Specie_data"}->{"Old_Genome"}." -g ".$variable->[3]->{"Specie_data"}->{"Genome"}." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Specie_data"}->{"Tag"}." -usrM ".$data_user;
+    # Homology genome with all specific candidates
+    my $homology_genome = $variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta/Genomes/".$variable->[3]->{Specie_data}->{Name}."_subgenome.fasta";
+    my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Specie_data"}->{"Old_Genome"}." -g ".$homology_genome." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Specie_data"}->{"Tag"}." -usrM ".$data_user;
+    #my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Specie_data"}->{"Old_Genome"}." -g ".$variable->[3]->{"Specie_data"}->{"Genome"}." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Specie_data"}->{"Tag"}." -usrM ".$data_user;
     return $parameters;
 }
 

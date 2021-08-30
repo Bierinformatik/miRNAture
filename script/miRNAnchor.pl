@@ -196,6 +196,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
         accepted_file => $working_path."/".$address."/".$start_config->tag_spe_query."/".$rfam_defined_models."/".$rfam_defined_models.".accepted",
         mature_description => $working_path."/".$address."/".$start_config->tag_spe_query."/".$rfam_defined_models."/".$rfam_defined_models.".out",
     );
+    # Generate reference table from homology to re-map corrected miRNA:  <30-08-21, cavelandiah> #
     $family_check->process_fasta_sequences; #Start all required files and variables
     $family_check->check_candidate; #Based on produced files, run the steps of evaluation for each ACC number from CM models
     $family_check->concatenate_results("$working_path/$address", $start_config->tag_spe_query); #all_accepted/all_discarded

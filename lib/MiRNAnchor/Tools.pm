@@ -235,7 +235,7 @@ sub setup_all_to_run_mirfix_group {
 		mapping_file => "$location/BaseFiles/${name}.mappingtest.txt",
 		mature_file => "$location/BaseFiles/${name}_maturetest.fa",
 		extension => "10",
-		log_level => "ERROR"
+		log_level => "DEBUG"
 	);
 	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){
@@ -287,7 +287,7 @@ sub setup_all_to_run_mirfix_group_subset {
 		mapping_file => "$location/BaseFiles/${subset}.mappingtest.txt",
 		mature_file => "$location/BaseFiles/${subset}_maturetest.fa",
 		extension => "10",
-		log_level => "ERROR"
+		log_level => "DEBUG"
 	);
 	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){
