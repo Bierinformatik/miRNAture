@@ -540,7 +540,7 @@ sub write_cmsearch_specific_sequence_group {
 			if (!-e $cm || -z $cm ){
 				next;
 			} else {
-				my $param = "--cpu 8 --notrunc -Z $Zvalue --noali --nohmmonly --toponly --tblout $out_path_infernal/${query_file_modified}.${cm_name}.tab $cm $query_file";
+				my $param = "--cpu 8 -E 0.015 --notrunc -Z $Zvalue --noali --nohmmonly --toponly --tblout $out_path_infernal/${query_file_modified}.${cm_name}.tab $cm $query_file";
 				print $OUTTEMPC "$cmsearch_path $param\n";
 			}
 		}

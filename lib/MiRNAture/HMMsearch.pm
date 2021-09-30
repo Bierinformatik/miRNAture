@@ -51,7 +51,7 @@ sub cmsearch_specific_sequence {
 	foreach my $cm_models_path_specific (@$cm_models_path){
 		my $model = "$cm_models_path_specific/${cm}.cm";
 		if (-e $model && !-z $model){
-			my $param = "--cpu 5 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.${cm}.tab $model $fasta";
+			my $param = "--cpu 5 -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.${cm}.tab $model $fasta";
 			system "$cmsearch_path $param 1> /dev/null";
 		}
 	}
@@ -95,7 +95,7 @@ sub runNhmmer {
 	my $param;
 	foreach my $hmms_path_specific (@$path_hmm){
 		if (-e "$hmms_path_specific/$HMM.hmm"){
-			$param = "--cpu 8 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
+			$param = "--cpu 8 -E 0.015 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
 			system "$nhmmer_path $param 1> /dev/null";
 		} else {
 			next;

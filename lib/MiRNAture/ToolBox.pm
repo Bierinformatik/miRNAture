@@ -1098,7 +1098,7 @@ sub cmsearch {
 	}
 	$genome =~ s/"//g;
 	if (-e "$path_cm/${nameCMFinal}" && !-z "$path_cm/${nameCMFinal}"){
-		my $param = "--cpu 5 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm/${nameCMFinal} $genome";
+		my $param = "--cpu 5 -E 0.015 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm/${nameCMFinal} $genome";
 		system "$cmsearch_path $param 1> /dev/null";
 	} else {
 		;

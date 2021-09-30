@@ -27,7 +27,7 @@ sub cmsearch {
 	$genome =~ s/"//g;
 	foreach my $path_cm_specific (@$path_cm){
 		if (-e "$path_cm_specific/${nameCMFinal}" && !-z "$path_cm_specific/${nameCMFinal}"){
-			my $param = "--cpu 5 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm_specific/${nameCMFinal} $genome";
+			my $param = "--cpu 5 -E 0.015 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm_specific/${nameCMFinal} $genome";
 			system "$cmsearch_path $param 1> /dev/null";
 		} 
 	}
