@@ -13,6 +13,8 @@ Revision history for Bio-miRNAture
           re-mapping correct candidates is done on previous calculated genome regions.
         - Added -E 0.015 to get valid candidates. Since the pipeline is not dealing with candidates that reported
           greater E-values.
+        - Broken evaluation could be restarted, miRNAture evaluates folder structure and structurally evaluate
+          candidates.
         # Corrected bugs
         - Temporal file folders moved to TemporalFiles/ folder.
         - Corrected cleaning of temporal files.
