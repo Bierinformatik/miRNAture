@@ -80,6 +80,12 @@ my @all_results;
 
 # Iterate Rfam Model
 foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only to the targeted ones
+    ### Evaluate if the family was previously evaluated, in cases of broken runs.
+    my $evaluated = evaluated_family($rfam_defined_models, $working_path."/miRNA_validation/".$tag_specie);
+    if ($evaluated == 1){ # Family has been evaluated
+        print_result("The family $rfam_defined_models has been previously evaluated");
+        next;
+    }
     my $eval = detect_multifamily_rfam($rfam_defined_models);
     my $rfam_precalculated_specific = $start_config->precalculated_path."/".$rfam_defined_models; #Data from working RFAM family.
     if (!-d $rfam_precalculated_specific){

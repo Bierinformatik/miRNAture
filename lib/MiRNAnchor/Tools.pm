@@ -2,7 +2,7 @@ package MiRNAnchor::Tools;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(check_folder_files load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam read_data_share end_close);
+@EXPORT = qw(check_folder_files load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam read_data_share end_close evaluated_family);
 
 use Moose::Role;
 use Data::Dumper;
@@ -456,6 +456,22 @@ sub create_folders {
 		mkdir($dir, 0755);
 	}
 	return;
+}
+
+=head1 evaluated_family 
+    Title: evaluated_family 
+    Usage: evaluated_family(mirna_fam);
+    Function: Check if folder exists. 
+    Returns: '1' if does not exists, otherwise '0'.
+=cut 
+
+sub evaluated_family {
+	my ($fam, $outpath_eval) = @_;
+	my $dir = "$outpath_eval/$fam";
+	if (-d $dir){ #If DIR does exists
+		return 1;
+	}
+	return 0;
 }
 #sub read_data_share {
 #	my $data_location = dist_dir('Bio-miRNAture');
