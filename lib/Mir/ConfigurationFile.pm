@@ -165,7 +165,15 @@ has 'repetition_rules' => (
 	isa => 'Str',
 	required => 1,
 	lazy => 1,
-    	default => "default,200,100"
+    default => "default,200,100"
+);
+
+has 'nbitscore_cut' => (
+	is => 'ro',
+	isa => 'Num',
+	required => 1
+	#lazy => 1
+	#default => 0.32 # By default this nBit= 0.32, cutoff bitscore
 );
 
 sub _folder_set {
@@ -412,6 +420,11 @@ sub write_config_file {
 		$yaml->[3]->{Homology_options}{Repetition_threshold} = "default,200,100";
 	} else {
 		$yaml->[3]->{Homology_options}{Repetition_threshold} = $shift->repetition_rules;
+	}
+	if (length $shift->nbitscore_cut == 0){
+		$yaml->[3]->{Homology_options}{Threshold_bitscore} = "0.32";
+	} else {
+		$yaml->[3]->{Homology_options}{Threshold_bitscore} = $shift->nbitscore_cut;
 	}
 	$yaml->write($shift->config_file);
 	return;

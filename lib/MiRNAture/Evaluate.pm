@@ -210,7 +210,7 @@ sub concatenate_true_cand {
 }
 
 sub cleancmsearch {
-	my ($tabfile, $defined_nGA, $mode, $bitscores, $lengs, $names_r, $minBitscore) = @_; #Mode=1 with GA score, 2: no GA score
+	my ($tabfile, $defined_nGA, $mode, $bitscores, $lengs, $names_r, $minBitscore, $maxthreshold) = @_; #Mode=1 with GA score, 2: no GA score
 	$tabfile =~ s/(\.\.\/.*\/|\/.*\/|.*\/)(.*)/$1$2/g;
 	my $path_data = $1;
 	my $filename = $2;
@@ -276,6 +276,7 @@ sub cleancmsearch {
 			#if ($evalue > 100){
 			print $OUT2 "$ln\t$max\n";
 		} else {
+			# $defined_nGA is the proportion of nBit that discriminate btw true|false:  <26-11-21, cavelandiah> #
 			if ($bitscoreC < $defined_nGA || $bitsc <= $minBitscore){ #Defined log2(N) <= x & nx >= nGA 
 				print $OUT2 "$ln\t$max\n";
 			} else {

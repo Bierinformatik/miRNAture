@@ -166,7 +166,7 @@ sub searchHomologySequenceBlast {
 }
 
 sub searchHomologyBlast {
-	my ($shift, $molecules, $query_species, $families, $files_relation, $Zscore, $minBitscore) = @_;
+	my ($shift, $molecules, $query_species, $families, $files_relation, $Zscore, $minBitscore, $maxthreshold) = @_;
 	my @id_running; # Save the id of running infernal processes
 	my $result_blast_experiment = MiRNAture::_BlastSearch->new(
 		blast_str => $shift->blast_str, 
@@ -232,7 +232,7 @@ sub searchHomologyBlast {
 		my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
 		my @result_cmsearch = check_folder_files($infernal_out_path, $shift->subject_specie."\_".$shift->blast_str."\\.$molecule\\.\.*\\.tab"); #Dive_8.miRNA.RF02024.tab
 		foreach my $file_out_cmsearch (@result_cmsearch){
-			classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore); #Obtain true candidates
+			classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore, $maxthreshold); #Obtain true candidates
 		}
 		print_process("Structural evaluation of $molecule complete");
 	}

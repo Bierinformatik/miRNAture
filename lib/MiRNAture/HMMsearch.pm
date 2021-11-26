@@ -13,7 +13,7 @@ with 'MiRNAture::Evaluate';
 my %len;
 
 sub searchHomologyHMM {
-	my ($hmm, $genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore) = @_;
+	my ($hmm, $genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore, $maxthreshold) = @_;
 	if (!-d "$outHMM/$specie"){ #Check if already exists specie-specific directory
 		create_folders($outHMM,$specie);#Create folder specific to specie
 	}
@@ -37,7 +37,7 @@ sub searchHomologyHMM {
 			my @result_cmseach = check_folder_files($infernal_out_path, "tab");
 			my $molecule = get_family_name($hmm, $families_names);
 			create_folders("$outHMM/$specie/Infernal","Final");#Create folder specific to specie
-			classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"HMM", $molecule, $bitscores, $len_r, $names_r, $minBitscore); #Obtain true candidates
+			classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"HMM", $molecule, $bitscores, $len_r, $names_r, $minBitscore, $maxthreshold); #Obtain true candidates
 		}
 		return;
 	}

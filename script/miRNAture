@@ -28,6 +28,7 @@ my $name_specie = ""; #Scientific name of specie
 my $specie_tag = ""; #Label of specie
 my $subset_models; #Subset of models provided by the user
 my $rep_cutoff = ""; # Homology cutoff to speed-up the searches 
+my $maxthresholdBit = ""; # nBitscore threshold to clean data: 0-1
 my $parallel_run = 0;
 my $current_path = getcwd;
 my $stagesRun = "";
@@ -51,6 +52,7 @@ GetOptions (
 	'blastQueriesFolder|blstq=s' => \$path_blast_queries,
 	'stage|stg=s' => \$stagesRun,
 	'repetition_cutoff|rep=s' => \$rep_cutoff,
+    'nbitscore_cutoff|nb_cut=f' => \$maxthresholdBit,
 	'user_models|usrM=s' => \$user_folder,
 	'help|h' => \$help,
 	 man => \$man,
@@ -77,6 +79,7 @@ my $config_file = Mir::ConfigurationFile->new (
 	mirfix_path => $mirfix_path,
 	mode => $mode,
 	repetition_rules => $rep_cutoff,
+    nbitscore_cut => $maxthresholdBit,
 	blast_strategy => \@strategy,
 	blast_queries_path => $path_blast_queries,
 	user_folder => $user_folder,

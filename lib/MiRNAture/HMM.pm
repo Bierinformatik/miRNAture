@@ -86,8 +86,8 @@ sub create_folders_hmm {
 }
 
 sub search_homology_HMM {
-	my ($shift, $zvalue, $minBitscore) = @_;
-	searchHomologyHMM($shift->hmm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore);
+	my ($shift, $zvalue, $minBitscore, $maxthreshold) = @_;
+	searchHomologyHMM($shift->hmm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold);
 	return;
 }	
 

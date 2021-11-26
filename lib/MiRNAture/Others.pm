@@ -79,7 +79,8 @@ sub search_homology_other {
 	my $shift = shift;
 	my $zscore = shift;
 	my $minBitscore = shift;
-	searchOthershomology($shift, $zscore, $minBitscore);
+	my $maxthreshold = shift;
+	searchOthershomology($shift, $zscore, $minBitscore, $maxthreshold);
 	return;
 }	
 

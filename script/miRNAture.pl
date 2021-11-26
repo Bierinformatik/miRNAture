@@ -36,6 +36,7 @@ my $name_specie = ""; #Scientific name of specie
 my $data_folder = "";
 my $parallel_run = "";
 my $rep_cutoff; # Homology cutoff to speed-up the searches 
+my $maxthresholdBit; # nBitscore threshold to clean data: 0-1
 
 my $help = 0; 
 my $man = 0;
@@ -51,6 +52,7 @@ GetOptions (
     'specie_name|n_spe=s' => \$name_specie,
     'workdir|w=s' => \$work_folder,
     'repetition_cutoff|rep=s' => \$rep_cutoff,
+    'nbitscore_cutoff|nb_cut=f' => \$maxthresholdBit, #CAVH
     'help|h' => \$help,
     man => \$man,
     'strategy|str=s' => \@strategy,
@@ -176,7 +178,7 @@ if (exists $$genomes{$specie}){
             if ($blast_experiment->blast_str =~ /^\d+$/){
                 my ($id_process_running, $molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast; #Run all blastn jobs, returns array by Str
                 $blast_experiment->wait_processes($id_process_running, $parallel_run); #Wait until complete all processes from Str
-                $blast_experiment->searchHomologyBlast($molecules, $query_species, $families, $files_relation, $Zvalue, $minBitscore);	
+                $blast_experiment->searchHomologyBlast($molecules, $query_species, $families, $files_relation, $Zvalue, $minBitscore,$maxthresholdBit);	
             } elsif ($blast_experiment->blast_str =~ /^ALL$/){
                 $blast_experiment->join_all_blast_str;
                 $blast_experiment->clean_empty;
@@ -208,7 +210,7 @@ if (exists $$genomes{$specie}){
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             );
             $hmm_experiment->create_folders_hmm($work_folder);
-            $hmm_experiment->search_homology_HMM($Zvalue, $minBitscore);						
+            $hmm_experiment->search_homology_HMM($Zvalue, $minBitscore,$maxthresholdBit);						
             $hmm_experiment->clean_empty;
         }
         #my $diff = $start - time;
@@ -234,7 +236,7 @@ if (exists $$genomes{$specie}){
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             );
             $cm_experiment->create_folders_cm;
-            $cm_experiment->search_homology_CM($Zvalue,$minBitscore);
+            $cm_experiment->search_homology_CM($Zvalue,$minBitscore,$maxthresholdBit);
             $cm_experiment->clean_empty;
         }		
         #my $diff = $start - time;
@@ -259,7 +261,7 @@ if (exists $$genomes{$specie}){
                 cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             );					
             $other_experiment->create_folders_other;
-            $other_experiment->search_homology_other($Zvalue,$minBitscore);
+            $other_experiment->search_homology_other($Zvalue,$minBitscore,$maxthresholdBit);
             $other_experiment->clean_empty;
         }
         #my $diff = $start - time;

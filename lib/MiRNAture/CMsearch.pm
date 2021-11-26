@@ -7,10 +7,10 @@ with 'MiRNAture::ToolBox';
 with 'MiRNAture::Evaluate';
 
 sub searchCMhomology {
-	my ($shift, $zscore,$minBitscore) = @_;
+	my ($shift, $zscore,$minBitscore, $maxthreshold) = @_;
 	cmsearch($shift->cm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->path_covariance, 1, $shift->cmsearch_program_path->stringify, $zscore);
 	my $molecule = get_family_name($shift->cm_model, $shift->families_names_CM);
-	classify_2rd_align_results($shift->subject_specie, $shift->cm_model, $shift->output_folder."/".$shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/".$shift->cm_model."\_".$shift->subject_specie.".tab" ,"INFERNAL", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore);
+	classify_2rd_align_results($shift->subject_specie, $shift->cm_model, $shift->output_folder."/".$shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/".$shift->cm_model."\_".$shift->subject_specie.".tab" ,"INFERNAL", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore, $maxthreshold);
 	return;
 }
 

@@ -973,7 +973,7 @@ sub existenceProgram {
 
 
 sub classify_2rd_align_results {
-	my ($spe, $cm, $folder_in, $file, $mode, $molecule, $cm_scores, $len_scores, $names_cms, $minBitscore) = @_;
+	my ($spe, $cm, $folder_in, $file, $mode, $molecule, $cm_scores, $len_scores, $names_cms, $minBitscore, $maxthreshold) = @_;
 	my $filein;
 	if ($cm ne "NA"){
 		#$filein = "$folder_in/$spe.$cm.tab";
@@ -989,11 +989,11 @@ sub classify_2rd_align_results {
 	}
 	if (-e $filein && !-z $filein){
 		if ($molecule =~ /^miRNA/){ #Based on evidence, miRNAs are evaluated with 32% of Bitscore.
-			cleancmsearch($filein, 0.32, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
+			cleancmsearch($filein, $maxthreshold, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
 			#cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); #filein, threshold bitscore, mode GA score
 		} elsif ($molecule =~ /^NA$/){ #other CMs without bitscore
 			cleancmsearch($filein, 0, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
-		} else {
+		} else { # Other RNA families
 			cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); 
 		}
 	}

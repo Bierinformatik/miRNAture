@@ -76,8 +76,8 @@ sub create_folders_cm {
 }
 
 sub search_homology_CM {
-	my ($shift, $zscore, $minBitscore) = @_;
-	searchCMhomology($shift, $zscore,$minBitscore);
+	my ($shift, $zscore, $minBitscore,$maxthreshold) = @_;
+	searchCMhomology($shift, $zscore,$minBitscore,$maxthreshold);
 	return;
 }	
 
