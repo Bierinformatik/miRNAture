@@ -210,7 +210,7 @@ sub concatenate_true_cand {
 }
 
 sub cleancmsearch {
-	my ($tabfile, $defined_nGA, $mode, $bitscores, $lengs, $names_r, $minBitscore, $maxthreshold) = @_; #Mode=1 with GA score, 2: no GA score
+	my ($tabfile, $defined_nGA, $mode, $bitscores, $lengs, $names_r, $minBitscore) = @_; #Mode=1 with GA score, 2: no GA score
 	$tabfile =~ s/(\.\.\/.*\/|\/.*\/|.*\/)(.*)/$1$2/g;
 	my $path_data = $1;
 	my $filename = $2;
@@ -261,7 +261,13 @@ sub cleancmsearch {
 				$max = $$lengs{$valuesT[3]};
 			}
 		} elsif ($mode == 2){
-			$bitscoreC = 1; #
+			# Other_CMs
+			if ($$bitscores{$valuesT[3]} == 0){ #CMs did not reported bitscore threshold
+				$bitscoreC = $defined_nGA;
+			} else {
+				$bitscoreC = $valuesT[14]/$$bitscores{$valuesT[3]}; #nGA
+			}
+			#$bitscoreC = 1; #
 			if (exists $$lengs{$valuesT[2]}){
 				$max = $$lengs{$valuesT[2]};
 			} elsif (exists $$lengs{$valuesT[3]}){
@@ -277,6 +283,7 @@ sub cleancmsearch {
 			print $OUT2 "$ln\t$max\n";
 		} else {
 			# $defined_nGA is the proportion of nBit that discriminate btw true|false:  <26-11-21, cavelandiah> #
+			print $defined_nGA."\n";
 			if ($bitscoreC < $defined_nGA || $bitsc <= $minBitscore){ #Defined log2(N) <= x & nx >= nGA 
 				print $OUT2 "$ln\t$max\n";
 			} else {

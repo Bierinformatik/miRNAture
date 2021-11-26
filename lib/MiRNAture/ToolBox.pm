@@ -977,7 +977,7 @@ sub classify_2rd_align_results {
 	my $filein;
 	if ($cm ne "NA"){
 		#$filein = "$folder_in/$spe.$cm.tab";
-		if ($mode eq "INFERNAL" || $mode eq "OTHER_CM"){
+		if ($mode eq "INFERNAL" || $mode eq "Infernal" || $mode eq "OTHER_CM"){
 			$filein = $file; 
 		} elsif ($mode eq "HMM"){
 			$filein = $file;
@@ -992,7 +992,7 @@ sub classify_2rd_align_results {
 			cleancmsearch($filein, $maxthreshold, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
 			#cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); #filein, threshold bitscore, mode GA score
 		} elsif ($molecule =~ /^NA$/){ #other CMs without bitscore
-			cleancmsearch($filein, 0, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
+			cleancmsearch($filein, $maxthreshold, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
 		} else { # Other RNA families
 			cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); 
 		}
