@@ -283,7 +283,6 @@ sub cleancmsearch {
 			print $OUT2 "$ln\t$max\n";
 		} else {
 			# $defined_nGA is the proportion of nBit that discriminate btw true|false:  <26-11-21, cavelandiah> #
-			print $defined_nGA."\n";
 			if ($bitscoreC < $defined_nGA || $bitsc <= $minBitscore){ #Defined log2(N) <= x & nx >= nGA 
 				print $OUT2 "$ln\t$max\n";
 			} else {
