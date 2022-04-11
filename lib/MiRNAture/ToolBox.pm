@@ -288,7 +288,7 @@ sub check_folder_files {
             return unless -f; # Test if is a file
             return if /^\.\_/; # Not accept hidden/MacOS-system files
             return unless /$prefix$/;
-            push @files, $File::Find::name; 
+            push @files, $_; 
         }, $dir);
     return @files;
 }
