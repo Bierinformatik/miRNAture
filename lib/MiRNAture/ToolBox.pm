@@ -290,8 +290,20 @@ sub check_folder_files {
             return unless /$prefix$/;
             push @files, $_; 
         }, $dir);
+    my $num = scalar @files;
+    if ($num == 0){
+        print_error("The $dir does not contain desired files with pattern $prefix");
+    }
     return @files;
 }
+
+#sub check_folder_files {
+#	my ($dir, $prefix) = @_;
+#	opendir(DIR, $dir);
+#	my @files = grep(/$prefix$/, readdir(DIR));
+#	closedir(DIR);
+#	return @files;
+#}
 
 =head1 calculate_Z_value
     Title: calculate_Z_value

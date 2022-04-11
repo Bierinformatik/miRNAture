@@ -77,7 +77,7 @@ sub resolve_mergings {
 	} elsif ($str =~ /^\d+$/) {
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable.clean"; #Adjusted Blast specific str coordinates
 	} else {
-		die "Str is not recognized\n";
+		print_error("$str is not recognized");
 	}
 	if (!-e $file || -z $file) {
 		print_result("No valid candidates were found by $str method");
