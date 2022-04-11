@@ -64,12 +64,13 @@ sub resolve_mergings {
 		$file = "${dir}/all_RFAM_$specie.truetable.clean"; #Adjusted HMM coordinates
 	} elsif ($str =~ /^INFERNAL$|^OTHER_CM$/){
 		$file = "${dir}/all_RFAM_$specie.truetable"; #INFERNAL direct coordinates
-	} elsif ($str =~ /^ALL$|^Final$|^COMPLETE$/) {
+	} elsif ($str =~ /^ALL$|^COMPLETE$/) {
 		my $database_folder = "${dir}/../../";
 		my $pattern_file_db = "miRNA\\.tab\\.db\\.location\\.database"; #All database files
-        print "$database_folder, $pattern_file_db";
 		# Load all database files to get query references
 		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $specie);
+		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
+    } elsif ($str =~ /^Final$/) {
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
 	} elsif ($str =~ /^Merging$/){
 		$file = "${dir}/all_RFAM_${specie}_Final.all";
