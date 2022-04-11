@@ -63,6 +63,7 @@ sub resolve_mergings {
 	} elsif ($str =~ /^ALL$|^Final$|^COMPLETE$/) {
 		my $database_folder = "${dir}/../../";
 		my $pattern_file_db = "miRNA\\.tab\\.db\\.location\\.database"; #All database files
+        print "$database_folder, $pattern_file_db";
 		# Load all database files to get query references
 		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $specie);
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
