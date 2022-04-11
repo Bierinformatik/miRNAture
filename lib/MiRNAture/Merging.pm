@@ -419,7 +419,7 @@ sub fusion_all {
 			} elsif ($a == 6 || $a == 7 || $a == 9 || $a == 10 || $a == 11 || $a == 12){ #Text comparison, merge
 				push_best($cand1[0][$a], $cand2[0][$a], 0);
 			} else { #text comparison, merge by comma
-				error();
+				print_error("Comparison names are not consistent when merging");
 			}
 		}	
 	} elsif ($mode == 1){ #CM names are diferent merge with greater values and names with comma
@@ -464,7 +464,8 @@ sub push_best {
 		if ($test1 eq $test2){
 			$best = 2; #$test1;	
 		} else {
-			$best = 3; #"($test1,$test2)";
+            $best = "$test1,$test2";
+            #$best = 3; #"($test1,$test2)";
 		}
 	} else {
 		error();
