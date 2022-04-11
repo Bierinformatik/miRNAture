@@ -27,6 +27,10 @@ sub load_database_query {
 		my $str = $filesdb;
 		$str =~ s/(${specie}\_)([0-9]+)(\.miRNA\.tab\.db\.location\.database)/$2/g;
 		my $complete = "${folder}${filesdb}";
+        if(!-e $complete || -z $complete){
+           print_error("The database file did not exists"); 
+           die;
+        }
 		open $IN, "< $complete" or die "The database file is corrupted\n";
 		while (<$IN>){
 			chomp;
