@@ -71,7 +71,7 @@ sub resolve_mergings {
 		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $specie);
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
     } elsif ($str =~ /^Final$/) {
-		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
+		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Final file concatenated
 	} elsif ($str =~ /^Merging$/){
 		$file = "${dir}/all_RFAM_${specie}_Final.all";
 	} elsif ($str =~ /^\d+$/) {
