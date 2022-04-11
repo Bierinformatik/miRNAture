@@ -6,6 +6,7 @@ use Exporter;
 
 use Moose::Role; 
 use File::Copy; 
+use File::Find;
 BEGIN {
 	local $SIG{__WARN__} = sub {};
 	require Bio::DB::Fasta;
@@ -282,11 +283,23 @@ sub copy_files {
 
 sub check_folder_files {
 	my ($dir, $prefix) = @_;
-	opendir(DIR, $dir);
-	my @files = grep(/$prefix$/, readdir(DIR));
-	closedir(DIR);
-	return @files;
+    my @files;
+    find( sub {
+            return unless -f; # Test if is a file
+            return if /^\.\_/; # Not accept hidden/MacOS-system files
+            return unless /$prefix$/;
+            push @files, $File::Find::name; 
+        }, $dir);
+    return @files;
 }
+
+#sub check_folder_files {
+#	my ($dir, $prefix) = @_;
+#	opendir(DIR, $dir);
+#	my @files = grep(/$prefix$/, readdir(DIR));
+#	closedir(DIR);
+#	return @files;
+#}
 
 =head1 calculate_Z_value
     Title: calculate_Z_value
