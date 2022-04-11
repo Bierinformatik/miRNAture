@@ -464,8 +464,8 @@ sub push_best {
 		if ($test1 eq $test2){
 			$best = 2; #$test1;	
 		} else {
-            $best = "$test1,$test2";
-            #$best = 3; #"($test1,$test2)";
+            #TODO: Here look the way how concatenate correctly the text, because sometime is also numbers.
+			$best = 3; #"($test1,$test2)";
 		}
 	} else {
 		error();
