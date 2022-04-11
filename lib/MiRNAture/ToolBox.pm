@@ -293,14 +293,6 @@ sub check_folder_files {
     return @files;
 }
 
-#sub check_folder_files {
-#	my ($dir, $prefix) = @_;
-#	opendir(DIR, $dir);
-#	my @files = grep(/$prefix$/, readdir(DIR));
-#	closedir(DIR);
-#	return @files;
-#}
-
 =head1 calculate_Z_value
     Title: calculate_Z_value
     Usage: calculate_Z_value(genome);
