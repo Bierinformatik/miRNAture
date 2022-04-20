@@ -45,8 +45,8 @@ my @original_ARGV = @ARGV;
 my @strategy;
 GetOptions (
     'cmlist|l=s' => \$nameC,
-    'cmpath|cmp=s{3}' => \@path_cm,
-    'hmmpath|hmmp=s{3}' => \@path_hmm,
+    'cmpath|cmp=s{3}' => \@path_cm, # including CMs from multiple sources
+    'hmmpath|hmmp=s{3}' => \@path_hmm, # including HMMs from multiple sources 
     'mode|m=s' => \$mode,
     'specie|spe=s' => \$specie,
     'specie_name|n_spe=s' => \$name_specie,
@@ -65,7 +65,8 @@ GetOptions (
 
 my $startComplete = time();
 #### Flags Evaluation
-$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run,$rep_cutoff);
+my $new_model_path = $cm_model_others[-1];
+$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run, $rep_cutoff, $new_model_path);
 my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$specie.yaml");
 my $current_dir = $configuration_mirnature->[3]->{Default_folders}->{Output_folder}."/TemporalFiles"; #getcwd;
 ## Working Paths
@@ -102,8 +103,9 @@ $log_file->create_file;
 my @species;
 my $outHMM = "$work_folder/HMMs";
 my $outBlast = "$work_folder/Blast";
-my $outInfernal = "$work_folder/Infernal";
-my $outOther = "$work_folder/Other";
+my $outInfernal = "$work_folder/Rfam";
+my $outOther = "$work_folder/Mirbase";
+my $outUser = "$work_folder/User_models";
 my $out_final_path = "$work_folder";
 
 ##My Result files:
@@ -122,15 +124,17 @@ if (length $user_data_path > 0){ #If path defined check that exists scores file
       	}
 }
 
-if ($mode =~ m/OTHER_CM/){ #Load specific scores for user-provided CMs and mirbase.
-    if (length $user_data_path > 0){ #If path defined check that exists scores file
-	    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, $user_data_path);
-    } else { #Only with miRNAture models
+if ($mode =~ m/mirbase/){ #Load specific scores for mirbase.
+    #if (length $user_data_path > 0){ #If path defined check that exists scores file
+    #    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, $user_data_path);
+    #} else { #Only with miRNAture models
 	    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("mirbase", $basicFiles, $user_data_path); 
-    }
-} elsif ($mode =~ m/INFERNAL/) { #Here get all the scores from RFAM database
+    #}
+} elsif ($mode =~ m/rfam/) { #Here get all the scores from RFAM database
     ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, $user_data_path); 
-} else { #Here get all the scores from RFAM
+} elsif ($mode =~ m/user/) { #Here get all the scores from RFAM database
+    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("User", $basicFiles, $user_data_path); 
+} else { #Here get all the scores from RFAM and miRBase for: blast, hmm and final
 	if (length $user_data_path > 0){ #If path defined check that exists scores file
 		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 
 	} else {

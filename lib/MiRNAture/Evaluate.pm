@@ -30,7 +30,7 @@ my (%names_r, %names_r_inverse, %bitscores, %lengs, %families_names, %len_other)
 sub load_all_databases {
 	my ($modeT, $datapath, $user) = @_;
 	if ($modeT =~ /^Basic$/){ #Only include RFAM
-		open my $BASIC, "< $datapath/all_RFAM_scores.txt" or die "Critical error: Does not have the file $datapath/all_RFAM_scores.txt, which provides all scores to miRNAture\n";
+		open my $BASIC, "< $datapath/all_rfam_scores.txt" or die "Critical error: Does not have the file $datapath/all_rfam_scores.txt, which provides all rfam scores\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$BASIC>){
 			chomp;
@@ -44,7 +44,7 @@ sub load_all_databases {
 		close $BASIC;
 		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
 	} elsif ($modeT =~ /^Additional$/){ #Include miRBase and User
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -56,7 +56,7 @@ sub load_all_databases {
 			$families_names{$fields[0]} = $fields[-1];
 		}
 		close $OTHER;
-		open my $USER, "< $user/all_user_scores.txt" or die "Critical error: Does not have the file $user/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $USER, "< $user/all_user_scores.txt" or die "Critical error: Does not have the file $user/all_user_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$USER>){
 			chomp;
@@ -69,8 +69,8 @@ sub load_all_databases {
 		}
 		close $USER;
 		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
-	} elsif ($modeT =~ /^mirbase$/){ #Include miRBase and User
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+	} elsif ($modeT =~ /^mirbase$/){ #Include miRBase
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -83,6 +83,20 @@ sub load_all_databases {
 		}
 		close $OTHER;
 		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
+	} elsif ($modeT =~ /^user$/){ #Include miRBase
+		open my $USER, "< $user/all_user_scores.txt" or die "Critical error: Does not have the file $user/all_user_scores.txt, which provides all scores to miRNAture\n";
+		#RF00006    34.00   96  Vault   misc_RNA
+		while (<$USER>){
+			chomp;
+			my @fields = split /\s+|\t/, $_;
+			$bitscores{$fields[0]} = $fields[1];
+			$lengs{$fields[0]} = $fields[2];
+			$names_r{$fields[0]} = $fields[3];
+			$names_r_inverse{$fields[3]} = $fields[0];
+			$families_names{$fields[0]} = $fields[-1];
+		}
+		close $USER;
+		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
 	} elsif ($modeT =~ /^Joined$/){ #When both modes are used other + infernal 
 		#Clear previously defined hashes
 		undef %names_r;
@@ -92,7 +106,7 @@ sub load_all_databases {
 		undef %families_names;
 		undef %len_other;
 		#
-		open my $BASIC, "< $datapath/all_RFAM_scores.txt" or die "Critical error: Does not have the file $datapath/all_RFAM_scores.txt, which provides all scores to miRNAture\n";
+		open my $BASIC, "< $datapath/all_rfam_scores.txt" or die "Critical error: Does not have the file $datapath/all_rfam_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$BASIC>){
 			chomp;
@@ -104,7 +118,7 @@ sub load_all_databases {
 			$families_names{$fields[0]} = $fields[-1];
 		}
 		close $BASIC;
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -138,7 +152,7 @@ sub load_all_databases {
 		undef %families_names;
 		undef %len_other;
 		#
-		open my $BASIC, "< $datapath/all_RFAM_scores.txt" or die "Critical error: Does not have the file $datapath/all_RFAM_scores.txt, which provides all scores to miRNAture\n";
+		open my $BASIC, "< $datapath/all_rfam_scores.txt" or die "Critical error: Does not have the file $datapath/all_rfam_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$BASIC>){
 			chomp;
@@ -150,7 +164,7 @@ sub load_all_databases {
 			$families_names{$fields[0]} = $fields[-1];
 		}
 		close $BASIC;
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;

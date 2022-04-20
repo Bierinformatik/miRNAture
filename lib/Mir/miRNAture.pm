@@ -43,7 +43,14 @@ sub generate_file_mirnature {
 	my $shift = shift;
 	my $variable = shift;
 	my $config_file = shift;
-	my $program = $variable->[2]->{Program_locations}->{miRNAture};
+	my $debug_mode = shift;
+	my $program;
+	if ($debug_mode == 1) {
+		# Activate perl debbuger
+		$program = "perl -d ".$variable->[2]->{Program_locations}->{miRNAture};
+	} elsif ($debug_mode == 0) {
+		$program = $variable->[2]->{Program_locations}->{miRNAture};
+	}
     my $outfile = $variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}."/mirnature_run_".$variable->[3]->{Specie_data}->{Tag}."_".$variable->[3]->{Homology_options}->{Mode};
     if (-e "$outfile.sh" && !-z "$outfile.sh" ){
         $outfile = test_name($outfile);
@@ -56,24 +63,28 @@ sub generate_file_mirnature {
 	print $OUT "#!/bin/bash\n\n####\n$header\n####\n$headerUser\n####\n";
 	my $parameters = build_parameters_mirnature($variable);
 	my $mode = $variable->[3]->{"Homology_options"}->{"Mode"};
-	if ($mode =~ m/Blast/i){
+	if ($mode =~ m/blast/i){
 		print $OUT "#BLAST searches\n";
 		print $OUT $program." ".$$parameters{blast}."\n";
 	} 
-	if ($mode =~ m/HMM/i){
+	if ($mode =~ m/hmm/i){
 		print $OUT "#HMM searches\n";
 		print $OUT $program." ".$$parameters{hmm}."\n";
 	}
-	if ($mode =~ m/Infernal/i){
-		print $OUT "#Infernal searches\n";
-		print $OUT $program." ".$$parameters{infernal}."\n";
+	if ($mode =~ m/rfam/i){
+		print $OUT "#Rfam covariance models search\n";
+		print $OUT $program." ".$$parameters{rfam}."\n";
 	}
-	if ($mode =~ m/Other/i){
-		print $OUT "#Other searches\n";
-		print $OUT $program." ".$$parameters{others}."\n";
+	if ($mode =~ m/mirbase/i){
+		print $OUT "#miRBase covariance models search\n";
+		print $OUT $program." ".$$parameters{mirbase}."\n";
 	}
-	if ($mode =~ m/Final/i){
-		print $OUT "#Final searches\n";
+	if ($mode =~ m/user/i){ # Search with the user's CMs
+		print $OUT "#User' covariance models search\n";
+		print $OUT $program." ".$$parameters{user}."\n";
+	}
+	if ($mode =~ m/final/i){
+		print $OUT "#Final search\n";
 		print $OUT $program." ".$$parameters{final}."\n";
 	}
 	$variable->[4]->{"User_results"}{"miRNAture_program"} = $outfile.".sh";
@@ -90,12 +101,14 @@ sub build_parameters_mirnature {
 	my $parameters_blast = " -l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m BLAST -str ".$blast_strategies." -blstq ".$variable->[3]->{"Default_folders"}->{"Blast_queries"}." -pe ".$variable->[3]->{"Homology_options"}->{"Parallel"}." -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}. " -cmp ".$variable->[3]->{"Default_folders"}->{"CM_folder"}." ".$variable->[3]->{"Default_folders"}->{"Other_CM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_CM_folder"}." -hmmp ".$variable->[3]->{"Default_folders"}->{"HMM_folder"}." ".$variable->[3]->{Default_folders}{"Other_HMM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_HMM_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
 	my $parameters_hmm = "-l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m HMM -pe 0 -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}. " -cmp ".$variable->[3]->{"Default_folders"}->{"CM_folder"}." ".$variable->[3]->{"Default_folders"}->{"Other_CM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_CM_folder"}." -hmmp ".$variable->[3]->{"Default_folders"}->{"HMM_folder"}." ".$variable->[3]->{Default_folders}{"Other_HMM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_HMM_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
 	my $parameters_infernal = "-l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m INFERNAL -pe 0 -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}. " -cmp ".$variable->[3]->{"Default_folders"}->{"CM_folder"}." -hmmp ".$variable->[3]->{"Default_folders"}->{"HMM_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
-	my $parameters_others = "-l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m OTHER_CM -pe 0 -nmodels ".$variable->[3]->{"Default_folders"}->{"Other_CM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_CM_folder"}." -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}. " -cmp ".$variable->[3]->{"Default_folders"}->{"Other_CM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_CM_folder"}." -hmmp ".$variable->[3]->{Default_folders}{"Other_HMM_folder"}." ".$variable->[3]->{"Default_folders"}->{"User_HMM_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
+	my $parameters_others = "-l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m OTHER_CM -pe 0 -nmodels ".$variable->[3]->{"Default_folders"}->{"Other_CM_folder"}." -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}. " -cmp ".$variable->[3]->{"Default_folders"}->{"Other_CM_folder"}." -hmmp ".$variable->[3]->{Default_folders}{"Other_HMM_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
+	my $parameters_user = "-l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m OTHER_CM -pe 0 -nmodels "$variable->[3]->{"Default_folders"}->{"User_CM_folder"}." -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}. " -cmp ".$variable->[3]->{"Default_folders"}->{"User_CM_folder"}." -hmmp ".$variable->[3]->{"Default_folders"}->{"User_HMM_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
 	my $parameters_final_homology = "-l ".$variable->[3]->{"Default_folders"}->{"List_cm_miRNAs"}." -m Final -pe 0 -spe ".$variable->[3]->{"Specie_data"}->{"Tag"}." -n_spe ".$variable->[3]->{"Specie_data"}->{"Name"}." -w ".$variable->[4]->{"User_results"}->{"Output_miRNAture_folder"}." -data ".$variable->[3]->{"Default_folders"}->{"Data_folder"}." -rep ".$variable->[3]->{Homology_options}->{Repetition_threshold}." -nb_cut ".$variable->[3]->{Homology_options}->{Threshold_bitscore};
 	$parameters_homology{"blast"} = $parameters_blast;	
 	$parameters_homology{"hmm"} = $parameters_hmm;
-	$parameters_homology{"infernal"} = $parameters_infernal;
-	$parameters_homology{"others"} = $parameters_others;
+	$parameters_homology{"rfam"} = $parameters_infernal;
+	$parameters_homology{"mirbase"} = $parameters_others;
+	$parameters_homology{"user"} = $parameters_others;
 	$parameters_homology{"final"} = $parameters_final_homology;
 	return \%parameters_homology;
 }

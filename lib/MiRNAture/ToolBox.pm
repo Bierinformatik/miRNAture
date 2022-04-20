@@ -32,7 +32,7 @@ with 'MiRNAture::Evaluate'; #Load tool subroutines
 
 sub evaluate_input_flags {
 	#cmlist file, mode run, out folder, parallel mode.
-	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $repetition_threshold) = @_;
+	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $repetition_threshold, $new_models) = @_;
 	# Evaluate the existence of list of CM models
 	my $name = $nameC;
 	$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
@@ -42,10 +42,16 @@ sub evaluate_input_flags {
 		print_process("The default covariance list will be used");
 	}
 	#Check the selected mode
-	if ($mode =~ /BLAST|INFERNAL|HMM|OTHER_CM|Final/){ # This is the valid modes
+	if ($mode =~ /blast|rfam|hmm|mirbase|user|final/){ # This is the valid modes
 		;
 	} else {
 		print_error("The mode $mode is not valid!");
+	}
+	# Check user models folder and the definition of the correct OTHER_CM mode
+	if ($mode =~ /user/){
+		if ($new_models eq "NA"){
+			print_error("The flag -usrM <USER_MODELS_PATH> is missing. It is required to run the OTHER_CM mode.");
+		}
 	}
 	if ($parallel == 1 || $parallel == 0){
 		;	
@@ -103,16 +109,22 @@ sub get_basic_files {
 	#create_folders($working_folder, "Data");
 	create_folders($data_folder, "Basic_files");
 	if (is_folder_empty($basic_folder)){
-		print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
-		copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
+		print_error("Seems that you do not have the scores files to run miRNAture.")
+		#TODO: Consider point the location to download those files
+		#print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
+		#copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
 		#copy_files("$working_folder/Default_Data/genomes.txt", $basic_folder);
 	} else { #Test if files are in the right format to be processed
-		if (-s "$basic_folder/all_RFAM_scores.txt"){
-			test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
-		} else {
-			copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
-			test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
-		}
+		if (-s "$basic_folder/all_rfam_scores.txt"){
+			test_basic_file("$basic_folder/all_rfam_scores.txt", "scores");
+		} 
+		if (-s "$basic_folder/all_mirbase_scores.txt"){
+			test_basic_file("$basic_folder/all_mirbase_scores.txt", "scores");
+		} 
+		#else {
+		#	copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
+		#	test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
+		#}
         ##if (-s "$basic_folder/genomes.txt"){
         ##	test_basic_file("$basic_folder/genomes.txt", "genomes");
         ##} else {
@@ -123,9 +135,9 @@ sub get_basic_files {
 			#test_basic_file("$basic_folder/genomes.txt", "genomes");
         ##}
 	}
-	if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
-		copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
-	} 
+	#if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
+	#	copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
+	#} 
 	return;
 }
 

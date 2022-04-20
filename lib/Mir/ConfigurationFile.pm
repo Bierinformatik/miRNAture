@@ -136,6 +136,12 @@ has 'parallel' => (
 	required => 1
 );
 
+has 'debug_mode' => (
+	is => 'ro',
+	isa => 'Int',
+	required => 0
+);
+
 has 'user_folder' => (
     is => 'ro',
     isa => 'Maybe[Str|Path::Class::File]',
@@ -369,6 +375,7 @@ sub obtain_paths_programs {
     ##TEMPORAL
     my $mirnatureHomology = "/homes/biertank/cristian/Projects/miRNAture_v1/script/miRNAture.pl";
     my $mirnanchor = "/homes/biertank/cristian/Projects/miRNAture_v1/script/miRNAnchor.pl";
+	##TODO
     return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix, $mirnatureHomology, $mirnanchor);
 }
 
@@ -404,8 +411,13 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"HMM_folder"} = "$data_path/Data/RFAM_14-4/HMMs"; #Modified Lach
 
 	$yaml->[3]->{Default_folders}{"User_folder"} = $shift->user_folder;
-	$yaml->[3]->{Default_folders}{"User_CM_folder"} = $shift->user_folder."/CMs";
-	$yaml->[3]->{Default_folders}{"User_HMM_folder"} = $shift->user_folder."/HMMs";
+	if (length $shift->user_folder > 0) {
+		$yaml->[3]->{Default_folders}{"User_CM_folder"} = $shift->user_folder."/CMs";
+		$yaml->[3]->{Default_folders}{"User_HMM_folder"} = $shift->user_folder."/HMMs";
+	} else { # Case when the user folder is not defined
+		$yaml->[3]->{Default_folders}{"User_CM_folder"} = "NA";
+		$yaml->[3]->{Default_folders}{"User_HMM_folder"} = "NA";
+	}
 
 	$yaml->[3]->{Default_folders}{"Basic_files_miRNAture"} = "$data_path/Data/Basic_files";
 
