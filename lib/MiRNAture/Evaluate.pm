@@ -341,8 +341,8 @@ sub index_new_old_contig_names {
 
 sub format_final_table {
 	my ($input_folder, $specie, $families_names, $names_r_inverse, $database_names_contigs) = @_;
-	my $file_in = "$input_folder/all_RFAM_${specie}_Final.truetable.joined.table"; 
-	my $file_out = "$input_folder/all_RFAM_${specie}_Final.ncRNAs_homology.txt.temp";
+	my $file_in = "$input_folder/all_RFAM_${specie}_final.truetable.joined.table"; 
+	my $file_out = "$input_folder/all_RFAM_${specie}_final.ncRNAs_homology.txt.temp";
 	my $index_names = index_new_old_contig_names($database_names_contigs); # tagnameNumb => contigName
 	open my $INF, "< $file_in" or die "The file $file_in not exists\n";  #all_RFAM_Dive_Final.truetable.joined.table
 	open my $OUTF, "> $file_out" or die;  

@@ -1135,7 +1135,6 @@ sub cmsearch {
 	return;
 }
 
-
 sub print_error {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;

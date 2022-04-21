@@ -91,6 +91,12 @@ my $config_file = Mir::ConfigurationFile->new (
 $config_file->start;
 $config_file->generate_copy_genome;
 
+if ($config_file->mode =~ /mirbase/ && $config_file->mode =~ /rfam/){
+	$config_file->concatenate_models($config_file->data_path."/Data/RFAM_14-4/rfam_models_list.txt", 
+									$config_file->data_path."/Data/Mirbase/mirbase_models_list.txt"
+									);
+}
+
 my $variables;
 if ($config_file->stage =~ /^summarise$/){
 	#I don't need to create a new summarise file,

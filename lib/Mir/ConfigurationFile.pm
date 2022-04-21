@@ -155,15 +155,20 @@ has 'user_folder' => (
 );
 
 has 'model_list' => (
-    is => 'ro',
-    isa => 'Maybe[Str|Path::Class::File]',
-    required => 1,
-    lazy => 1,
-    default => sub {
-        my $shift = shift;
-        return $shift->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
-        },
-    trigger => \&_size_set,
+	is => 'ro',
+	isa => 'Maybe[Str|Path::Class::File]',
+	required => 1,
+	lazy => 1,
+	default => sub {
+		my $shift = shift;
+		if ($shift->mode->stringify eq "rfam"){
+			#TODO: Change those references
+			return $shift->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
+		} elsif ($shift->mode->stringify eq "mirbase"){
+			return $shift->data_path->stringify."/Data/Mirbase/mirbase_models_list.txt";
+		}
+	},
+	trigger => \&_size_set,
 );
 
 has 'repetition_rules' => (
@@ -209,17 +214,37 @@ sub _path_set {
 }
 
 sub _size_set {
-    my ( $self, $size, $old_size ) = @_;
+    my ($self) = @_;
     if (!$self->model_list){
-        $self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
+		if ($self->mode =~ /^rfam$/){
+			#TODO: Change those references
+			$self->{model_list} = $self->data_path."/Data/RFAM_14-4/rfam_models_list.txt";
+		} elsif ($self->mode =~ /^mirbase$/){
+			$self->{model_list} = $self->data_path."/Data/Mirbase/mirbase_models_list.txt";
+		} elsif ($self->mode =~ /mirbase/ && $self->mode =~ /rfam/){
+			$self->{model_list} = $self->data_path."/Data/concatenated_models_list.txt";
+		}
+		#$self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
         return;
     }
     if (length $self->model_list > 0){
         $self->{model_list} = $self->model_list;
-    } else {
-        $self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
-}
+    } 
     return;
+}
+
+#Concatenate models in case both rfam and mirbase modes are indicated
+sub concatenate_models {
+	my $self = shift;
+	my $modelA = shift;
+	my $modelB = shift;
+	my $out = $self->data_path."/Data/concatenated_models_list.txt";
+	if (!-e $self->data_path."/Data/concatenated_models_list.txt" || -z $self->data_path."/Data/concatenated_models_list.txt"){
+		system "touch $out";
+		system "cat $modelA >> $out";
+		system "cat $modelB >> $out";
+	}
+	return;
 }
 
 sub generate_copy_genome {

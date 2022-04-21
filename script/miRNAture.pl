@@ -111,7 +111,7 @@ my $outUser = "$work_folder/User_models";
 my $out_final_path = "$work_folder";
 
 ##My Result files:
-my ($blast_output, $hmm_output, $infernal_output, $other_output, $user_output);
+my ($blast_output, $hmm_output, $infernal_output, $mirbase_output, $user_output);
 
 ##Load basic databases
 my $basicFiles = "$data_folder/Basic_files";
@@ -286,7 +286,7 @@ if ($configuration_file->mode eq "blast"){
             cm_model => $_,
             genome_subject => $$genomes{$specie},
             subject_specie => $specie,
-            output_folder => $outOther,
+            output_folder => $outUser,
             path_covariance => \@cm_model_others, 
             bitscores_CM => $bitscores, 
             length_CM => $len_r,
@@ -336,22 +336,24 @@ if ($configuration_file->mode eq "final"){
     $blast_output = "$outBlast/$specie/Infernal/Final/all_RFAM_${specie}_ALL.truetable.joined.table"; #Blast
     $hmm_output = "$outHMM/$specie/Infernal/Final/all_RFAM_${specie}.truetable.clean.joined.table"; #HMMs
     $infernal_output = "$outInfernal/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Direct Infernal
-    $other_output = "$outOther/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Other direct CMs
+    $mirbase_output = "$outOther/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Other direct CMs
+    $user_output = "$outUser/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Other direct CMs
     #$infernalDefault = "$outInfernalDefault/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Direct Infernal
     ###
-    if ($other_output){
+    #if ($other_output){
         # Refill hashes with both score files
-	if (length $user_data_path > 0){ #If path defined check that exists scores file
-		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 
-	} else {
-		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("JoinedN", $basicFiles, $user_data_path); 
-	}
-}
+    #if (length $user_data_path > 0){ #If path defined check that exists scores file
+    #	($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 
+    #} else {
+    #	($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("JoinedN", $basicFiles, $user_data_path); 
+    #}
+    #}
     my $final_candidates = MiRNAture::FinalCandidates->new(
         blast_results => $blast_output,
         hmm_results => $hmm_output,
         infernal_results => $infernal_output,
-        other_results => $other_output,
+        other_results => $mirbase_output,
+        user_results => $user_output,
         output_folder => $work_folder,	
         subject_specie => $specie,
         genome_subject => $configuration_mirnature->[3]->{Specie_data}{"Old_Genome"}, #$genomes{$specie}, # Here the original one

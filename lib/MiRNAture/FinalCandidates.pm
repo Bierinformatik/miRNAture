@@ -25,6 +25,11 @@ has 'other_results' => (
 	isa => 'Path::Class::File',
 	coerce => 1,
 );
+has 'user_results' => (
+	is => 'ro',
+	isa => 'Path::Class::File',
+	coerce => 1,
+);
 
 has 'output_folder' => (
 	is => 'ro',
@@ -102,7 +107,7 @@ sub create_folders_final {
 
 sub generate_final_output {
 	my $shift = shift;
-	my @all_files = ($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify);
+	my @all_files = ($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify);
 	my @final_files;
 	foreach my $possible_out_files (@all_files){
 		if (-e $possible_out_files || !-z $possible_out_files){
@@ -111,12 +116,12 @@ sub generate_final_output {
 	}
 	my $number_final_files = scalar @final_files;
 	if ($number_final_files == 0){
-		die "It was not generated final output files for any blast, HMM or Infernal TTO, not possible to merge anything\n";
+		print_error("Final output files for any blast, hmm, rfam or user method are not detected. Not possible to merge anything");
 	} else {
-		generate_final_ncRNAs($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->output_folder."/Final_Candidates", $shift->subject_specie);		
+		generate_final_ncRNAs($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify, $shift->output_folder."/Final_Candidates", $shift->subject_specie);		
 		format_final_table($shift->output_folder."/Final_Candidates", $shift->subject_specie, $shift->families_names_CM, $shift->names_CM, $shift->specie_genome_new_database);
-        #my $final_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_Final.truetable.joined.table";
-        my $temporal_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_Final.ncRNAs_homology.txt.temp";
+        #my $final_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_final.truetable.joined.table";
+        my $temporal_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_final.ncRNAs_homology.txt.temp";
         my $mode = (split /\,/, $shift->repetition_rules)[0]; 
         my $repeat_threshold = (split /\,/, $shift->repetition_rules)[1];
         my $number_best = (split /\,/, $shift->repetition_rules)[2];
@@ -147,7 +152,7 @@ sub get_small_genomes {
 
 sub generate_gff_homology {
     my $shift = shift;
-    my $target_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_Final.ncRNAs_homology.txt.db"; #Complete_target file
+    my $target_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_final.ncRNAs_homology.txt.db"; #Complete_target file
     open my $OUT, "> ${target_file}.gff3" or die;
     open my $IN, "< $target_file";
     print $OUT "##gff-version 3\n";

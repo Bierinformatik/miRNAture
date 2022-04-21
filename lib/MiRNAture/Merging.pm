@@ -495,12 +495,13 @@ sub push_to_new {
 }
 
 sub generate_final_ncRNAs {
-	my ($blast_file, $hmm_file, $infernal_file, $other_file, $out_folder, $specie) = @_;
+	my ($blast_file, $hmm_file, $infernal_file, $other_file, $user_file, $out_folder, $specie) = @_;
 	my (@all_files, @all_filesT);
 	push @all_filesT, $blast_file;
 	push @all_filesT, $hmm_file;
 	push @all_filesT, $infernal_file;
 	push @all_filesT, $other_file;
+	push @all_filesT, $user_file;
 	foreach my $file (@all_filesT){
 		if (-z $file || !-e $file){
 			print_result("$file is empty or is missing!");
@@ -508,8 +509,8 @@ sub generate_final_ncRNAs {
 			push @all_files, $file;
 		}
 	}
-	concatenate_true_cand($specie, $out_folder, \@all_files, "Final"); #Concantenate all true
-	resolve_mergings($specie, $out_folder, "5", "Final");
+	concatenate_true_cand($specie, $out_folder, \@all_files, "final"); #Concantenate all true
+	resolve_mergings($specie, $out_folder, "5", "final");
 	return;
 }
 
