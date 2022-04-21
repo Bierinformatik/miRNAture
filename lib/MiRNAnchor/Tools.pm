@@ -2,7 +2,7 @@ package MiRNAnchor::Tools;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(check_folder_files load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam read_data_share end_close evaluated_family);
+@EXPORT = qw(check_folder_files2 load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam read_data_share end_close evaluated_family);
 
 use Moose::Role;
 use Data::Dumper;
@@ -10,8 +10,9 @@ use File::Copy;
 use File::Copy::Recursive qw(dircopy);
 use Term::ANSIColor qw(:constants); 
 use MiRNAnchor::ExternalPrograms;
+use File::Find;
 
-=head1 check_folder_files 
+=head1 check_folder_files2
 	Title: check_folder_files
 	Usage: check_folder_files(<PATH_DIR_TO_SEARCH>, PATTERN);
 	Function: Get list files that have specific pattern. 
@@ -19,7 +20,7 @@ use MiRNAnchor::ExternalPrograms;
 		menctioned pattern in its name. 
 =cut 
 
-sub check_folder_files {
+sub check_folder_files2 {
 	my ($dir, $prefix) = @_;
 	opendir(DIR, $dir);
 	my @files = grep(/$prefix$/, readdir(DIR));

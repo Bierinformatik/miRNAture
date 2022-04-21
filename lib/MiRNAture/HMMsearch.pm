@@ -61,14 +61,14 @@ sub cmsearch_specific_sequence {
 sub define_final_CMs {
 	my ($outpath, $specie, $str, $len_r) = @_;
 	my @result_cmsearch;
-	if ($str =~ /^HMM$/){
+	if ($str =~ /^hmm$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
-	} elsif ($str =~ /^INFERNAL$/){
+	} elsif ($str =~ /^rfam$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
 		concatenate_true_cand($specie, $outpath,\@result_cmsearch, $str); #Concantenate all true
 		resolve_mergings($specie, $outpath, "3", $str);
 		return;
-	} elsif ($str =~ /^OTHER_CM$/){
+	} elsif ($str =~ /^mirbase$|^user$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
 		concatenate_true_cand($specie, $outpath,\@result_cmsearch, $str); #Concantenate all true
 		resolve_mergings($specie, $outpath, "3", $str);

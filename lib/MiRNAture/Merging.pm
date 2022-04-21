@@ -60,9 +60,9 @@ sub resolve_mergings {
 	my $file;
 	my $tto = 0;
 	my $database_grouped_queries;
-	if ($str =~ /^HMM$/){
+	if ($str =~ /^hmm$/){
 		$file = "${dir}/all_RFAM_$specie.truetable.clean"; #Adjusted HMM coordinates
-	} elsif ($str =~ /^INFERNAL$|^OTHER_CM$/){
+	} elsif ($str =~ /^rfam$|^mirbase$|^user$/){
 		$file = "${dir}/all_RFAM_$specie.truetable"; #INFERNAL direct coordinates
 	} elsif ($str =~ /^ALL$|^COMPLETE$/) {
 		my $database_folder = "${dir}/../../";
@@ -70,7 +70,7 @@ sub resolve_mergings {
 		# Load all database files to get query references
 		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $specie);
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
-    } elsif ($str =~ /^Final$/) {
+    } elsif ($str =~ /^final$/) {
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Final file concatenated
 	} elsif ($str =~ /^Merging$/){
 		$file = "${dir}/all_RFAM_${specie}_Final.all";
@@ -130,7 +130,7 @@ sub resolve_mergings {
 sub direct_flow {
 	my ($number, $values) = @_;
 	if ($number == 0){
-		error();
+		print_error("No candidates on the merging process. Critical error!");
 	} elsif ($number == 1 ){
 		foreach my $i (${$values}[0]){
 			my $fam2 = get_uniq($$i[10]);

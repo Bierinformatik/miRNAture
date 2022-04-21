@@ -37,9 +37,9 @@ sub evaluate_input_flags {
 	my $name = $nameC;
 	$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 	if (!-z $nameC && -e $nameC){ #This is a file, must exists and must be non-zero
-		print_process("The $name covariance list will be used");
+		print_process("The $name covariance list is correctly defined");
 	} else {
-		print_process("The default covariance list will be used");
+		print_error("The $name model does not have models to search. Please provide a list of models to be searched on the target genome");
 	}
 	#Check the selected mode
 	if ($mode =~ /blast|rfam|hmm|mirbase|user|final/){ # This is the valid modes
@@ -327,7 +327,7 @@ sub check_folder_files {
 sub calculate_Z_value {
 	my ($genome, $mode) = @_; #mode: Genome or Region
 	if (!-e $genome || -z $genome){
-		print_error("Seems that your $genome does not exists or it is empty, fix that please.");
+		print_error("Seems that your $genome file does not exists or it is empty. Please provide the correspondent fasta file");
 	}
 	my ($value, $value2);
 	existenceProgram("esl-seqstat");
@@ -995,7 +995,7 @@ sub existenceProgram {
 	my $tool = shift;
 	my $tool_path = `which $tool 2> /dev/null | tr -d '\n'`;
 	unless ($tool_path){
-		print_error("No $tool command is available in your system!");
+		print_error("No $tool command is available in your system! Please install it.");
 	}
 	return;
 }
@@ -1006,9 +1006,9 @@ sub classify_2rd_align_results {
 	my $filein;
 	if ($cm ne "NA"){
 		#$filein = "$folder_in/$spe.$cm.tab";
-		if ($mode eq "INFERNAL" || $mode eq "Infernal" || $mode eq "OTHER_CM"){
+		if ($mode eq "rfam" || $mode eq "mirbase" || $mode eq "user"){
 			$filein = $file; 
-		} elsif ($mode eq "HMM"){
+		} elsif ($mode eq "hmm"){
 			$filein = $file;
 		}
 	} else { #Here is the Blast/Infernal input data, not too much input data, then reeplace.

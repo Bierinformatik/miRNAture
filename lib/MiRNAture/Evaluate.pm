@@ -185,12 +185,12 @@ sub load_all_databases {
 sub concatenate_true_cand {
 	my ($specie, $dir, $files_true, $str) = @_;
 	my $output_file;
-	if ($str !~ /^HMM$|^INFERNAL$|^Final$|^OTHER_CM$/){ #Str is not Infernal or HMM, only blast
+	if ($str !~ /^hmm$|^rfam$|^final$|^mirbase$|^user$/){ #Str is not rfam or hmm, only blast
 		foreach my $input_file (@$files_true){
 			system "cat $dir/$input_file >> $dir/all_RFAM_${specie}_${str}.truetable.temp";
 		}
 		$output_file = "$dir/all_RFAM_${specie}_${str}.truetable.temp";
-	} elsif ($str =~ /^Final$/){
+	} elsif ($str =~ /^final$/){
 		foreach my $input_file (@$files_true){
 			system "cat $input_file >> $dir/all_RFAM_${specie}_${str}.truetable.temp";
 		}
@@ -211,7 +211,7 @@ sub concatenate_true_cand {
 	while (<$GENERATED>){
 		chomp;
 		# JH126831.1.-.75502.75785.41	-	mir-10	RF00104	cm	1	74	159	220	+	no	1	0.26	0.2	15.5	0.0021	!	-	74
-		if ($str =~ /^ALL$|^Final$/){
+		if ($str =~ /^ALL$|^final$/){
 			print $OUT "$_\n";
 		} else { #Here Blast, Infernal and HMM modes
 			my @split = split /\s+|\t/, $_;
@@ -320,8 +320,9 @@ sub get_family_name {
 	if (exists $$families_names{$acc}){
 		$name = $$families_names{$acc};
 	} else {
-		$name = "lncRNA";
-		print_error("Your $acc has not description of the ncRNA family!");
+		#TODO: Future references to search other ncRNAs
+		#$name = "NA";
+		print_error("Your $acc has not description field of the ncRNA family!");
 	}
 	return $name;
 }
