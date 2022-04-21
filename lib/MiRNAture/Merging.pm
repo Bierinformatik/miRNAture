@@ -497,16 +497,30 @@ sub push_to_new {
 sub generate_final_ncRNAs {
 	my ($blast_file, $hmm_file, $infernal_file, $other_file, $user_file, $out_folder, $specie) = @_;
 	my (@all_files, @all_filesT);
-	push @all_filesT, $blast_file;
-	push @all_filesT, $hmm_file;
-	push @all_filesT, $infernal_file;
-	push @all_filesT, $other_file;
-	push @all_filesT, $user_file;
-	foreach my $file (@all_filesT){
-		if (-z $file || !-e $file){
-			print_result("$file is empty or is missing!");
+	push @all_filesT, $blast_file; # 0
+	push @all_filesT, $hmm_file; # 1
+	push @all_filesT, $infernal_file; # 2
+	push @all_filesT, $other_file; # 3
+	push @all_filesT, $user_file; # 4
+	
+	for (my $i = 0; $i <= 4; $i++) {
+		if (-z $all_filesT[$i] || !-e $all_filesT[$i]){
+			;#print_result("$file is empty or is missing!");
 		} else {
-			push @all_files, $file;
+			my $mode_run;
+			if ($i == 0) {
+				$mode_run = "blast";
+			} elsif ($i == 1){
+				$mode_run = "hmm";
+			} elsif ($i == 2){
+				$mode_run = "rfam";
+			} elsif ($i == 3){
+				$mode_run = "mirbase";
+			} elsif ($i == 4){
+				$mode_run = "user_cm";
+			}
+			print_result("Detected homology candidates by $mode_run mode");
+			push @all_files, $all_filesT[$i];
 		}
 	}
 	concatenate_true_cand($specie, $out_folder, \@all_files, "final"); #Concantenate all true
