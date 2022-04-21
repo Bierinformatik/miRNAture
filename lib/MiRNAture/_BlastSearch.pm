@@ -402,7 +402,7 @@ sub wait_processes {
 	if ($parallel == 1){
 		foreach my $reference (@$processes){
 			chomp $reference;
-			print_process("Waiting for the process: $reference"); 
+			#print_process("Waiting for the process: $reference"); 
 			EVAL:
 			my $state_qsub = `squeue -o "%8i %20j %4t %10u" | grep "^$reference"`; #Capture state
 			if ($state_qsub && length $state_qsub > 0){

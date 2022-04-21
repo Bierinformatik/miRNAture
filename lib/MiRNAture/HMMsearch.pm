@@ -18,26 +18,28 @@ sub searchHomologyHMM {
 		create_folders($outHMM,$specie);#Create folder specific to specie
 	}
 	runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
-	my @result_files = check_folder_files("$outHMM/$specie", "\.tab");
+	#my @result_files = check_folder_files("$outHMM/$specie", "\.tab");
 	my $new_out = "$outHMM/$specie";
 	obtainTrueCandidates($specie, $new_out, $hmm);
 	if (!-e "$outHMM/$specie/$specie.$hmm.tab.true.table" || -z "$outHMM/$specie/$specie.$hmm.tab.true.table"){
-		return 1;
+		print_error("Not possible to create files with candidate classification");
+		#return 1;
 	} else {
 		my @result_true = check_folder_files("$outHMM/$specie", "$hmm\\.tab\\.true\\.table");
 		getSequencesFasta($specie, $genome, $hmm, "$outHMM/$specie", "2", $len_r, $names_r); #Header mode == 2 HMM
-		my @result_fasta = check_folder_files("$outHMM/$specie", "fasta");
+		#my @result_fasta = check_folder_files("$outHMM/$specie", "fasta");
 		create_folders("$outHMM/$specie","Infernal");#Create folder specific to specie
 		my $infernal_out_path = "$outHMM/$specie/Infernal";
 		if (-z "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta" || !-e "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta"){
-			return 1;	
+			print_error("Not possible to create files with candidate classification");
+			#return 1;	
 		} else {
 			$zvalue = $zvalue/2; # Because it is only one strand
 			cmsearch_specific_sequence($hmm, $CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
-			my @result_cmseach = check_folder_files($infernal_out_path, "tab");
+			#my @result_cmseach = check_folder_files($infernal_out_path, "tab");
 			my $molecule = get_family_name($hmm, $families_names);
 			create_folders("$outHMM/$specie/Infernal","Final");#Create folder specific to specie
-			classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"HMM", $molecule, $bitscores, $len_r, $names_r, $minBitscore, $maxthreshold); #Obtain true candidates
+			classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"hmm", $molecule, $bitscores, $len_r, $names_r, $minBitscore, $maxthreshold); #Obtain true candidates
 		}
 		return;
 	}
@@ -130,7 +132,7 @@ sub obtainTrueCandidates {
 sub update_coordinates_to_genome { #Only for HMMs and Blast strategies
 	my ($input_folder, $specie, $strategy, $len_r) = @_;
 	my ($IN, $OUT);
-	if ($strategy =~ /^HMM$/){
+	if ($strategy =~ /^hmm$/){
 		open $IN, "< $input_folder/all_RFAM_$specie.truetable" or die;
 		open $OUT, "> $input_folder/all_RFAM_$specie.truetable.clean" or die;
 	} else {
@@ -167,7 +169,7 @@ sub update_coordinates_to_genome { #Only for HMMs and Blast strategies
 		my $len_cm = $$len_r{$parts[3]};
 		# Here prints the line with the group reference of the merged query candidates
 		# on the blast block file specie_str.miRNA.tab.db.location.database: $parts[-1]
-		if ($strategy =~ /^HMM$/){
+		if ($strategy =~ /^hmm$/){
 			print $OUT "$other[0]\t$other[4]\t$other[1]\t$parts[5]\t$parts[6]\t$realStart\t$realEnd\t$parts[14]\t$parts[15]\t$parts[10]\t$parts[2]\t$len_cm\t$strategy\n";
 		} else {
 			print $OUT "$other[0]\t$other[-1]\t$other[1]\t$parts[5]\t$parts[6]\t$realStart\t$realEnd\t$parts[14]\t$parts[15]\t$parts[10]\t$parts[2]\t$len_cm\t$strategy\n";

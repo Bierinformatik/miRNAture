@@ -221,7 +221,7 @@ sub _size_set {
 			$self->{model_list} = $self->data_path."/Data/RFAM_14-4/rfam_models_list.txt";
 		} elsif ($self->mode =~ /^mirbase$/){
 			$self->{model_list} = $self->data_path."/Data/Mirbase/mirbase_models_list.txt";
-		} elsif ($self->mode =~ /mirbase/ && $self->mode =~ /rfam/){
+		} elsif (($self->mode =~ /mirbase/ && $self->mode =~ /rfam/) || $self->mode =~ /hmm/ || $self->mode =~ /blast/){
 			$self->{model_list} = $self->data_path."/Data/concatenated_models_list.txt";
 		}
 		#$self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";

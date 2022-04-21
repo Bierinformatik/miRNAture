@@ -211,13 +211,12 @@ sub concatenate_true_cand {
 	while (<$GENERATED>){
 		chomp;
 		# JH126831.1.-.75502.75785.41	-	mir-10	RF00104	cm	1	74	159	220	+	no	1	0.26	0.2	15.5	0.0021	!	-	74
-		if ($str =~ /^ALL$|^final$/){
-			print $OUT "$_\n";
-		} else { #Here Blast, Infernal and HMM modes
-			my @split = split /\s+|\t/, $_;
-			my @other = split /\./, $split[0];
-			print $OUT "$_\n";
-		}
+		#if ($str =~ /^ALL$|^final$/){
+		print $OUT "$_\n";
+		#} else { #Here Blast, Infernal and HMM modes
+		#	my @split = split /\s+|\t/, $_;
+		#	my @other = split /\./, $split[0];
+		#	print $OUT "$_\n";
 	}
 	close $OUT;
 	return;
@@ -348,7 +347,6 @@ sub format_final_table {
 	open my $OUTF, "> $file_out" or die;  
 	while (<$INF>){
 		chomp;
-		#print "$_\n";
 		my @split = split /\s+|\t/, $_;
 		my ($ncRNA_name, $family_ncRNA);
 		if ($split[10] !~ /,/){
@@ -474,9 +472,8 @@ sub get_specie_name {
 	my ($spe, $str) = @_;
 	my $specie_out;
 	if ($spe =~ /^\w+/ && $str =~ /^0$/){
-		$specie_out = "Infernal";
+		$specie_out = "CM";
 	} elsif ($spe =~ /^\w{2,4}\d+/ && $str =~ /\d+/ && $str !~ /^0$/){
-		#} elsif ($spe =~ /^anca|^brfl|^cael|^ciin|^cisa|^dare|^lach|^oidi|^pema|^sce|^xetr/){
 		$specie_out = $spe;
 		$specie_out =~ s/^(\w{2,4})(\d+|\_.*)/$1/g;
 		$specie_out = uc($specie_out);
@@ -510,11 +507,11 @@ sub get_str_name {
 	my $query_2 = shift;
 	my $q_out;
 	if ($query_2 =~ /^0$|^0D$/){
-		$q_out = "Infernal";
-	} elsif ($query_2 =~ /^HMM/){
-		$q_out = "HMM";
+		$q_out = "cmseach";
+	} elsif ($query_2 =~ /^hmm/){
+		$q_out = "hmm";
 	} else { #numbers from 1 to 10
-		$q_out = "Blast";
+		$q_out = "blast";
 	}
 	return $q_out;
 }
