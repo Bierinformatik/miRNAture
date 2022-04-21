@@ -135,7 +135,7 @@ if ($mode =~ m/mirbase/){ #Load specific scores for mirbase.
 } elsif ($mode =~ m/rfam/) { #Here get all the scores from RFAM database
     ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Basic", $basicFiles, $user_data_path); 
 } elsif ($mode =~ m/user/) { #Here get all the scores from RFAM database
-    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("User", $basicFiles, $user_data_path); 
+    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("user", $basicFiles, $user_data_path); 
 } else { #Here get all the scores from RFAM and miRBase for: blast, hmm and final
 	if (length $user_data_path > 0){ #If path defined check that exists scores file
 		($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 

@@ -74,10 +74,10 @@ has 'blast_strategy' => (
 	default => sub { #Test if previously defined mode
 		my $shift =  shift;
 		my $mode = $shift->mode or die "Mode didn't specified\n";
-		if ($mode eq "BLAST"){
+		if ($mode eq "blast"){
 			return $shift->blast_strategy;
 		} else {
-			print_error("Declaring strategies only makes sense if you are running BLAST mode");
+			print_error("Declaring strategies only makes sense if you are running blast mode");
 		}
 	},
 );
@@ -90,10 +90,10 @@ has 'blast_queries_path' => (
 	default => sub { 
 		my $shift =  shift;
 		my $mode = $shift->mode or die "Mode didn't specified\n";
-		if ($mode eq "BLAST"){
+		if ($mode eq "blast"){
 			return $shift->blast_queries_path->stringify;
 		} else {
-			print_error("Declaring the location of queries to blast only makes sense if you are running BLAST mode");
+			print_error("Declaring the location of queries to blast only makes sense if you are running blast mode");
 		}
 	},
 );
@@ -223,6 +223,8 @@ sub _size_set {
 			$self->{model_list} = $self->data_path."/Data/Mirbase/mirbase_models_list.txt";
 		} elsif (($self->mode =~ /mirbase/ && $self->mode =~ /rfam/) || $self->mode =~ /hmm/ || $self->mode =~ /blast/){
 			$self->{model_list} = $self->data_path."/Data/concatenated_models_list.txt";
+		} elsif ($self->mode =~ /^user$/){
+			$self->{model_list} = $self->user_folder."/user_models_list.txt";
 		}
 		#$self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
         return;
@@ -231,6 +233,20 @@ sub _size_set {
         $self->{model_list} = $self->model_list;
     } 
     return;
+}
+
+# Create list of models provided for the user
+sub infer_list_models_user {
+	my $self = shift;
+	my $path_scores = shift;
+	if (!-e $path_scores || -z $path_scores){
+		print_error("The user score file: $path_scores is incorrect");
+	}
+	my $outfile = $self->user_folder."/user_models_list.txt";
+	if (!-e $outfile || -z $outfile){
+		system "cut -f 1 $path_scores | sort | uniq >  $outfile";
+	}
+	return;
 }
 
 #Concatenate models in case both rfam and mirbase modes are indicated

@@ -234,7 +234,7 @@ sub searchHomologyBlast {
 		foreach my $file_out_cmsearch (@result_cmsearch){
 			classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore, $maxthreshold); #Obtain true candidates
 		}
-		print_process("Structural evaluation of $molecule complete");
+		print_process("Structural evaluation of strategy ".$shift->blast_str." complete");
 	}
 	#Here, concatenate by Str
 	if ($shift->blast_str =~ /^\d+$/){
@@ -416,7 +416,7 @@ sub wait_processes {
 		return;
 	} else {
 		foreach my $reference (@$processes){
-			print_process("Waiting for the process: $reference"); 
+			#print_process("Waiting for the process: $reference"); 
 			EVAL2:
 			my $exists = kill 0, $reference;
 			if ( $exists ){
