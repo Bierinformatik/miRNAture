@@ -142,9 +142,9 @@ sub searchHomologySequenceBlast {
 	create_folders($shift->current_directory,".blastTemp/");
 	create_folders($shift->current_directory,".blastTemp/LOGs");
 	# Load both score files, from RFAM and others
-	my $families = index_ncRNA_families($shift->data_folder."/Basic_files/all_RFAM_scores.txt", $shift->data_folder."/Basic_files/all_other_scores.txt", $shift->user_data."/all_user_scores.txt"); #Create groups of ncRNA families from CMs
+	my $families = index_ncRNA_families($shift->data_folder."/Basic_files/all_rfam_scores.txt", $shift->data_folder."/Basic_files/all_mirbase_scores.txt", $shift->user_data."/all_user_scores.txt"); #Create groups of ncRNA families from CMs
 	my ($molecules, $query_species, $files_relation) = infer_data_queries($shift->query_folder); #Based on metafile, infer query species and molecules
-	foreach my $molecule (@$molecules){ #Each fasta file provided by the user
+	foreach my $molecule (@$molecules){ #Each type of molecules
 		foreach my $queryS (@$query_species){
 			print_process("Searching $molecule homologs from $queryS");
 			my $tag_query_spe = create_tag_specie($queryS);

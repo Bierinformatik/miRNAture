@@ -278,7 +278,6 @@ sub concatenate_models {
 	my $self =  shift;
 	my $references = shift;
 	my $mode = $self->mode;
-	print "$mode\n";
 	my @modes = split /,/, $mode;
 	my $num = scalar @modes;
 	# Dinamically create/update file based on indicated modes
