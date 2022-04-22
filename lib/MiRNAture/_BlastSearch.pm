@@ -376,7 +376,7 @@ sub runBlastn {
 	my $id; 
 	system "chmod 755 $dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh";
 	if ($parallel == 1){
-		print_process("Going into parallel running!\n");
+		print_process("Going into SLURM running!\n");
 		$id = `sbatch --job-name=$nameTTO --nodes=1 --ntasks=1 --cpus-per-task=5 --time=96:00:00 --mem=2G --output=$dir_now/.blastTemp/LOGs/out_${specie}_$strategy.$ncrna.$query_tag.out --error=$dir_now/.blastTemp/LOGs/error_${specie}_$strategy.$ncrna.$query_tag.out $dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh`;
 		$id =~ /^Submitted batch job (\d+)/; 
 		$id = $1;
