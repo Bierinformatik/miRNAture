@@ -4,6 +4,7 @@ use Moose;
 use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Bio::SeqIO;
+use Data::Dumper;
 #use File::Share ':all';
 
 use lib "lib/MiRNAture";
@@ -221,12 +222,13 @@ sub _size_set {
 			$self->{model_list} = $self->data_path."/Data/RFAM_14-4/rfam_models_list.txt";
 		} elsif ($self->mode =~ /^mirbase$/){
 			$self->{model_list} = $self->data_path."/Data/Mirbase/mirbase_models_list.txt";
-		} elsif (($self->mode =~ /mirbase/ && $self->mode =~ /rfam/) || $self->mode =~ /hmm/ || $self->mode =~ /blast/){
+		} elsif ($self->mode =~ /,/){
 			$self->{model_list} = $self->data_path."/Data/concatenated_models_list.txt";
 		} elsif ($self->mode =~ /^user$/){
 			$self->{model_list} = $self->user_folder."/user_models_list.txt";
+		} elsif ($self->mode =~ /^final$/){
+			$self->{model_list} = $self->data_path."/Data/RFAM_14-4/rfam_models_list.txt";
 		}
-		#$self->{model_list} = $self->data_path->stringify."/Data/RFAM_14-4/rfam_models_list.txt";
         return;
     }
     if (length $self->model_list > 0){
@@ -249,16 +251,58 @@ sub infer_list_models_user {
 	return;
 }
 
+sub models_list_hash {
+	my $self = shift;
+	my %reference;
+	my $mirbase = $self->data_path."/Data/Mirbase/mirbase_models_list.txt"; 
+	my $rfam = $self->data_path."/Data/RFAM_14-4/rfam_models_list.txt";
+	my $user = $self->data_path.$self->user_folder."/user_models_list.txt";
+	push @{$reference{'mirbase'}}, $mirbase;
+	push @{$reference{'rfam'}}, $rfam;
+	push @{$reference{'user'}}, $user; 
+	push @{$reference{'hmm'}}, $rfam;	
+	push @{$reference{'hmm'}}, $mirbase;
+	push @{$reference{'blast'}}, $rfam;	
+	push @{$reference{'blast'}}, $mirbase;
+	push @{$reference{'final'}}, "NA";
+	if (-e $user && !-z $user){
+		push @{$reference{'hmm'}}, $user;
+		push @{$reference{'blast'}}, $user;
+	}
+	return \%reference;
+}
+
+
 #Concatenate models in case both rfam and mirbase modes are indicated
 sub concatenate_models {
-	my $self = shift;
-	my $modelA = shift;
-	my $modelB = shift;
+	my $self =  shift;
+	my $references = shift;
+	my $mode = $self->mode;
+	print "$mode\n";
+	my @modes = split /,/, $mode;
+	my $num = scalar @modes;
+	# Dinamically create/update file based on indicated modes
+	my @final_paths;
 	my $out = $self->data_path."/Data/concatenated_models_list.txt";
-	if (!-e $self->data_path."/Data/concatenated_models_list.txt" || -z $self->data_path."/Data/concatenated_models_list.txt"){
+	if (-e $out){
+		system "rm $out";
 		system "touch $out";
-		system "cat $modelA >> $out";
-		system "cat $modelB >> $out";
+	}
+	for (my $i = 0; $i <= $num - 1; $i++) { #Iterate modes
+		if (exists $$references{$modes[$i]}){
+			my $path = $$references{$modes[$i]}; # Array
+			my $num2 = scalar @$path;
+			for (my $j = 0; $j <= $num2 - 1; $j++) {
+				push @final_paths, $$path[$j];
+			}
+		}
+	}
+	# Remove redundants
+	my @unique_paths = do { my %seen; grep { !$seen{$_}++} @final_paths }; 
+	for (my $l = 0; $l <= $#unique_paths; $l++) {
+		unless ($unique_paths[$l] eq "NA"){
+			system "cat $unique_paths[$l] >> $out";
+		}
 	}
 	return;
 }

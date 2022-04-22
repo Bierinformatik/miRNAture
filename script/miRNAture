@@ -91,13 +91,10 @@ my $config_file = Mir::ConfigurationFile->new (
 $config_file->start;
 $config_file->generate_copy_genome;
 
-if (($config_file->mode =~ /mirbase/ && $config_file->mode =~ /rfam/) || $config_file->mode =~ /blast/ || $config_file->mode =~ /hmm/){
-	$config_file->concatenate_models($config_file->data_path."/Data/RFAM_14-4/rfam_models_list.txt", 
-									$config_file->data_path."/Data/Mirbase/mirbase_models_list.txt"
-									);
-} elsif ($config_file->mode =~ /user/){
-	$config_file->infer_list_models_user($config_file->user_folder."/all_user_scores.txt");
-}
+# Build defaul models lists based on selected modes:  <22-04-22, cavelandiah> #
+my $default_models = $config_file->models_list_hash();
+$config_file->concatenate_models($default_models);
+
 
 my $variables;
 if ($config_file->stage =~ /^summarise$/){
