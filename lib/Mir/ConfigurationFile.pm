@@ -256,7 +256,7 @@ sub models_list_hash {
 	my %reference;
 	my $mirbase = $self->data_path."/Data/Mirbase/mirbase_models_list.txt"; 
 	my $rfam = $self->data_path."/Data/RFAM_14-4/rfam_models_list.txt";
-	my $user = $self->data_path.$self->user_folder."/user_models_list.txt";
+	my $user = $self->user_folder."/user_models_list.txt";
 	push @{$reference{'mirbase'}}, $mirbase;
 	push @{$reference{'rfam'}}, $rfam;
 	push @{$reference{'user'}}, $user; 
