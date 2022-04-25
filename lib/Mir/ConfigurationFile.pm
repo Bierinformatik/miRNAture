@@ -137,6 +137,12 @@ has 'parallel' => (
 	required => 1
 );
 
+has 'parallel_linux' => (
+	is => 'ro',
+	isa => 'Int',
+	required => 1
+);
+
 has 'debug_mode' => (
 	is => 'ro',
 	isa => 'Int',
@@ -509,6 +515,7 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{"Blast_queries"} = $shift->blast_queries_path->stringify;
 	$yaml->[3]->{Homology_options}{"Mode"} = $shift->mode;
 	$yaml->[3]->{Homology_options}{"Parallel"} = $shift->parallel;
+	$yaml->[3]->{Homology_options}{"Parallel_linux"} = $shift->parallel_linux;
 	if ($shift->blast_strategy){
 		$yaml->[3]->{Homology_options}{"Blast_strategies"} = $shift->blast_strategy;
 	}

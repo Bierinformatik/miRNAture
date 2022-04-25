@@ -32,7 +32,7 @@ with 'MiRNAture::Evaluate'; #Load tool subroutines
 
 sub evaluate_input_flags {
 	#cmlist file, mode run, out folder, parallel mode.
-	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $repetition_threshold, $new_models) = @_;
+	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $parallel_linux, $repetition_threshold, $new_models) = @_;
 	# Evaluate the existence of list of CM models
 	my $name = $nameC;
 	$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
@@ -57,6 +57,11 @@ sub evaluate_input_flags {
 		;	
 	} else {
 		print_error("The mode $parallel mode is not valid!");
+	}
+	if ($parallel_linux == 1 || $parallel_linux == 0){
+		;	
+	} else {
+		print_error("The mode $parallel_linux mode is not valid!");
 	}
 	# Check if work folder exists, if not create it.
 	if (-d $work_folder){ #This is the outfolder, test if exists or create
@@ -436,6 +441,7 @@ sub getSequencesFasta {
 	}
 	while (<$IN>){
 		chomp;
+		next if $_ =~ /^#/;
 		my ($ids, $idsDouble);
 		if ($mode == 1 || $mode == 5){
 			my $strand = (split /\s+|\t/, $_)[1];

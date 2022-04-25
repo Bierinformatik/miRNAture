@@ -36,6 +36,7 @@ my $work_folder = ""; #output folder
 my $name_specie = ""; #Scientific name of specie
 my $data_folder = "";
 my $parallel_run = "";
+my $parallel_linux = "";
 my $rep_cutoff; # Homology cutoff to speed-up the searches 
 my $maxthresholdBit; # nBitscore threshold to clean data: 0-1
 
@@ -59,7 +60,8 @@ GetOptions (
     'strategy|str=s' => \@strategy,
     'blast_queries|blstq=s' => \$blastQueriesFolder,
     'data_folder|data=s' => \$data_folder,
-    'parallel|pe=i' => \$parallel_run,
+    'parallel|ps=i' => \$parallel_run, # Parallel SLURM
+    'parallel_linux|pe=i' => \$parallel_linux, # Parallel SLURM
     'new_models|nmodels=s{1,2}' => \@cm_model_others,
 ) or pod2usage(2);
 @strategy = split (/,/, join(',',@strategy));
@@ -67,7 +69,7 @@ GetOptions (
 my $startComplete = time();
 #### Flags Evaluation
 my $new_model_path = $cm_model_others[-1];
-$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run, $rep_cutoff, $new_model_path);
+$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run, $parallel_linux, $rep_cutoff, $new_model_path);
 my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$specie.yaml");
 my $current_dir = $configuration_mirnature->[3]->{Default_folders}->{Output_folder}."/TemporalFiles"; #getcwd;
 ## Working Paths
@@ -183,7 +185,7 @@ if ($configuration_file->mode eq "blast"){
             cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             makeblast_program_path => $configuration_mirnature->[2]->{Program_locations}->{makeblastdb},
             models_list => $configuration_mirnature->[3]->{Default_folders}->{List_cm_miRNAs},
-    user_data => $user_data_path,
+            user_data => $user_data_path,
         );	
         if ($blast_experiment->blast_str =~ /^\d+$/){
             my ($id_process_running, $molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast; #Run all blastn jobs, returns array by Str
@@ -202,27 +204,29 @@ if ($configuration_file->mode eq "blast"){
     print_process("Running ".$configuration_file->mode." searches mode");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_hmm = time;
-    while (<$LIST>){ #In this case, list is the CM names
-        chomp;
-        #print_process("Running on $specie\t$_");
-        my $hmm_experiment = MiRNAture::HMM->new(
-            hmm_model => $_,	
-            genome_subject => $$genomes{$specie},
-            subject_specie => $specie,
-            output_folder => $outHMM,
-            path_hmm_models => \@path_hmm,
-            path_covariance => \@path_cm,
-            bitscores_CM => $bitscores,
-            length_CM => $len_r,
-            names_CM => $names_r,
-            families_names_CM => $families_names,
-            nhmmer_program_path => $configuration_mirnature->[2]->{Program_locations}->{nhmmer},
-            cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
-        );
-        $hmm_experiment->create_folders_hmm($work_folder);
-        $hmm_experiment->search_homology_HMM($Zvalue, $minBitscore,$maxthresholdBit);						
-        $hmm_experiment->clean_empty;
-    }
+    ##while (<$LIST>){ #In this case, list is the CM names
+    ##chomp;
+    ##print_process("Running on $specie\t$_");
+    my $hmm_experiment = MiRNAture::HMM->new(
+        ##hmm_model => $_,	
+        parallel_linux => $parallel_linux,
+        genome_subject => $$genomes{$specie},
+        subject_specie => $specie,
+        output_folder => $outHMM,
+        path_hmm_models => \@path_hmm,
+        path_covariance => \@path_cm,
+        bitscores_CM => $bitscores,
+        length_CM => $len_r,
+        names_CM => $names_r,
+        families_names_CM => $families_names,
+        nhmmer_program_path => $configuration_mirnature->[2]->{Program_locations}->{nhmmer},
+        cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
+        list_models => $configuration_file->list_file->stringify, 
+    );
+    $hmm_experiment->create_folders_hmm($work_folder);
+    $hmm_experiment->search_homology_HMM($Zvalue, $minBitscore, $maxthresholdBit);						
+    $hmm_experiment->clean_empty;
+    ##}
     #my $diff = $start - time;
     #LogFile::write_line_log("# Running homology search time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "rfam"){
