@@ -233,25 +233,26 @@ if ($configuration_file->mode eq "blast"){
     print_process("Running ".$configuration_file->mode." searches mode");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_infernal = time;
-    while (<$LIST>){ #In this case, list is the CM names
-        chomp;
-        next if $_ !~ /^RF/; # Must start with RF[0-9]+
-        my $cm_experiment = MiRNAture::CM->new(
-            cm_model => $_,
-            genome_subject => $$genomes{$specie},
-            subject_specie => $specie,
-            output_folder => $outInfernal,
-            path_covariance => \@path_cm,
-            bitscores_CM => $bitscores,
-            length_CM => $len_r,
-            names_CM => $names_r,
-            families_names_CM => $families_names,
-            cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
-        );
-        $cm_experiment->create_folders_cm;
-        $cm_experiment->search_homology_CM($Zvalue,$minBitscore,$maxthresholdBit);
-        $cm_experiment->clean_empty;
-    }		
+    ##while (<$LIST>){ #In this case, list is the CM names
+    ##    chomp;
+    ##    next if $_ !~ /^RF/; # Must start with RF[0-9]+
+    my $cm_experiment = MiRNAture::CM->new(
+        ##cm_model => $_,
+        genome_subject => $$genomes{$specie},
+        subject_specie => $specie,
+        output_folder => $outInfernal,
+        path_covariance => \@path_cm,
+        bitscores_CM => $bitscores,
+        length_CM => $len_r,
+        names_CM => $names_r,
+        families_names_CM => $families_names,
+        cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
+        list_models => $configuration_file->list_file->stringify, 
+    );
+    $cm_experiment->create_folders_cm;
+    $cm_experiment->search_homology_CM($Zvalue,$minBitscore,$maxthresholdBit);
+    $cm_experiment->clean_empty;
+    ##}		
     #my $diff = $start - time;
     #LogFile::write_line_log("# Running homology search time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "mirbase"){
