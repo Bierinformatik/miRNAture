@@ -67,12 +67,12 @@ has 'cmsearch_program_path' => (
 	coerce => 1,
 );
 
-has 'list_models' => (
-	is => 'ro',
-	isa => 'Path::Class::Dir',
-	coerce => 1,
-	required => 1,
-);
+##has 'list_models' => (
+##	is => 'ro',
+##	isa => 'Path::Class::Dir',
+##	coerce => 1,
+##	required => 1,
+##);
 
 sub create_folders_cm {
 	my $shift = shift;

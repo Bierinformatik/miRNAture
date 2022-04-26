@@ -247,7 +247,7 @@ if ($configuration_file->mode eq "blast"){
         names_CM => $names_r,
         families_names_CM => $families_names,
         cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
-        list_models => $configuration_file->list_file->stringify, 
+        #list_models => $configuration_file->list_file->stringify, 
     );
     $cm_experiment->create_folders_cm;
     $cm_experiment->search_homology_CM($Zvalue,$minBitscore,$maxthresholdBit);
