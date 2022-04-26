@@ -84,7 +84,7 @@ sub search_homology_other {
 	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie, $shift->subject_specie."\.tab");
 	for (my $i = 0; $i <= $#result_files; $i++) {
 		my $cm_model = $result_files[$i];
-		$cm_model =~ s/(MIPF[0-9]+)(.*)(\.tab)/$1/g;
+		$cm_model =~ s/(MIPF[0-9]+|.*)(\_.*)(\.tab)/$1/g;
 		my $molecule = "NA";
 		classify_2rd_align_results($shift->subject_specie, $cm_model, $shift->output_folder."/".$shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/".$cm_model."\_".$shift->subject_specie."\.tab", "mirbase", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore, $maxthreshold);
 	}
