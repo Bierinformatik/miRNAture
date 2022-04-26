@@ -259,25 +259,25 @@ if ($configuration_file->mode eq "blast"){
     print_process("Running Mode: ".$configuration_file->mode." searches");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_other = time;
-    while (<$LIST>){ #In this case, list is the CM names
-        chomp;
-        next if $_ =~ /^RF/;
-        my $other_experiment = MiRNAture::Others->new(
-            cm_model => $_,
-            genome_subject => $$genomes{$specie},
-            subject_specie => $specie,
-            output_folder => $outOther,
-            path_covariance => \@cm_model_others, 
-            bitscores_CM => $bitscores, 
-            length_CM => $len_r,
-            names_CM => $names_r,
-            families_names_CM => $families_names,
-            cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
-        );					
-        $other_experiment->create_folders_other;
-        $other_experiment->search_homology_other($Zvalue,$minBitscore,$maxthresholdBit);
-        $other_experiment->clean_empty;
-    }
+    ##while (<$LIST>){ #In this case, list is the CM names
+    ##    chomp;
+    ##    next if $_ =~ /^RF/;
+    my $other_experiment = MiRNAture::Others->new(
+        ## cm_model => $_,
+        genome_subject => $$genomes{$specie},
+        subject_specie => $specie,
+        output_folder => $outOther,
+        path_covariance => \@cm_model_others, 
+        bitscores_CM => $bitscores, 
+        length_CM => $len_r,
+        names_CM => $names_r,
+        families_names_CM => $families_names,
+        cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
+    );					
+    $other_experiment->create_folders_other;
+    $other_experiment->search_homology_other($Zvalue,$minBitscore,$maxthresholdBit);
+    $other_experiment->clean_empty;
+    ##}
     #my $diff = $start - time;
     #write_line_log("# Running search time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "user"){
