@@ -8,7 +8,7 @@ use Getopt::Long qw(HelpMessage GetOptionsFromArray);
 use Pod::Usage;
 use YAML::Tiny;
 use Term::ANSIColor;
-use Cwd qw(getcwd);
+use Cwd qw(getcwd abs_path);
 
 use lib "lib";
 use Mir::ConfigurationFile;
@@ -70,6 +70,17 @@ pod2usage ( -verbose => 2 ) if $man;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
+
+# Relative paths correction for input paths
+if ($path_blast_queries =~ /\/\.\.\//){
+	$path_blast_queries = abs_path($path_blast_queries);
+}
+if ($work_folder =~ /\/\.\.\//){
+	$work_folder = abs_path($work_folder);
+}
+if ($specie_genome_path =~ /\/\.\.\//){
+	$specie_genome_path = abs_path($specie_genome_path);
+}
 
 my $config_file = Mir::ConfigurationFile->new (
 	stage => $stagesRun,

@@ -162,7 +162,7 @@ if ($configuration_file->mode eq "blast"){
     print_process("Running Mode: ".$configuration_file->mode." searches");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_blast = time;
-    detect_blast_queries($blastQueriesFolder);
+    my $speciesTag = detect_blast_queries($blastQueriesFolder);
     index_query_genome($$genomes{$specie}, $configuration_mirnature->[2]->{Program_locations}->{makeblastdb});
     create_folders("$work_folder", "Blast");
     for (my $i = 0; $i<=$#strategy; $i++){
@@ -180,7 +180,7 @@ if ($configuration_file->mode eq "blast"){
             bitscores_CM => $bitscores,
             length_CM => $len_r,
             names_CM => $names_r,
-            parallel_running => $parallel_run,
+            parallel_running => $parallel_linux,
             blast_program_path => $configuration_mirnature->[2]->{Program_locations}->{blastn},
             cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
             makeblast_program_path => $configuration_mirnature->[2]->{Program_locations}->{makeblastdb},
@@ -188,8 +188,8 @@ if ($configuration_file->mode eq "blast"){
             user_data => $user_data_path,
         );	
         if ($blast_experiment->blast_str =~ /^\d+$/){
-            my ($id_process_running, $molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast; #Run all blastn jobs, returns array by Str
-            $blast_experiment->wait_processes($id_process_running, $parallel_run); #Wait until complete all processes from Str
+            my ($molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast_parallel($speciesTag); #Run all blastn jobs, returns array by Str
+            ## $blast_experiment->wait_processes($id_process_running, $parallel_run); #Wait until complete all processes from Str
             $blast_experiment->searchHomologyBlast($molecules, $query_species, $families, $files_relation, $Zvalue, $minBitscore,$maxthresholdBit);	
         } elsif ($blast_experiment->blast_str =~ /^ALL$/){
             $blast_experiment->join_all_blast_str;

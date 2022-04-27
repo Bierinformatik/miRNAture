@@ -134,8 +134,10 @@ with 'MiRNAture::_BlastSearch_ResolveBlastMergings';
 with 'MiRNAture::_BlastSearch_BlockDetection';
 with 'MiRNAture::Cleaner';
 
-sub searchHomologySequenceBlast {
+
+sub searchHomologySequenceBlast_parallel {
 	my $shift = shift;
+	my $tags = shift;
 	my @id_running;
 	my $param = blast_strategies($shift->blast_str); #Get specific parameters.
 	create_folders($shift->output_folder, $shift->subject_specie ); #Create folder specific to spe
@@ -143,7 +145,39 @@ sub searchHomologySequenceBlast {
 	create_folders($shift->current_directory,".blastTemp/LOGs");
 	# Load both score files, from RFAM and others
 	my $families = index_ncRNA_families($shift->data_folder."/Basic_files/all_rfam_scores.txt", $shift->data_folder."/Basic_files/all_mirbase_scores.txt", $shift->user_data."/all_user_scores.txt"); #Create groups of ncRNA families from CMs
-	my ($molecules, $query_species, $files_relation) = infer_data_queries($shift->query_folder); #Based on metafile, infer query species and molecules
+	# Infer species from meta file and create tags:  <26-04-22, cavelandiah> #
+	my ($query_species) = create_index_fasta($shift->query_folder);
+	my ($molecules, $files_relation) = infer_data_queries($shift->query_folder, $tags); #Based on metafile, infer query species and molecules
+	foreach my $molecule (@$molecules){ #Each type of molecules
+##		foreach my $queryS (@$query_species){
+##			print_process("Searching $molecule homologs from $queryS");
+##			my $tag_query_spe = create_tag_specie($queryS);
+##			my $query_seq;
+##			if (exists $$files_relation{"${molecule}_${queryS}"}){
+##				my $file_name = $$files_relation{"${molecule}_${queryS}"};
+##				$query_seq = $shift->query_folder."/".$file_name;
+##			}
+##		}
+##	}
+	#writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->blast_program_path->stringify);
+		runBlastn_parallel($shift->blast_program_path, $param, $shift->genome_subject, $shift->blast_str, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running, $shift->query_folder->stringify);
+	}
+	#runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running);
+	##push @id_running, $runId;
+	return ($molecules, $query_species, $families, $files_relation);
+}
+
+sub searchHomologySequenceBlast {
+	my $shift = shift;
+	my $tags = shift;
+	my @id_running;
+	my $param = blast_strategies($shift->blast_str); #Get specific parameters.
+	create_folders($shift->output_folder, $shift->subject_specie ); #Create folder specific to spe
+	create_folders($shift->current_directory,".blastTemp/");
+	create_folders($shift->current_directory,".blastTemp/LOGs");
+	# Load both score files, from RFAM and others
+	my $families = index_ncRNA_families($shift->data_folder."/Basic_files/all_rfam_scores.txt", $shift->data_folder."/Basic_files/all_mirbase_scores.txt", $shift->user_data."/all_user_scores.txt"); #Create groups of ncRNA families from CMs
+	my ($molecules, $query_species, $files_relation) = infer_data_queries($shift->query_folder, $tags); #Based on metafile, infer query species and molecules
 	foreach my $molecule (@$molecules){ #Each type of molecules
 		foreach my $queryS (@$query_species){
 			print_process("Searching $molecule homologs from $queryS");
@@ -322,28 +356,52 @@ sub index_ncRNA_families {
 	return \%families;
 }
 
+sub create_index_fasta {
+	my $blastqueriesfolder = shift;
+	my $file = "$blastqueriesfolder/queries_description.txt";
+	if (!-e "$file" || -z $file) {
+		print_error("The metadata file describing the blast queries is missing");
+	}
+	open my $METADATA, "< $file" or die "The Metadata file describing the blast queries is missing\n";	
+	my (@species);
+	my (%specie);
+	while (<$METADATA>){
+		#tRNA.fasta	tRNA	Ciona intestinalis
+		chomp;
+		my @all = split /\t|\s+/, $_;
+		$specie{"$all[-2] $all[-1]"} = 1;
+	}
+	foreach my $spe (sort keys %specie){
+		push @species, $spe;
+	}
+	for (my $i = 0; $i < $#species; $i++) {
+		my $tag = create_tag_specie($species[$i]);
+		#$specie_tag{$specie[$i]} = $tag;
+	}
+	return (\@species);
+}
+
 sub infer_data_queries {
 	my $blastqueriesfolder = shift;
+	my $tags = shift;
 	open my $METADATA, "< $blastqueriesfolder/queries_description.txt" or die "The Metadata file describing the blast queries is missing\n";	
-	my (@molecules, @species);
-	my (%mol, %specie, %files);
+	my (@molecules);
+	my (%mol, %files);
 	while (<$METADATA>){
 		#tRNA.fasta	tRNA	Ciona intestinalis
 		chomp;
 		#print "$_\n";
 		my @all = split /\t|\s+/, $_;
 		$mol{$all[1]} = 1;
-		$specie{"$all[-2] $all[-1]"} = 1;
-		$all[0] =~ s/(.*)(\.fa$|\.fasta$|\.fna$)/$1.new.fasta/g;
+		my $specie_complete = $all[0];
+		my $tag = $$tags{$specie_complete};
+		$all[0] =~ s/(.*)(\.fa$|\.fasta$|\.fna$)/$1.$tag.new.fasta/g;
 		$files{"$all[1]_$all[-2] $all[-1]"} = $all[0];	
 	}
 	foreach my $molecule (sort keys %mol){
 		push @molecules, $molecule;
 	}
-	foreach my $spe (sort keys %specie){
-		push @species, $spe;
-	}
-	return (\@molecules, \@species, \%files);
+	return (\@molecules, \%files);
 }
 
 sub makeDatabaseQueryLen {
@@ -368,6 +426,16 @@ sub writeBlastn {
 	close $OUTTEMP;
 	return;
 }
+
+sub runBlastn_parallel {
+	my ($blast_path, $parameters, $genome, $strategy, $ncrna, $specie, $out_path_blast, $dir_now, $parallel, $query_path_specific) = @_;	
+	if ($parallel == 1){
+		print_process("Going into parallel running!");
+		system("parallel  --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:([A-z]+\_[a-z]+\.)::; s:\$:.tab:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${specie}_$strategy.$ncrna.'..' 1> /dev/null ::: $query_path_specific/*.new.fasta");
+	}
+	return; 
+}
+
 
 sub runBlastn {
 	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $specie, $out_path_blast, $dir_now, $parallel) = @_;	

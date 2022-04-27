@@ -29,7 +29,7 @@ sub detect_blast_queries {
 		if (exists $$speciesTag{$fastaF}){
 			$tag = $$speciesTag{$fastaF};
 		} else {
-			$tag = "unkn";
+			print_error("Sequence tag for query sequence: $fastaF is not available.");
 		}
 		my $sum = generate_map_file_and_sizes("$queriesFolder/$fastaF", $tag, $count); #combine all to create new headers, based on mapping and generated tag for specie
 		if ($sum =~ /^NA$/){ #Avoid to create map and sizes if exists
@@ -48,7 +48,7 @@ sub detect_blast_queries {
 	} else {
 		create_metadata_file_fasta($queriesFolder, \@fasta_files);
 	}
-	return;
+	return $speciesTag;
 }
 
 =head1 generate_tags
@@ -132,7 +132,7 @@ sub create_metadata_file_fasta {
 sub generate_map_file_and_sizes {
 	my ($file, $short_lab, $count) = @_;
 	my (%DB, %DB_Real,%sizesDB);
-	if ((-e "$file.map" && !-z "$file.map") && (-e "$file.new.fasta" && -z "$file.new.fasta") ){
+	if ((-e "$file.$short_lab.map" && !-z "$file.$short_lab.map") && (-e "$file.$short_lab.new.fasta" && -z "$file.$short_lab.new.fasta")){
 		return "NA";
 	}
 	my $files2 = Bio::SeqIO->new(-file => $file, -format => "fasta");
@@ -147,15 +147,15 @@ sub generate_map_file_and_sizes {
 		$DB_Real{$def} = $files->id." ".$files->desc;
 		$count++;	
 	}
-	open my $OUTF, "> $filename.new.fasta";
+	open my $OUTF, "> $filename.$short_lab.new.fasta";
 	foreach my $assign (keys %DB){
 		print $OUTF ">".${short_lab}.$assign."\n".$DB{$assign}."\n";
 	}
-	open my $OUT, "> $file.map" or die;
+	open my $OUT, "> $file.$short_lab.map" or die;
 	foreach my $assign (keys %DB_Real){
 		print $OUT ${short_lab}.$assign."\t".$DB_Real{$assign}."\n";
 	}
-	open my $OUT2, "> $filename.new.fasta.len" or die;
+	open my $OUT2, "> $filename.$short_lab.new.fasta.len" or die;
 	foreach my $label (keys %sizesDB){
 		print $OUT2 ${short_lab}.$label."\t".$sizesDB{$label}."\n";
 	}
