@@ -4,6 +4,7 @@ use Moose;
 use Data::Dumper;
 use List::MoreUtils;
 use MiRNAture::_BlastSearch_ResolveBlastMergings;
+use Cwd 'abs_path';
 with 'MiRNAture::HMMsearch';
 
 has 'blast_str' => (
@@ -222,7 +223,7 @@ sub searchHomologyBlast {
 	);
 	foreach my $molecule (@$molecules){
 		foreach my $queryS (@$query_species){
-			print_process("Cleaning $molecule homologs from $queryS into ", $shift->subject_specie);
+			print_process("Cleaning $molecule homologs from $queryS");
 			my $tag_query_spe = create_tag_specie($queryS);
 			my $query_seq;
 			if (exists $$files_relation{"${molecule}_${queryS}"}){
@@ -253,12 +254,13 @@ sub searchHomologyBlast {
 			my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
 			my $list_file = $result_blast_experiment->models_list->stringify;
 			my $all_cm_list = get_list_cms($molecule, $families, $list_file); #list of cms
-			write_cmsearch_specific_sequence_group($shift->current_directory, \@$all_cm_list, $shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore);
-			my $runIdCM = runcmSearch($shift->blast_str, $molecule, $shift->subject_specie, $shift->current_directory,$shift->parallel_running);
-			push @id_running, $runIdCM;
+			runcmSearch_parallel($shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore, $shift->parallel_running);	
+			##write_cmsearch_specific_sequence_group($shift->current_directory, \@$all_cm_list, $shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore);
+			##my $runIdCM = runcmSearch($shift->blast_str, $molecule, $shift->subject_specie, $shift->current_directory,$shift->parallel_running);
+			##push @id_running, $runIdCM;
 		}
 	}
-	wait_processes($shift, \@id_running, $shift->parallel_running); #Wait until complete all processes from Str
+	##wait_processes($shift, \@id_running, $shift->parallel_running); #Wait until complete all processes from Str
 	# Iterate over infernal results, evaluate and merge
 	foreach my $molecule (@$molecules){
 		#foreach my $queryS (@$query_species){
@@ -435,7 +437,6 @@ sub runBlastn_parallel {
 	}
 	return; 
 }
-
 
 sub runBlastn {
 	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $specie, $out_path_blast, $dir_now, $parallel) = @_;	
@@ -616,6 +617,23 @@ sub write_cmsearch_specific_sequence_group {
 	close $OUTTEMPC;
 	return;
 }
+
+sub runcmSearch_parallel {
+	my ($cm_models_path, $out_path_infernal, $genome_tag, $str, $molecule_query, $cmsearch_path, $Zvalue, $parallel) = @_;
+	existenceProgram($cmsearch_path);
+	my $query_file = "$out_path_infernal/../${genome_tag}_$str.$molecule_query.tab.db.location.blocks.coord.fasta";
+	my $query_file_modified = abs_path($query_file);
+	$query_file_modified =~ s/(\/.*\/|\.\.\/|.*\/)(.*)(\.tab\.db\.location\.blocks\.coord\.fasta)/$2/g;	
+	$Zvalue = $Zvalue/2; #The search is performed only in one strand which is defined by the previous blast search
+	if ($parallel == 1){
+	foreach my $cm_path_specific (@$cm_models_path){
+		next if $cm_path_specific =~ /^$/;
+		system("parallel $cmsearch_path -E 0.015 --notrunc -Z $Zvalue --noali --nohmmonly --toponly --tblout $out_path_infernal/${query_file_modified}.{/.}.tab {} $query_file 1> /dev/null ::: $cm_path_specific/*.cm");
+		}
+	} 	
+	return;
+}
+
 
 sub runcmSearch {
 	#infernalTemp/${genome_tag}_$str.$molecule_query.$query_name_spe.sh";
