@@ -46,12 +46,14 @@ has 'parallel_linux' => (
 
 has 'path_hmm_models' => (
 	is => 'ro',
+	#isa => 'Path::Class::Dir',
 	isa => 'ArrayRef[Str]',
 	required => 1,
 );
 
 has 'path_covariance' => (
 	is => 'ro',
+	#isa => 'Path::Class::Dir',
 	isa => 'ArrayRef[Str]',
 	required => 1,
 );
@@ -103,7 +105,7 @@ sub search_homology_HMM {
 	searchHomologyHMM($shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold, $shift->list_models);
 	##searchHomologyHMM($shift->hmm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold);
 	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie, "\.tab\.true\.table");
-	for (my $i = 0; $i <= $#result_files -1 ; $i++) {
+	for (my $i = 0; $i <= $#result_files; $i++) {
 		my $hmm = $result_files[$i];
 		$hmm =~ s/([A-Za-z]+\.)(.*)(\.tab\.true\.table)/$2/g;
 		getSequencesFasta($shift->subject_specie, $shift->genome_subject, $hmm, $shift->output_folder->stringify."/".$shift->subject_specie, "2", $shift->length_CM, $shift->names_CM); #Header mode == 2 HMM

@@ -2,6 +2,9 @@ package MiRNAture::ConfigFile;
 
 use Moose;
 use MooseX::Types::Path::Class;
+use MiRNAture::ToolBox;
+use File::Path;
+use File::Copy;
 use Data::Dumper;
 
 has 'tag' => (
@@ -58,6 +61,73 @@ sub read_genomes_paths {
     my %genomes; 
     $genomes{$tag} = $path;
     return \%genomes;
+}
+
+=head1 subset_search_models 
+    Title: subset_search_models
+    Usage: subset_search_models(path_cms, path_hmms);
+    Function: If defined a short list, select CMs to be searched on the 
+	target genome.
+    Returns: 0
+=cut 
+
+sub subset_search_models {
+	my ($shift, $path_cm, $path_hmm, $path_user) = @_;
+	my $new_cm = $shift->data_folder->stringify."/Selected_CM_models";
+	my $new_hmm = $shift->data_folder->stringify."/Selected_HMM_models";
+	# Create required folders to put temporal models
+	if (!-e $new_cm){
+		create_folders($shift->data_folder->stringify, "Selected_CM_models");
+	} else {
+		rmtree $new_cm;
+		create_folders($shift->data_folder->stringify, "Selected_CM_models");
+	}
+	if (!-e $new_hmm){
+		create_folders($shift->data_folder->stringify, "Selected_HMM_models");
+	} else {
+		rmtree $new_hmm;
+		create_folders($shift->data_folder->stringify, "Selected_HMM_models");
+	}
+	my $numC = scalar @$path_cm;
+	my $numH = scalar @$path_hmm;
+	my $numU = scalar @$path_user;
+	#Copy CMs
+	open my $IN, "<", $shift->list_file->stringify;
+	while(<$IN>){
+		chomp;
+		for (my $j = 0; $j <= $numC -1; $j++) {
+			my $test_file = "$$path_cm[$j]/$_.cm";
+			if (-e $test_file){
+				copy($test_file, $new_cm);
+			}
+		}
+		#Copy HMMs
+		for (my $j = 0; $j <= $numH -1; $j++) {
+			my $test_file = "$$path_hmm[$j]/$_.hmm";
+			if (-e $test_file){
+				copy($test_file, $new_hmm);
+			}
+		}
+		#Copy CM and HMM user
+		for (my $j = 0; $j <= $numU -1; $j++) {
+			next if $_ =~ /^RF/;
+			next if $_ =~ /^MIPF/;
+			my $test_file = "$$path_user[$j]/HMMs/$_.hmm";
+			if (-e $test_file){
+				copy($test_file, $new_hmm);
+			}
+			my $test_file2 = "$$path_user[$j]/CMs/$_.cm";
+			if (-e $test_file2){
+				copy($test_file2, $new_cm);
+			}
+		}
+
+	}
+	my @new_cm;
+	my @new_hmm;
+	push @new_cm, $new_cm;
+	push @new_hmm, $new_hmm;
+	return (\@new_cm, \@new_hmm);
 }
 
 ##sub read_genomes_paths { #File

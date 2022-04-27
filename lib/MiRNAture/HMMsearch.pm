@@ -52,8 +52,8 @@ sub searchStructureHMM {
 	create_folders("$outHMM/$specie","Infernal");#Create folder specific to specie
 	my $infernal_out_path = "$outHMM/$specie/Infernal";
 	if (-z "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta" || !-e "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta"){
-		print_error("Not possible to create files with candidate classification");
-		#return 1;	
+		# Were not geneneated candidates
+		return;	
 	} else {
 	$zvalue = $zvalue/2; # Because it is only one strand
 	##cmsearch_specific_sequence_parallel($CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
@@ -151,7 +151,7 @@ sub runNhmmer_parallel {
 	existenceProgram($nhmmer_path);
 	my $param;
 	foreach my $hmms_path_specific (@$path_hmm){
-		next if $hmms_path_specific =~ /^$/;
+		next if $hmms_path_specific =~ /^$|^NA$/;
 		#system("parallel $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{}\.tab\.true\.table $hmms_path_specific/{}\.hmm $genome 1> /dev/null :::: $list_cm_file");
 		system("parallel $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{/.}\.tab\.true\.table $hmms_path_specific/{/.}\.hmm $genome 1> /dev/null ::: $hmms_path_specific/*\.hmm");
 		#system("parallel --rpl '.. s/(.*)(\.hmm)/$1/;' echo '{/.}' ::: $hmms_path_specific/*.hmm")

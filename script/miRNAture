@@ -72,6 +72,9 @@ pod2usage ( -message => "Seems that you did pass an empty flag, please refer to 
 @strategy = split (/,/, join(',',@strategy));
 
 # Relative paths correction for input paths
+if ($subset_models =~ /\/\.\.\/|^\.\//){
+	$subset_models = abs_path($subset_models);
+}
 if ($path_blast_queries =~ /\/\.\.\//){
 	$path_blast_queries = abs_path($path_blast_queries);
 }
@@ -108,7 +111,6 @@ $config_file->generate_copy_genome;
 # Build defaul models lists based on selected modes:  <22-04-22, cavelandiah> #
 my $default_models = $config_file->models_list_hash();
 $config_file->concatenate_models($default_models);
-
 
 my $variables;
 if ($config_file->stage =~ /^summarise$/){

@@ -627,7 +627,7 @@ sub runcmSearch_parallel {
 	$Zvalue = $Zvalue/2; #The search is performed only in one strand which is defined by the previous blast search
 	if ($parallel == 1){
 	foreach my $cm_path_specific (@$cm_models_path){
-		next if $cm_path_specific =~ /^$/;
+		next if $cm_path_specific =~ /^$|^NA/;
 		system("parallel $cmsearch_path -E 0.015 --notrunc -Z $Zvalue --noali --nohmmonly --toponly --tblout $out_path_infernal/${query_file_modified}.{/.}.tab {} $query_file 1> /dev/null ::: $cm_path_specific/*.cm");
 		}
 	} 	

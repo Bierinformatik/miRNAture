@@ -92,6 +92,10 @@ my $configuration_file = MiRNAture::ConfigFile->new(
     data_folder => $data_folder,
 );
 $configuration_file->include_running_mode($mode);
+my ($temp_cm, $temp_hmm) = $configuration_file->subset_search_models(\@path_cm, \@path_hmm, \@cm_model_others);
+#my $path_selected_cm = $configuration_mirnature->[3]->{"Default_folders"}->{"Data_folder"}."/Selected_CM_models";
+#my $path_selected_hmm = $configuration_mirnature->[3]->{"Default_folders"}->{"Data_folder"}."/Selected_HMM_models";
+
 my $tag_spe = $configuration_mirnature->[3]->{"Specie_data"}->{"Tag"};
 my $genome_path = $configuration_mirnature->[3]->{"Specie_data"}->{"Genome"};
 my $genomes = $configuration_file->read_genomes_paths($tag_spe, $genome_path);
@@ -147,7 +151,7 @@ if ($mode =~ m/mirbase/){ #Load specific scores for mirbase.
 }
 
 ## Start all
-open my $LIST, "< $nameC" or die;
+##open my $LIST, "< $nameC" or die;
 
 #Check that genome tag has genome path
 if (!exists $$genomes{$specie}){
@@ -176,7 +180,8 @@ if ($configuration_file->mode eq "blast"){
             subject_specie => $specie,
             data_folder => $data_folder,
             current_directory => $current_dir,
-            path_covariance => \@path_cm,
+            #path_covariance => \@path_cm,
+            path_covariance => \@$temp_cm,
             bitscores_CM => $bitscores,
             length_CM => $len_r,
             names_CM => $names_r,
@@ -213,8 +218,10 @@ if ($configuration_file->mode eq "blast"){
         genome_subject => $$genomes{$specie},
         subject_specie => $specie,
         output_folder => $outHMM,
-        path_hmm_models => \@path_hmm,
-        path_covariance => \@path_cm,
+        #path_hmm_models => \@path_hmm,
+        #path_covariance => \@path_cm,
+        path_covariance => \@$temp_cm,
+        path_hmm_models => \@$temp_hmm,
         bitscores_CM => $bitscores,
         length_CM => $len_r,
         names_CM => $names_r,
@@ -241,7 +248,7 @@ if ($configuration_file->mode eq "blast"){
         genome_subject => $$genomes{$specie},
         subject_specie => $specie,
         output_folder => $outInfernal,
-        path_covariance => \@path_cm,
+        path_covariance => \@$temp_cm,
         bitscores_CM => $bitscores,
         length_CM => $len_r,
         names_CM => $names_r,
@@ -267,7 +274,7 @@ if ($configuration_file->mode eq "blast"){
         genome_subject => $$genomes{$specie},
         subject_specie => $specie,
         output_folder => $outOther,
-        path_covariance => \@cm_model_others, 
+        path_covariance => \@$temp_cm, 
         bitscores_CM => $bitscores, 
         length_CM => $len_r,
         names_CM => $names_r,
@@ -292,7 +299,7 @@ if ($configuration_file->mode eq "blast"){
         genome_subject => $$genomes{$specie},
         subject_specie => $specie,
         output_folder => $outUser,
-        path_covariance => \@cm_model_others, 
+        path_covariance => \@$temp_cm, 
         bitscores_CM => $bitscores, 
         length_CM => $len_r,
         names_CM => $names_r,
