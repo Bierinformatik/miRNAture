@@ -496,9 +496,9 @@ sub write_config_file {
 	$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = "$data_path/Data/Validation_mature_data";
 	$yaml->[3]->{Default_folders}{"Data_folder"} = "$data_path/Data";
 	$yaml->[3]->{Default_folders}{"CM_folder"} = "$data_path/Data/RFAM_14-4/CMs"; #Default Models
-	$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "$data_path/Data/Other_CM";
-	$yaml->[3]->{Default_folders}{"Other_HMM_folder"} = "$data_path/Data/Other_HMM";
 	$yaml->[3]->{Default_folders}{"HMM_folder"} = "$data_path/Data/RFAM_14-4/HMMs"; #Modified Lach
+	$yaml->[3]->{Default_folders}{"Other_CM_folder"} = "$data_path/Data/Mirbase/CMs";
+	$yaml->[3]->{Default_folders}{"Other_HMM_folder"} = "$data_path/Data/Mirbase/HMMs";
 
 	$yaml->[3]->{Default_folders}{"User_folder"} = $shift->user_folder;
 	if (length $shift->user_folder > 0) {

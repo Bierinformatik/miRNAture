@@ -81,6 +81,10 @@ sub resolve_mergings {
 	}
 	if (!-e $file || -z $file) {
 		print_result("No valid candidates were found by $str method");
+		if ($str eq "final") {
+			print_result("miRNAture did not detected candidates at the $str mode");
+			exit(0);
+		} 
 		return;
 	}
 	open $IN, "< $file" or die;

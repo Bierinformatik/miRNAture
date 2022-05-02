@@ -12,7 +12,7 @@ use Term::ANSIColor qw(:constants);
 use MiRNAnchor::ExternalPrograms;
 use File::Find;
 
-=head1 check_folder_files2
+=head1 check_folder_files_miranchor
 	Title: check_folder_files
 	Usage: check_folder_files(<PATH_DIR_TO_SEARCH>, PATTERN);
 	Function: Get list files that have specific pattern. 
@@ -20,7 +20,7 @@ use File::Find;
 		menctioned pattern in its name. 
 =cut 
 
-sub check_folder_files2 {
+sub check_folder_files_miranchor {
 	my ($dir, $prefix) = @_;
 	opendir(DIR, $dir);
 	my @files = grep(/$prefix$/, readdir(DIR));
@@ -76,7 +76,7 @@ sub create_folder_environment {
 	my ($dir, $dir2, $dir3);
 	my $dir0 = "$working_path/$acc_RFAM";
 	create_folder($dir0);
-	if ($mode eq "RFAM"){
+	if ($mode eq "rfam"){
 		my $dir1 = "$working_path/$acc_RFAM/$class";
 		create_folder($dir1);
 		my $dir2 = "$working_path/$acc_RFAM/$class/$acc_mirbase";
@@ -372,6 +372,13 @@ sub check_if_file_exists {
 		$answer = 0;
 	}
 	return $answer;
+}
+
+sub print_error2 {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD RED "[ERROR] $text\n";
+	exit(1);
 }
 
 sub print_error {

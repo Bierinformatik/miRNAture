@@ -70,7 +70,7 @@ sub recognize_families_homology {
 	my $db_models_relation = shift;
 	my $specie = $shift->tag_spe_query;
 	my $targetfolder = $shift->output_folder->stringify;
-	my $table_db_target = "$targetfolder/miRNA_prediction/Final_Candidates/all_RFAM_${specie}_Final.ncRNAs_homology.txt.db";
+	my $table_db_target = "$targetfolder/miRNA_prediction/Final_Candidates/all_RFAM_${specie}_final.ncRNAs_homology.txt.db";
 	my $target_fasta = $shift->fasta_sequences->stringify;
 	modify_table($table_db_target, $db_models_relation);
 	modify_fasta($target_fasta, $specie, $db_models_relation);
@@ -80,7 +80,7 @@ sub recognize_families_homology {
 sub identify_RFAM_families {
 	my $shift = shift;
 	my %rfam_families_list;	
-	my @files = check_folder_files($shift->fasta_sequences->stringify, "\_".$shift->tag_spe_query."\.\.\*\.fa|\_".$shift->tag_spe_query."\.\.\*"."\.fasta"); #Get all fasta files
+	my @files = check_folder_files_miranchor($shift->fasta_sequences->stringify, "\_".$shift->tag_spe_query."\.\.\*\.fa|\_".$shift->tag_spe_query."\.\.\*"."\.fasta"); #Get all fasta files
 	if (scalar @files == 0){
 		die "Does not exists fasta candidates in the declared folder\n";
 	}

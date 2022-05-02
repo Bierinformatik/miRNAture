@@ -102,6 +102,10 @@ sub cmsearch_specific_sequence {
 sub define_final_CMs {
 	my ($outpath, $specie, $str, $len_r) = @_;
 	my @result_cmsearch;
+	unless (-d $outpath){
+		print_result("I did not found true candidates for the CM evaluation on HMM searches");
+		return;
+	}
 	if ($str =~ /^hmm$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
 	} elsif ($str =~ /^rfam$/){

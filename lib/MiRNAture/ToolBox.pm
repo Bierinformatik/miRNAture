@@ -2,7 +2,7 @@ package MiRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final infer_name_database_cm);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_error2 print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final infer_name_database_cm);
 
 use Moose::Role; 
 use File::Copy; 
@@ -1139,6 +1139,22 @@ sub cmsearch {
 		;
 	}
 	return;
+}
+
+sub check_status {
+	my $state = shift;
+	if ($state != 0) {
+		print_error("The analysis could not be completed. Detected errors when running miRNAture");
+		exit($state >> 8);
+	}
+	return;
+}
+
+sub print_error2 {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD RED "[ERROR] $text\n";
+	exit(1);
 }
 
 sub print_error {

@@ -343,6 +343,10 @@ sub format_final_table {
 	my $file_in = "$input_folder/all_RFAM_${specie}_final.truetable.joined.table"; 
 	my $file_out = "$input_folder/all_RFAM_${specie}_final.ncRNAs_homology.txt.temp";
 	my $index_names = index_new_old_contig_names($database_names_contigs); # tagnameNumb => contigName
+	if (-z $file_in){
+		print_result("No candidates were found in the $specie specie\n");
+		exit(0);
+	}
 	open my $INF, "< $file_in" or die "The file $file_in not exists\n";  #all_RFAM_Dive_Final.truetable.joined.table
 	open my $OUTF, "> $file_out" or die;  
 	while (<$INF>){

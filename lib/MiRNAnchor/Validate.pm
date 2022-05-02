@@ -15,7 +15,7 @@ with 'MiRNAnchor::Tools';
 sub process_query_fasta_specific {
 	my ($fasta_query_path, $family, $working_path, $tag) = @_;
     #my $fasta_query = (check_folder_files($fasta_query_path, ".*\_$tag.$family\.*\.fasta"))[0]; 	
-    my $fasta_query = (check_folder_files($fasta_query_path, ".*\_$tag\.$family\.fasta"))[0]; 	
+    my $fasta_query = (check_folder_files_miranchor($fasta_query_path, ".*\_$tag\.$family\.fasta"))[0]; 	
 	#>aeae-RF00103-856 B1566465451 Aedes aegypti RF00103 stem-loop
 	if (!-e $fasta_query_path."/".$fasta_query && -z $fasta_query_path."/".$fasta_query) {
 		print_error("The input fasta file ".$fasta_query_path."/".$fasta_query." is empty or not exists!");

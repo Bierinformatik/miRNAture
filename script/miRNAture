@@ -72,7 +72,7 @@ pod2usage ( -message => "Seems that you did pass an empty flag, please refer to 
 @strategy = split (/,/, join(',',@strategy));
 
 # Relative paths correction for input paths
-if ($subset_models =~ /\/\.\.\/|^\.\//){
+if ($subset_models && $subset_models =~ /\/\.\.\/|^\.\//){
 	$subset_models = abs_path($subset_models);
 }
 if ($path_blast_queries =~ /\/\.\.\//){
@@ -247,13 +247,17 @@ Activate the DEBUG mode on miRNAture run modes.
 
 Alternative path of the MIRfix.py program.
 
-=item -m/-mode <Blast, HMM, Other_CM, Infernal, Final>
+=item -m/-mode <blast,hmm,rfam,mirbase,user,final>
 
-Homology search modes: blast, hmm, mirbase, infernal, user and/or final. It is possible to perform individual analysis, but it is always recommended to include the I<final> option to merge multiple results.
+Homology search modes: blast, hmm, rfam, mirbase, infernal, user and/or final. It is possible to perform individual analysis, but it is always recommended to include the I<final> option to merge multiple results.
 
-=item -pe/-parallel_slurm <0|1>
+=item -ps/-parallel_slurm <0|1>
 
 Activate SLURM resource manager to submit parallel jobs (1) or not (0). 
+
+=item -pe/-parallel <0|1>
+
+Activate parallel jobs processing (1) or not (0). 
 
 =item -rep/-repetition_cutoff <relax,Number_Loci,Candidates_to_evaluate>
 

@@ -20,7 +20,7 @@ sub include_folder_environment {
     my $config_file = shift;
     my $variables = shift;
     create_folders($shift->all_parameters->[3]->{"Default_folders"}->{"Output_folder"}, "miRNA_validation");
-    my $database_file = $variables->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/all_RFAM_".$variables->[3]->{Specie_data}->{Tag}."_Final.ncRNAs_homology.txt.db";
+    my $database_file = $variables->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/all_RFAM_".$variables->[3]->{Specie_data}->{Tag}."_final.ncRNAs_homology.txt.db";
     if (-e $database_file && !-z $database_file){
         $variables->[4]->{User_results}{Database_miRNA_file_result} = $database_file;
     } else {
@@ -69,7 +69,8 @@ sub run_miRNAnchor {
     if (-e $run_file && !-z $run_file){
         print_result("I am ready to run miRNAnchor");
         system "chmod 755 $run_file";
-        system "$run_file";
+        my $status = system("$run_file");
+        check_status($status);
     } else {
         print_error("The file $run_file does not exists, fatal error");
     }

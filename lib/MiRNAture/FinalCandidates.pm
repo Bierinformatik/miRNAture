@@ -110,13 +110,14 @@ sub generate_final_output {
 	my @all_files = ($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify);
 	my @final_files;
 	foreach my $possible_out_files (@all_files){
-		if (-e $possible_out_files || !-z $possible_out_files){
+		if (-e $possible_out_files && !-z $possible_out_files){
 			push @final_files, $possible_out_files;
 		}
 	}
 	my $number_final_files = scalar @final_files;
 	if ($number_final_files == 0){
-		print_error("Final output files for any blast, hmm, rfam or user method are not detected. Not possible to merge anything");
+		print_result("Were not detected blast, hmm, mirbase, rfam or user candidates. Not possible to merge anything");
+		exit(0);
 	} else {
 		generate_final_ncRNAs($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify, $shift->output_folder."/Final_Candidates", $shift->subject_specie);		
 		format_final_table($shift->output_folder."/Final_Candidates", $shift->subject_specie, $shift->families_names_CM, $shift->names_CM, $shift->specie_genome_new_database);

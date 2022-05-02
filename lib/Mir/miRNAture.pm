@@ -126,7 +126,8 @@ sub run_miRNAture {
 	if (-e $run_file && !-z $run_file){
 		print_result("I am ready to run miRNAture");
 		system "chmod 755 $run_file";
-		system "$run_file";
+		my $status = system("$run_file");
+		check_status($status);
 	} else {
 		print_error("The file $run_file does not exists, fatal error");
 	}
