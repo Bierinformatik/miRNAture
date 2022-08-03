@@ -142,9 +142,10 @@ sub clean_cache {
     my $foldert = $variables->[3]->{"Default_folders"}->{"Output_folder"}."/TemporalFiles"; 
     my $data_folder = $variables->[3]->{"Default_folders"}->{"Data_folder"}; 
     my $index = $variables->[3]->{Specie_data}->{Old_Genome}.".index";
-
+	my $selected_cm = $data_folder."/Selected_CM_models";
+	my $selected_hmm = $data_folder."/Selected_HMM_models";
     print_process("Cleaning temporal files...");
-    if ($mode =~ /^All$/){
+    if ($mode =~ /^all$/){
         ##if (-e "$folder/.used_ids.txt"){
         ##    system("rm $folder/.used_ids.txt");
         ##}
@@ -164,7 +165,13 @@ sub clean_cache {
         if (-e "$index"){
             system("rm $index");
         }
-    } elsif ($mode =~ /^Homology/){
+		if (-d $selected_cm) {
+			system("rm -r $selected_cm");
+		}
+		if (-d $selected_hmm) {
+			system("rm -r $selected_hmm");
+		}
+    } elsif ($mode =~ /homology/){
         ##if (-e "$folder/.used_ids.txt"){
         ##    system("rm $folder/.used_ids.txt");
         ##}
@@ -177,7 +184,13 @@ sub clean_cache {
         if (-e "$index"){
             system("rm $index");
         }
-    } elsif ($mode =~ /^Validation/){
+		if (-d $selected_cm) {
+			system("rm -r $selected_cm");
+		}
+		if (-d $selected_hmm) {
+			system("rm -r $selected_hmm");
+		}
+    } elsif ($mode =~ /^validation/){
         #if (-e "$foldert/.mirfixTempIndividual/"){
         #    system("rm -r $foldert/.mirfixTempIndividual/");
         #}
@@ -186,7 +199,12 @@ sub clean_cache {
         #    system("rm $data_folder/Validation_mature_data/all_genomes_list.txt");
         #}
     } else {
-	    ;
+		if (-f $selected_cm) {
+			system("rm -r $selected_cm");
+		}
+		if (-f $selected_hmm) {
+			system("rm -r $selected_hmm");
+		}
     }
     return;
 }

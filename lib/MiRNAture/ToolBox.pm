@@ -309,7 +309,8 @@ sub check_folder_files {
         }, $dir);
     my $num = scalar @files;
     if ($num == 0){
-        print_error("The $dir does not contain desired files with pattern $prefix");
+        print_result("The $dir does not contain desired files with pattern $prefix");
+		exit(0);
     }
     return @files;
 }
@@ -1161,7 +1162,14 @@ sub print_error {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
 	print BOLD RED "[ERROR] $text\n";
-	die "miRNAture failed to continue working due derected errors\nExiting...\n";
+	die "miRNAture failed to continue working due detected errors\nExiting...\n";
+	return;
+}
+
+sub print_warning {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD YELLOW "[WARNING] $text\n";
 	return;
 }
 

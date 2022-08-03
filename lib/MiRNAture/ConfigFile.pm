@@ -4,7 +4,7 @@ use Moose;
 use MooseX::Types::Path::Class;
 use MiRNAture::ToolBox;
 use File::Path;
-use File::Copy;
+#use File::Copy;
 use Data::Dumper;
 
 has 'tag' => (
@@ -97,15 +97,17 @@ sub subset_search_models {
 		chomp;
 		for (my $j = 0; $j <= $numC -1; $j++) {
 			my $test_file = "$$path_cm[$j]/$_.cm";
-			if (-e $test_file){
-				copy($test_file, $new_cm);
+			if (-e $test_file && !-l "$new_cm/$_.cm"){
+				#copy($test_file, $new_cm);
+				symlink($test_file, "$new_cm/$_.cm") || print_error("Cannot create CM reference");
 			}
 		}
 		#Copy HMMs
 		for (my $j = 0; $j <= $numH -1; $j++) {
 			my $test_file = "$$path_hmm[$j]/$_.hmm";
-			if (-e $test_file){
-				copy($test_file, $new_hmm);
+			if (-e $test_file && !-l "$new_hmm/$_.hmm"){
+				#copy($test_file, $new_hmm);
+				symlink($test_file, "$new_hmm/$_.hmm") || print_error("Cannot create CM reference");
 			}
 		}
 		#Copy CM and HMM user
@@ -113,12 +115,14 @@ sub subset_search_models {
 			next if $_ =~ /^RF/;
 			next if $_ =~ /^MIPF/;
 			my $test_file = "$$path_user[$j]/HMMs/$_.hmm";
-			if (-e $test_file){
-				copy($test_file, $new_hmm);
+			if (-e $test_file && !-l "$new_hmm/$_.hmm"){
+				#copy($test_file, $new_hmm);
+				symlink($test_file, "$new_hmm/$_.hmm") || print_error("Cannot create CM reference");
 			}
 			my $test_file2 = "$$path_user[$j]/CMs/$_.cm";
-			if (-e $test_file2){
-				copy($test_file2, $new_cm);
+			if (-e $test_file2 && !-l "$new_cm/$_.cm"){
+				#copy($test_file2, $new_cm);
+				symlink($test_file2, "$new_cm/$_.cm") || print_error("Cannot create CM reference");
 			}
 		}
 

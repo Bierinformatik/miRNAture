@@ -161,7 +161,7 @@ sub searchHomologySequenceBlast_parallel {
 ##		}
 ##	}
 	#writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->blast_program_path->stringify);
-		runBlastn_parallel($shift->blast_program_path, $param, $shift->genome_subject, $shift->blast_str, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running, $shift->query_folder->stringify);
+		runBlastn_parallel($shift->blast_program_path, $param, $shift->genome_subject, $shift->blast_str, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running, $shift->query_folder);
 	}
 	#runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running);
 	##push @id_running, $runId;
@@ -433,7 +433,8 @@ sub runBlastn_parallel {
 	my ($blast_path, $parameters, $genome, $strategy, $ncrna, $specie, $out_path_blast, $dir_now, $parallel, $query_path_specific) = @_;	
 	if ($parallel == 1){
 		print_process("Going into parallel running!");
-		system("parallel  --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:([A-z]+\_[a-z]+\.)::; s:\$:.tab:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${specie}_$strategy.$ncrna.'..' 1> /dev/null ::: $query_path_specific/*.new.fasta");
+		# Ciona_savignyi.cisa.new.fasta -> Cirp_3.miRNA.cisa.tab
+		system("parallel  --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${specie}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
 	}
 	return; 
 }

@@ -25,19 +25,20 @@ sub detect_blast_queries {
 	my $speciesTag = generate_tags($queriesFolder); #Return hash based on queries_description.txt file
 	foreach my $fastaF (@fasta_files){ #Iterate along all the defined query files
 		next if ($fastaF =~ /\.new\.fasta/); #Skip database created files
-		my $tag; #Specie tag
+		my ($tag, $sum); #Specie tag
 		if (exists $$speciesTag{$fastaF}){
 			$tag = $$speciesTag{$fastaF};
-		} else {
-			print_error("Sequence tag for query sequence: $fastaF is not available.");
-		}
-		my $sum = generate_map_file_and_sizes("$queriesFolder/$fastaF", $tag, $count); #combine all to create new headers, based on mapping and generated tag for specie
-		if ($sum =~ /^NA$/){ #Avoid to create map and sizes if exists
-			print_process("$fastaF has been processed and indexed");
-			next;
-		} else {
-			$count += $sum; #Avoid duplicated mapped headers
-		}
+			$sum = generate_map_file_and_sizes("$queriesFolder/$fastaF", $tag, $count); #combine all to create new headers, based on mapping and generated tag for specie
+			if ($sum =~ /^NA$/){ #Avoid to create map and sizes if exists
+				print_process("$fastaF has been processed and indexed");
+				next;
+			} else {
+				$count += 1; #$sum; #Avoid duplicated mapped headers
+			}
+		} 
+		#else {
+		#	print_warning("Sequence tag for query sequence: $fastaF is not available.");
+		#}
 	}
 	if (-s "$queriesFolder/queries_description.txt"){
 		open my $METADATA, "< $queriesFolder/queries_description.txt" or die "Metadata file is corrupted\n";

@@ -137,7 +137,7 @@ if ($config_file->stage =~ /^homology$/){
 		$variables, $config_file->config_file, $debug 
 	);
 	$homology_searches->run_miRNAture($variables);
-	$homology_searches->clean_cache($variables, "Homology");
+	$homology_searches->clean_cache($variables, "homology");
 } elsif ($config_file->stage =~ /^validation$/){
 	my $validation_mirnas = Mir::miRNAnchor->new(
 		all_parameters => $variables
@@ -145,7 +145,7 @@ if ($config_file->stage =~ /^homology$/){
 	$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
 	$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
 	$validation_mirnas->run_miRNAnchor($variables);
-	$homology_searches->clean_cache($variables, "Validation");
+	$homology_searches->clean_cache($variables, "validation");
 } elsif ($config_file->stage =~ /^complete$/){
 	$homology_searches->create_folder_environment($config_file->config_file, $variables);
 	$homology_searches->generate_file_mirnature($variables, $config_file->config_file, $debug);
@@ -166,7 +166,7 @@ if ($config_file->stage =~ /^homology$/){
 		all_parameters => $variables
 	);
 	$summary_results->generate_summary_file($config_file->config_file, $variables);
-	$homology_searches->clean_cache($variables, "All");
+	$homology_searches->clean_cache($variables, "all");
 } elsif ($config_file->stage =~ /^no_homology$/){
 	my $validation_mirnas = Mir::miRNAnchor->new(
 		all_parameters => $variables
