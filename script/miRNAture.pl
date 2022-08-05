@@ -315,6 +315,8 @@ if ($configuration_file->mode eq "blast"){
 #} else {
 #print_error("Your sequence tag is not correct respect to genomes file");
 #}
+} else {
+    print_error("Not recognized homology mode: ".$configuration_file->mode.".")
 }
 
 print_process("Merging candidates on ".$configuration_file->mode);	
@@ -339,6 +341,8 @@ if ($configuration_file->mode eq "hmm"){
     define_final_CMs("$outUser/$specie/Final", $specie, $configuration_file->mode, $len_r);
     my $diff = time - $start_user;
     write_line_log($log_file, "# Total running time: ".$diff." s\n");
+} else {
+    print_error("Not recognized homology mode: ".$configuration_file->mode.".")
 }
 
 # Final Merge

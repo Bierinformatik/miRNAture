@@ -114,7 +114,7 @@ sub get_basic_files {
 	#create_folders($working_folder, "Data");
 	create_folders($data_folder, "Basic_files");
 	if (is_folder_empty($basic_folder)){
-		print_error("Seems that you do not have the scores files to run miRNAture.")
+		print_error("Seems that you do not have the scores files: all_rfam_scores.txt and all_mirbase_scores.txt to run miRNAture.")
 		#TODO: Consider point the location to download those files
 		#print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
 		#copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
