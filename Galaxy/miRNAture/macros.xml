@@ -1,0 +1,32 @@
+<macros>
+    <xml name="requirements">
+        <requirements>
+        <requirement type="package">mirnature</requirement>
+            <yield/>
+        </requirements>
+    </xml>
+    <xml name="citations">
+        <citations>
+            <citation type="doi">10.3390/genes12030348</citation>
+            <citation type="bibtex">
+@article{Velandia:2021,
+	title        = {{miRNAture}--Computational Detection of {microRNA} Candidates},
+	author       = {Velandia-Huerto, Cristian A. and Fallmann, J{\"o}rg and Stadler, Peter F.},
+	year         = 2021,
+	month        = feb,
+	day          = 27,
+	journal      = {Genes},
+	publisher    = {MDPI AG},
+	volume       = 12,
+	number       = 3,
+	pages        = 348,
+	doi          = {10.3390/genes12030348},
+	article-number = 348,
+}</citation>
+            <yield />
+        </citations>
+    </xml>
+    <xml name="version_command">
+        <version_command>1.01</version_command>
+    </xml>
+</macros>
