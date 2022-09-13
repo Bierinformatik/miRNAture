@@ -6,39 +6,62 @@
     <expand macro="requirements" />
     <expand macro="version_command" />
     <command detect_errors="exit_code"><![CDATA[
-        miRNAture -stage $stage 
-                  #if $subset_models 
-                  -subset_models $subset_models 
-                  # end if
-                  -nbitscore_cut $bitscore_cut 
-                  -datadir <DEFAULT> 
-                  -specie_genome $specie_genome 
-                  -specie_name $specie_name
-                  -specie_tag $specie_tag 
-                  -workdir <WORKDIR> 
-                  -mode $mode 
-                  -parallel $parallel 
-                  -strategy $strategy 
-                  -blastQueriesFolder QUERIESBLAST 
-                  -repetition_cutoff relax,150,100
-    ]]></command>
+        #import re
+        miRNAture2 -stage $stage 
+        -subset_models $subset_models 
+        -nbitscore_cut $bitscore_cut 
+        -datadir 'data'
+        -specie_genome $specie_genome 
+        -specie_name $specie_name
+        -specie_tag $specie_tag 
+        -workdir 'output'
+        -mode "${",".join(map(str, $homology_mode))}"
+        #if re.match(r'blast',str($homology_mode))
+            -strategy "${",".join(map(str, $blast_strategy))}" 
+        #end if
+        -parallel '0' 
+        -repetition_cutoff 'relax,150,100' > 'output_tool.txt'
+        ]]></command>
     <inputs>
+        <param format="fasta" multiple="true" name="specie_genome" type="data"
+            label="Input genome or sequence"
+            help="Input sequence to be processed by miRNAture" />
+        <!--TEXT-->
+        <param name="specie_name" type="text" label="Scientific specie name as: Genera_specie" />
+        <param name="specie_tag" type="text" label="Species tag to identify through experiment" />
         <!--Binary-->
-        <param name="parallel" type="boolean" label="Shift quality"
-       truevalue="1" falsevalue="0" help="Use parallel modules" />
+        <conditional name="activate_subset">
+            <!--Binary-->
+            <param name="subset_models_des" type="boolean" label="Subset default miRNA families"
+                truevalue="1" falsevalue="0" help="Make a selection of specific miRNA families to be search" />
+            <when value="1">
+                <param format="txt" multiple="true" name="subset_models" type="data"
+                    label="List of miRNA models to be searched"
+                    help="Input sequence to be processed by miRNAture" optional="true"/>
+            </when>
+        </conditional>
+        <param name="bitscore_cut" type="float" value="1.0" min="0.0" max="1.0" label="Bitscore threshold" />
+        <!--<param name="parallel" type="boolean" label="Run parallel"
+        truevalue="1" falsevalue="0" help="Use parallel modules" />-->
+            
         <!--Static list-->
-        <param name="stage" type="text" value="value1">
+        <param name="stage" type="select" value="value1" label="Stages to run">
             <option value="value1">complete</option>
             <option value="value2">homology</option>
             <option value="value3">validation</option>
             <option value="value4">evaluation</option>
             <option value="value5">summarise</option>
         </param>
-        <!--TEXT-->
-        <param name="specie_name" type="text" value="TODO" label="Scientific specie name as: Genera_specie" />
-        <param name="specie_tag" type="text" value="TODO" label="Species tag to identify through experiment" />
+        <!--Check Boxes-->
+        <param name="homology_mode" type="select" display="checkboxes" multiple="true" label="Homology mode">
+            <option value="ex1">blast</option>
+            <option value="ex2">rfam</option>
+            <option value="ex3">mirbase</option>
+            <option value="ex4">hmm</option>
+            <option value="ex5">final</option>
+        </param>
         <!--Integer/float list-->
-        <param name="strategy" type="integer" value="value8">
+        <param name="blast_strategy" type="select" value="value8" label="Blast strategy">
             <option value="value1">1</option>
             <option value="value2">2</option>
             <option value="value3">3</option>
@@ -49,113 +72,23 @@
             <option value="value8">8</option>
             <option value="value9">9</option>
         </param>
-        <!--Integer/float-->
-        <param name="bitscore_cut" type="integer" value="1.0" min="0.0" max="1.0" label="Bitscore cutoff for RFAM miRNA families" />
-        <!--Check Boxes-->
-        <param name="mode" type="select" display="checkboxes" multiple="true">
-            <option value="ex1">blast</option>
-            <option value="ex2">rfam</option>
-            <option value="ex3">mirbase</option>
-            <option value="ex4">hmm</option>
-            <option value="ex5">final</option>
+        <param name="outputs_select" type="select" optional="true" multiple="true" label="Which outputs should be generated">
+            <option value="short_summary" selected="true">short summary text</option>
+            <option value="gff">GFF file for miRNA predictions</option>
+            <option value="bed">BED file for miRNA predictions</option>
         </param>
-        <!--Data-->
-        <param format="fasta" multiple="true" name="specie_genome" type="data"
-       label="Input genome or sequence"
-       help="Input sequence to be processed by miRNAture" />
-        
-        <!--Maybe a box-->
-        <param format="fasta" multiple="true" name="subset_models" type="data"
-       label="Input genome or sequence"
-       help="Input sequence to be processed by miRNAture" optional="true"/>
     </inputs>
+
     <outputs>
+        <!--Maybe create a final html file pointing all the output files-->
+        <!--In that case look for the output files on the out folder-->
+        <collection type="lists" name="report" format="gff">
+            <discover_datasets pattern="(?P&lt;designation&gt;.*)" directory="output/Final_miRNA_evaluation" visible="true" />
+        </collection>
     </outputs>
     <help><![CDATA[
         Usage:
-    ./miRNAture [-options]
-
-Options:
-    -h/-help    Print this documentation.
-
-    -man        Prints an extended help page and exits.
-
-    -blstq/-blastQueriesFolder <PATH>
-                Path of blast query sequences in FASTA format to be searched
-                on the subject sequence.
-
-    -dataF/-datadir <PATH>
-                Path to pre-calculated data directory containing RFAM and
-                miRBase covariance, hidden markov models, and necessary
-                files to run MIRfix.
-
-    -mfx/-mirfix_path <PATH>
-                Alternative path of the MIRfix.py program.
-
-    -m/-mode <Blast, HMM, Other_CM, Infernal, Final>
-                Homology search modes: Blast, HMM, Other_CM, Infernal and/or
-                Final. It is possible to perform individual analysis, but it
-                is always recommended to include the Final option.
-
-    -pe/-parallel_slurm <0|1>
-                Activate SLURM resource manager to submit parallel jobs (1)
-                or not (0).
-
-    -rep/-repetition_cutoff <relax,Number_Loci,Candidates_to_evaluate>
-                Setup number of maximum loci number that will be evaluated
-                by the mature's annotation stage. By default, miRNAture will
-                detect miRNA families that report high number of loci (> 200
-                loci). Then, it will select the top 100 candidates in terms
-                of alignment scores, as candidates for the validation stage
-                (default,200,100). The designed values could be modified by
-                the following flag:
-                'relax,Number_Loci,Candidates_to_evaluate'. This option
-                allows to the user to select the threshold values to detect
-                repetitive families. The first parameter is <relax>, which
-                tells miRNAture to change the default configuration. The
-                next one, <Number_Loci> is the threshold of loci number to
-                classify a family as repetitive. The last one,
-                <Candidates_to_evaluate>, is the number of candidates prone
-                to be evaluated in the next evaluation section. The rest
-                candidates are included as homology 'potential' candidates.
-
-    -str/-strategy <1,2,3,4,5,6,7,8,9,10>
-                This flag is blast mode specific. It corresponds to blast
-                strategies that would be used to search miRNAs. It must be
-                indicated along with -m Blast flag.
-
-    -stg/-stage
-    <'homology','validation','evaluation','summarise','complete'>
-                Selects the stage to be run on miRNAture. The options are:
-                'homology', 'validation', 'evaluation', 'summarise' or
-                'complete'.
-
-    -speG/-specie_genome <PATH>
-                Path of target sequences to be analyzed in FASTA format.
-
-    -speN/-specie_name <Genera_specie>
-                Specie or sequence source's scientific name. The format must
-                be: Genera_specie, separated by '_'.
-
-    -speT/-specie_tag <TAG_NAME>
-                Experiment tag. Will help to identify the generated files
-                along miRNA output files.
-
-    -sublist/-subset_models <FILE_WITH_CM_NAMES>
-                Target list of CMs to be searched on subject
-                genome/sequences. If not indicated, miRNAture will run all
-                RFAM v14.4 metazoan miRNA models.
-
-    -usrM/-user_models <PATH>
-                Directory with additional hidden Markov (HMMs) or covariance
-                models (CMs) provided by the user. This must be contain a
-                corresponding HMMs/ and CMs/ folders, which the user models
-                will be identified.
-
-    -w/-workdir <OUT_PATH>
-                Working directory path to write all miRNAture results.
-
-
-    ]]></help>
+        ./miRNAture [-options]
+        ]]></help>
     <expand macro="citations" />
 </tool>
