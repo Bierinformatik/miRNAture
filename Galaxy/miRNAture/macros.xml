@@ -10,7 +10,8 @@
   </token>
     <xml name="requirements">
         <requirements>
-        <requirement type="package">mirnature</requirement>
+        <requirement type="package">mamba</requirement>
+        <requirement type="package">perl-statistics-r</requirement>
             <yield/>
         </requirements>
     </xml>

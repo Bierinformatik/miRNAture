@@ -6,24 +6,21 @@
     <expand macro="requirements" />
     <expand macro="version_command" />
     <command detect_errors="exit_code"><![CDATA[
-        #set mirnature="script/miRNAture"
         #set conda="mamba"
-        cd /scratch/bioinf/Proyects/miRNAture_v1/ &
         #import re
-        mirnature -stage $stage 
-        -subset_models $subset_models 
-        -nbitscore_cut $bitscore_cut 
-        -datadir '/scratch/bioinf/Proyects/miRNAture_v1/Galaxy/miRNAture/data_test'
+        miRNAture -stage homology 
+        -sublist $subset_models  
+        -dataF 'Precalculated-Data-tutorial'
         -specie_genome $specie_genome 
         -specie_name $specie_name
         -specie_tag $specie_tag 
-        -workdir '/scratch/bioinf/Proyects/miRNAture_v1/Galaxy/miRNAture/output'
+        -workdir 'output'
         -mode "${",".join(map(str, $homology_mode))}"
+        -pe '0'
         #if re.match(r'blast',str($homology_mode))
             -strategy "${",".join(map(str, $blast_strategy))}" 
         #end if
-        -parallel '0' 
-        -repetition_cutoff 'relax,150,100' > 'output_tool.txt'
+        -rep 'relax,150,100' > 'output_tool.txt'
         ]]></command>
     <inputs>
         <param format="fasta" multiple="true" name="specie_genome" type="data"
@@ -43,12 +40,11 @@
                     help="Input sequence to be processed by miRNAture" optional="true"/>
             </when>
         </conditional>
-        <param name="bitscore_cut" type="float" value="1.0" min="0.0" max="1.0" label="Bitscore threshold" />
         <!--<param name="parallel" type="boolean" label="Run parallel"
         truevalue="1" falsevalue="0" help="Use parallel modules" />-->
             
         <!--Static list-->
-        <param name="stage" type="select" value="value1" label="Stages to run">
+        <param name="stage" type="select" value="value2" label="Stages to run">
             <option value="value1">complete</option>
             <option value="value2">homology</option>
             <option value="value3">validation</option>
@@ -74,11 +70,6 @@
             <option value="value7">7</option>
             <option value="value8">8</option>
             <option value="value9">9</option>
-        </param>
-        <param name="outputs_select" type="select" optional="true" multiple="true" label="Which outputs should be generated">
-            <option value="short_summary" selected="true">short summary text</option>
-            <option value="gff">GFF file for miRNA predictions</option>
-            <option value="bed">BED file for miRNA predictions</option>
         </param>
     </inputs>
 
