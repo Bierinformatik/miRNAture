@@ -6,9 +6,7 @@
     <expand macro="requirements" />
     <expand macro="version_command" />
     <command detect_errors="exit_code"><![CDATA[
-        #set conda="mamba"
-        #import re
-        miRNAture -h 
+        miRNAture -h > 'output/file1.yaml'
         ]]></command>
     <inputs>
     </inputs>

@@ -11,7 +11,7 @@
     <xml name="requirements">
         <requirements>
         <requirement type="package">mamba</requirement>
-        <requirement type="package">perl-statistics-r</requirement>
+        <requirement type="package">mirnature</requirement>
             <yield/>
         </requirements>
     </xml>
