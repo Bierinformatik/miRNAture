@@ -3,6 +3,8 @@
 # Computational detection of microRNA candidates
 [![License](https://img.shields.io/github/license/cavelandiah/miRNAture_v1)](https://github.com/cavelandiah/miRNAture_v1)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/mirnature/README.html)
+![Conda](https://img.shields.io/conda/v/bioconda/mirnature)
+![Conda](https://img.shields.io/conda/dn/bioconda/mirnature)
 
 ## Description
 
