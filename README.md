@@ -8,12 +8,12 @@
 
 ## Description
 
-Detection of miRNAs is a difficult problem due their small size limits the
-available information. Current sensitive methods as: parameter optimized
-`blast`, `nhmmer`, or `cmsearch` runs designed to increase sensitivity, but
-leading to an inevitable large number of false positives only detected by
-detailed analysis of specific features of typical miRNAs and/or analysis of
-conservation patterns in a structure-annotated multiple sequence alignments.
+Detection of miRNAs is a difficult problem. Due their small size limits the
+available information and current sensitive methods, such as: `blast`, `nhmmer`,
+or `cmsearch` are designed to increase sensitivity, but lead to an inevitable
+large number of false positives only detected by detailed analysis of specific
+features of typical miRNAs and/or conservation patterns in a structure-annotated
+multiple sequence alignments.
 
 The **miRNAture** pipeline implements a workflow specific to animal microRNAs
 that automatizes homology search and validation steps.
@@ -43,13 +43,14 @@ To speed up installation of dependencies and packages we suggest to use
 conda install mamba -c conda-forge
 ```
 
-You can use `mamba` as drop-in replacement for `conda` by simply replacing the call to `conda` with a call to
-`mamba`.
+You can use `mamba` as drop-in replacement for `conda` by simply replacing the
+call to `conda` with a call to `mamba`.
 
 
 ### Install via Conda
 
-To install **miRNAture** from `conda` in a specific `mirnature` environment simply run:
+To install **miRNAture** from `conda` in a specific `mirnature` environment
+simply run:
 
 ```
 mamba create -n mirnature mirnature
@@ -89,13 +90,19 @@ which will install **miRNAture** in the `mirnature` `conda` environment.
 
 ## Input files
 
-The most important input file is a DNA sequence. This could be a multifasta 
+The most important input file is a DNA sequence. This could be a multi-fasta 
 sequence that belongs from a common specie (i.e. complete genome or group of 
 particular sequences). At the same time, previous to execute **miRNAture** a
 _pre-calculated_ dataset (that contains default data as CMs, HMMs, and required 
 files to perform mature prediction) must be downloaded and correctly indicated
-in the command line options, with the flag `-dataF`. To run **miRNAture** in 
-its _complete_ mode with default options, just run as:
+in the command line options with the flag `-dataF`. 
+
+**New in version 1.1**
+A new dataset containing all miRBase HMMs/CMs and validated mature sequences is
+recommended to use as first approach to identify miRNAs over target species.
+This dataset can be downloaded from **here**.
+
+To run **miRNAture** in its _complete_ mode with default options, just run as:
 
 ```
 # Activate the mirnature environment
@@ -121,22 +128,27 @@ Final_miRNA_evaluation/
 ```
 
 Inside this folder, **miRNAture** will create 3 folders containing their
-correspondent results: sequences in `fasta` format (`Fasta/`), minimum free energy and 
-lengths from described sequences (`MFE/`) and the supporting information ordered in tables
-for each annotated candidate (`Tables/`). Additionally, associated genomic positions 
-for the miRNA candidates are reported in `BED` and `GFF3` formats and a summary file,
-`miRNAture_summary_*.txt`, that describes overall descriptive statistics from found miRNA 
-families. 
+correspondent results: sequences in `fasta` format (`Fasta/`), minimum free
+energy and lengths from described sequences (`MFE/`) and the supporting
+information ordered in tables for each annotated candidate (`Tables/`).
+Additionally, associated genomic positions for the miRNA candidates are reported
+in `BED` and `GFF3` formats and a summary file, `miRNAture_summary_*.txt`, that
+describes overall descriptive statistics from found miRNA families. 
 
 For detailed instructions how to use **miRNAture** please refer to the Manual pages:
 
 * In this ![PDF](miRNAture-Manual/latex/mirnature.pdf) version.
-* Through your favorite explorer, open the `index.html` file located at `miRNAture-Manual/html/index.html`.
+* Through your favourite explorer, open the `index.html` file located at
+  `miRNAture-Manual/html/index.html`.
 
 ## Pre-calculated datasets
 
-Pre-calculated data composed by miRNA CMs, HMMs and required input files to perform mature annotation has
-to be downloaded before run the full **miRNAture** pipeline. Available datasets are listed below:
+Pre-calculated data composed by miRNA CMs, HMMs and required input files to
+perform mature annotation has to be downloaded before run the full **miRNAture**
+pipeline. Available datasets are listed below:
 
-- Required data to re-annotate human miRNAs: include CMs and HMMs build from miRBase without human 
-sequences. Stored in Zenodo [here](https://zenodo.org/record/4531376#.YCQS8EMo_ys).
+- **New dataset** containing metazoan curated miRBase v.22.1 families.
+  Recommended for use with `miRNAture` v.1.1. 
+- Required data to re-annotate human miRNAs: include CMs and HMMs build from
+  miRBase without human sequences. Stored in Zenodo
+  [here](https://zenodo.org/record/4531376#.YCQS8EMo_ys).

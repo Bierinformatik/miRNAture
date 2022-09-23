@@ -61,7 +61,7 @@ sub index_query_genome {
 	my ($genome, $makeblastpath) = @_;
 	#Only create in case it doesn't exists
 	if (!-e $genome.".nhr"){
-		print_process("Generating BLAST DB for genome");
+		print_process("Generating BLAST DB for the target genome");
 		make_blast_database($genome,$makeblastpath);
 	} else {
 		;

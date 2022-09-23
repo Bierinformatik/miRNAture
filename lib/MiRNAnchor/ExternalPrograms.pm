@@ -77,6 +77,7 @@ sub run_mirfix {
 	my ($parameters, $path) = @_;
 	my $starttime = time_measure();
 	my $endCode = system "python3 $path $parameters";
+    sleep(1);
 	if ($endCode != 0){
 		return 0;
 	}

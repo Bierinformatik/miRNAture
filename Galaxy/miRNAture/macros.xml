@@ -1,0 +1,27 @@
+<macros>
+    <token name="@TOOL_VERSION@">1.0</token>
+    <token name="@VERSION_SUFFIX@">0</token>
+    <token name="@ADDTHREADS@"><![CDATA[
+        ##compute the number of ADDITIONAL threads to be used (--cpu)
+        addthreads=\${GALAXY_SLOTS:-1} && (( addthreads-- )) &&
+    ]]></token>
+    <token name="@CPU@">
+      --cpu \$addthreads
+  </token>
+    <xml name="requirements">
+        <requirements>
+        <requirement type="package">mamba</requirement>
+        <requirement type="package">mirnature</requirement>
+            <yield/>
+        </requirements>
+    </xml>
+    <xml name="citations">
+        <citations>
+            <citation type="doi">10.3390/genes12030348</citation>
+            <yield />
+        </citations>
+    </xml>
+    <xml name="version_command">
+        <version_command>1.01</version_command>
+    </xml>
+</macros>

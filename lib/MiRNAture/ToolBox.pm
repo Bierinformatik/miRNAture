@@ -2,10 +2,11 @@ package MiRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF read_genomes_paths create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_error2 print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final infer_name_database_cm);
 
 use Moose::Role; 
 use File::Copy; 
+use File::Find;
 BEGIN {
 	local $SIG{__WARN__} = sub {};
 	require Bio::DB::Fasta;
@@ -31,25 +32,36 @@ with 'MiRNAture::Evaluate'; #Load tool subroutines
 
 sub evaluate_input_flags {
 	#cmlist file, mode run, out folder, parallel mode.
-	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $repetition_threshold) = @_;
+	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $parallel_linux, $repetition_threshold, $new_models) = @_;
 	# Evaluate the existence of list of CM models
 	my $name = $nameC;
 	$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 	if (!-z $nameC && -e $nameC){ #This is a file, must exists and must be non-zero
-		print_process("The $name covariance list will be used");
+		print_process("The $name covariance list is correctly defined");
 	} else {
-		print_process("The default covariance list will be used");
+		print_error("The $name model does not have models to search. Please provide a list of models to be searched on the target genome");
 	}
 	#Check the selected mode
-	if ($mode =~ /BLAST|INFERNAL|HMM|OTHER_CM|Final/){ # This is the valid modes
+	if ($mode =~ /blast|rfam|hmm|mirbase|user|final/){ # This is the valid modes
 		;
 	} else {
 		print_error("The mode $mode is not valid!");
+	}
+	# Check user models folder and the definition of the correct OTHER_CM mode
+	if ($mode =~ /user/){
+		if ($new_models eq "NA"){
+			print_error("The flag -usrM <USER_MODELS_PATH> is missing. It is required to run the OTHER_CM mode.");
+		}
 	}
 	if ($parallel == 1 || $parallel == 0){
 		;	
 	} else {
 		print_error("The mode $parallel mode is not valid!");
+	}
+	if ($parallel_linux == 1 || $parallel_linux == 0){
+		;	
+	} else {
+		print_error("The mode $parallel_linux mode is not valid!");
 	}
 	# Check if work folder exists, if not create it.
 	if (-d $work_folder){ #This is the outfolder, test if exists or create
@@ -91,7 +103,7 @@ sub evaluate_input_flags {
 	  to run the prediction of miRNAs.
     Returns: Created environment in the current folder:
 	 Creates: Data/, Basic_files/ including the basic
-	 files to run the pipeline (genomes.txt and RFAM scores file).
+	 files to run the pipeline (RFAM scores file).
 =cut 
 
 sub get_basic_files {
@@ -102,29 +114,35 @@ sub get_basic_files {
 	#create_folders($working_folder, "Data");
 	create_folders($data_folder, "Basic_files");
 	if (is_folder_empty($basic_folder)){
-		print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
-		copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
+		print_error("Seems that you do not have the scores files: all_rfam_scores.txt and all_mirbase_scores.txt to run miRNAture.")
+		#TODO: Consider point the location to download those files
+		#print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
+		#copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
 		#copy_files("$working_folder/Default_Data/genomes.txt", $basic_folder);
 	} else { #Test if files are in the right format to be processed
-		if (-s "$basic_folder/all_RFAM_scores.txt"){
-			test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
-		} else {
-			copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
-			test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
-		}
-		if (-s "$basic_folder/genomes.txt"){
-			test_basic_file("$basic_folder/genomes.txt", "genomes");
-		} else {
-			;
+		if (-s "$basic_folder/all_rfam_scores.txt"){
+			test_basic_file("$basic_folder/all_rfam_scores.txt", "scores");
+		} 
+		if (-s "$basic_folder/all_mirbase_scores.txt"){
+			test_basic_file("$basic_folder/all_mirbase_scores.txt", "scores");
+		} 
+		#else {
+		#	copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
+		#	test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
+		#}
+        ##if (-s "$basic_folder/genomes.txt"){
+        ##	test_basic_file("$basic_folder/genomes.txt", "genomes");
+        ##} else {
+        ##	;
 			#This file is generated automatically, so it must be on the folder. If not, is an error of miRNAture.
 			#print_process("The file: $data_folder/genomes.txt is missing, miRNAture will create it.");
 			#copy_files("Default_Data/genomes.txt", $basic_folder);
 			#test_basic_file("$basic_folder/genomes.txt", "genomes");
-		}
+        ##}
 	}
-	if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
-		copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
-	} 
+	#if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
+	#	copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
+	#} 
 	return;
 }
 
@@ -198,35 +216,33 @@ sub read_config_file {
 	return $final;
 }
 
-=head1 read_genomes_paths 
-    Title: read_genomes_paths 
-    Usage: read_genomes_paths(format_file, name_config_file);
-    Function: Fills up the path information table along all
-	  genomes. All of this information is retrieved from
-	  Data/Basic_files/genomes.txt file.
-    Returns: Hash with keys as Species tags, defined by the user, and values as paths. 
-=cut 
+##sub read_genomes_paths { #File
+##	my $name = shift;
+##	$name =~ s/(.*\/|\/.*\/)(.*)$/$2/g;
+##	open my $genomes_paths, "< Data/Basic_files/genomes.txt" or die "The file <Data/Basic_files/genomes.txt> does not exists\n"; 
+##	my $targetGenomes;
+##	my %genomes;
+##	while (<$genomes_paths>){
+##		chomp;
+##		next if ($_ =~ /^#|^$/); 
+##		my @splitline = split /\=/, $_;
+##		$splitline[1] =~ s/"//g;
+##		$genomes{$splitline[0]} = $splitline[1];
+##	}
+##	foreach my $keys (sort keys %genomes){
+##		$targetGenomes .= "$keys ";
+##	}
+##	$targetGenomes =~ s/(.*)(\s+)$/2\.$1/g; #add identification
+##	store_conf_file($targetGenomes, $name);
+##	return %genomes;
+##}
 
-sub read_genomes_paths { #File
-	my $name = shift;
-	$name =~ s/(.*\/|\/.*\/)(.*)$/$2/g;
-	open my $genomes_paths, "< Data/Basic_files/genomes.txt" or die "The file <Data/Basic_files/genomes.txt> does not exists\n"; 
-	my $targetGenomes;
-	my %genomes;
-	while (<$genomes_paths>){
-		chomp;
-		next if ($_ =~ /^#|^$/); 
-		my @splitline = split /\=/, $_;
-		$splitline[1] =~ s/"//g;
-		$genomes{$splitline[0]} = $splitline[1];
-	}
-	foreach my $keys (sort keys %genomes){
-		$targetGenomes .= "$keys ";
-	}
-	$targetGenomes =~ s/(.*)(\s+)$/2\.$1/g; #add identification
-	store_conf_file($targetGenomes, $name);
-	return %genomes;
-}
+#sub read_genomes_paths {
+#    my ($tag, $path) = @_;
+#    my %genomes; 
+#    $genomes{$tag} = $path;
+#    return \%genomes;
+#}
 
 =head1 create_folders 
     Title: create_folders 
@@ -284,11 +300,28 @@ sub copy_files {
 
 sub check_folder_files {
 	my ($dir, $prefix) = @_;
-	opendir(DIR, $dir);
-	my @files = grep(/$prefix$/, readdir(DIR));
-	closedir(DIR);
-	return @files;
+    my @files;
+    find( sub {
+            return unless -f; # Test if is a file
+            return if /^\.\_/; # Not accept hidden/MacOS-system files
+            return unless /$prefix$/;
+            push @files, $_; 
+        }, $dir);
+    my $num = scalar @files;
+    if ($num == 0){
+        print_result("The $dir does not contain desired files with pattern $prefix");
+		exit(0);
+    }
+    return @files;
 }
+
+#sub check_folder_files {
+#	my ($dir, $prefix) = @_;
+#	opendir(DIR, $dir);
+#	my @files = grep(/$prefix$/, readdir(DIR));
+#	closedir(DIR);
+#	return @files;
+#}
 
 =head1 calculate_Z_value
     Title: calculate_Z_value
@@ -300,11 +333,11 @@ sub check_folder_files {
 sub calculate_Z_value {
 	my ($genome, $mode) = @_; #mode: Genome or Region
 	if (!-e $genome || -z $genome){
-		print_error("Seems that your $genome does not exists or it is empty, fix that please.");
+		print_error("Seems that your $genome file does not exists or it is empty. Please provide the correspondent fasta file");
 	}
 	my ($value, $value2);
 	existenceProgram("esl-seqstat");
-	$value = `esl-seqstat $genome | grep "#"`;
+	$value = `esl-seqstat --dna $genome | grep "#"`;
 	$value = (split /\s+/, $value)[-1];
 	$value2 = $value;
 	if ($mode eq "Genome"){
@@ -409,6 +442,7 @@ sub getSequencesFasta {
 	}
 	while (<$IN>){
 		chomp;
+		next if $_ =~ /^#/;
 		my ($ids, $idsDouble);
 		if ($mode == 1 || $mode == 5){
 			my $strand = (split /\s+|\t/, $_)[1];
@@ -472,6 +506,11 @@ sub getSequencesFasta {
 			$tmp[4] = $exEnd;
 			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $specie_name_complete, $len_r);
 		} elsif ($mode == 4 || $mode == 5){ #Final Tables
+            if ($mode == 5){
+                my $extension_homology = 15; # Extension to the homology candidates
+                my $chr_length = $dbCHR->length("$tmp[0]");
+                ($tmp[5], $tmp[6]) = extendBlastnCoordinates($tmp[5], $tmp[6], 1, 0, 0, $chr_length, $extension_homology);
+            }
 			if ($tmp[6] > $tmp[5]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
 				$gen_seq = $dbCHR->seq( $tmp[0], $tmp[5], $tmp[6]); #Coordinates from nhmmer output Chr,S,E
 			} else {
@@ -584,8 +623,78 @@ sub getSequencesFasta {
 		print $DBFILE "H$reg\t$database{$reg}\n";
 	}
 	close $IN; close $DBFILE;
+    if ($mode == 1 || $mode == 5){
+        system("rm .used_ids.txt");
+    }
 	return;
 }
+
+##############
+
+sub getSequencesFastaSubGenome {
+	my ($specie_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
+	my %final_seq;
+	### First, index the genome
+	my $dbCHR;
+	# Look if exists index
+	if (!-e "$genome" || -z "$genome"){
+		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
+	} else {
+		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
+	}
+	##
+    # Here read the .db file which already included +-15nt:  <30-08-21, cavelandiah> #
+	open my $IN, "< $input_table.db" or die;
+	my ($gen_seq);
+    my $extension_genome = 250; # Extension to the homology candidates
+	while (<$IN>){
+		chomp;
+		my $ids;
+        #H1625790349	S104	+	MIPF0000079	1	88	271598	271735	33.8	0.00099	no	mir-145	88	0	Infernal	Infernal	mir-145	miRNA	RF00675
+		my @tmp = split /\s+|\t/, $_;
+        my $chr_length = $dbCHR->length("$tmp[1]");
+        ($tmp[6], $tmp[7]) = extendBlastnCoordinates($tmp[6], $tmp[7], 1, 0, 0, $chr_length, $extension_genome);
+		if ($tmp[6] < $tmp[7]){ 
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
+        } else {
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
+        }
+		my $frame = $tmp[2]; #Strand
+		my $gene_name = "$tmp[0] $specie_name $tmp[11] $tmp[1]#$tmp[6]#$tmp[7]"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
+		my $output_nucleotide2 = Bio::Seq->new(
+			-seq        => $gen_seq,
+			-id         => $gene_name,
+			#-display_id => $gene_name,
+			-alphabet   => 'dna'
+		);
+        # In case was detected in forward strand, just report as a genome in 5'->3'
+        # because MIRfix will search in both strands
+        #if ($frame eq "-") {
+        #	$output_nucleotide2 = $output_nucleotide2->revcom();
+        #}
+		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
+	}
+	close $IN;
+	my $outfileF = "$out_fasta/${specie_name}_subgenome.fasta";
+	open my $OUTFILE, ">> $outfileF";
+	foreach my $ids (sort keys %final_seq){
+		my $idsm = $ids;
+		print $OUTFILE ">$idsm\n";
+		my $all = $final_seq{$ids};
+		foreach my $sq (@$all){
+			if (!$sq){
+				print_error("The sequence for $ids is empty");
+			}
+			$sq = uc($sq);
+			$sq =~ s/(.{60})/$1\n/g;
+			print $OUTFILE "$sq\n";
+		}
+	}
+	close $OUTFILE;
+	return $outfileF;
+}
+
+#############
 
 sub getSequencesFasta_final {
 	my ($specie_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
@@ -593,7 +702,7 @@ sub getSequencesFasta_final {
 	### First, index the genome
 	my $dbCHR;
 	# Look if exists index
-	if (!-e $genome || -z $genome){
+	if (!-e "$genome" || -z "$genome"){
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
 	} else {
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
@@ -606,11 +715,11 @@ sub getSequencesFasta_final {
 		my $ids;
 		#H1595452937.0	JH127654.1	+.2	RF00929.3	1.4	77.5	486168.6	486267.7	33.8.8	0.0034.9	no.10	mir-574.1	77.2	9.3	Blast.4	ANCA.5	anca148294,anca148390.6	miRNA.7	2.8	18.9	-8.2	100.1
 		my @tmp = split /\s+|\t/, $_;
-		if ($tmp[6] < $tmp[7]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); #Coordinates from nhmmer output Chr,S,E
-		} else {
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); #Coordinates from nhmmer output Chr,S,E
-		}
+		if ($tmp[6] < $tmp[7]){ 
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
+        } else {
+			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
+        }
 		my $frame = $tmp[2]; #Strand
 		my $gene_name = "$tmp[0] $specie_name $tmp[11] stem-loop"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
 		my $output_nucleotide2 = Bio::Seq->new(
@@ -637,7 +746,7 @@ sub getSequencesFasta_final {
 			}
 			$sq = uc($sq);
 			$sq =~ s/T/U/g;
-			$sq =~ s/(.{60})/$1\n/g;
+            $sq =~ s/(.{60})/$1\n/g;
 			print $OUTFILE "$sq\n";
 		}
 	}
@@ -762,6 +871,7 @@ sub get_header_name {
 }
 
 sub generate_key {
+    my $folder = shift;
 	FLAG:	
 	my $id = time() + int rand(10000); #entropy_source->get_int(12345);#time(); #+ rand(1000);
 	$id =~ s/(.*)(\..*)/$1/g;
@@ -775,7 +885,8 @@ sub generate_key {
 }
 
 sub generate_key_double {
-	FLAG:	
+	my $folder = shift;
+    FLAG:	
 	my $id = time() + int rand(10000); #entropy_source->get_int(12345);#time(); #+ rand(1000);
 	$id =~ s/(.*)(\..*)/$1/g;
 	my $exist = check_if_exists($id);
@@ -891,20 +1002,20 @@ sub existenceProgram {
 	my $tool = shift;
 	my $tool_path = `which $tool 2> /dev/null | tr -d '\n'`;
 	unless ($tool_path){
-		print_error("No $tool command is available in your system!");
+		print_error("No $tool command is available in your system! Please install it.");
 	}
 	return;
 }
 
 
 sub classify_2rd_align_results {
-	my ($spe, $cm, $folder_in, $file, $mode, $molecule, $cm_scores, $len_scores, $names_cms, $minBitscore) = @_;
+	my ($spe, $cm, $folder_in, $file, $mode, $molecule, $cm_scores, $len_scores, $names_cms, $minBitscore, $maxthreshold) = @_;
 	my $filein;
 	if ($cm ne "NA"){
 		#$filein = "$folder_in/$spe.$cm.tab";
-		if ($mode eq "INFERNAL" || $mode eq "OTHER_CM"){
+		if ($mode eq "rfam" || $mode eq "mirbase" || $mode eq "user"){
 			$filein = $file; 
-		} elsif ($mode eq "HMM"){
+		} elsif ($mode eq "hmm"){
 			$filein = $file;
 		}
 	} else { #Here is the Blast/Infernal input data, not too much input data, then reeplace.
@@ -914,15 +1025,49 @@ sub classify_2rd_align_results {
 	}
 	if (-e $filein && !-z $filein){
 		if ($molecule =~ /^miRNA/){ #Based on evidence, miRNAs are evaluated with 32% of Bitscore.
-			cleancmsearch($filein, 0.32, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
+			cleancmsearch($filein, $maxthreshold, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
 			#cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); #filein, threshold bitscore, mode GA score
 		} elsif ($molecule =~ /^NA$/){ #other CMs without bitscore
-			cleancmsearch($filein, 0, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
-		} else {
+			cleancmsearch($filein, $maxthreshold, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
+		} else { # Other RNA families
 			cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); 
 		}
 	}
 	return;
+}
+
+sub infer_name_database_cm {
+	my ($new_cm_folder) = @_;
+    my @all_models;
+	foreach my $path (@$new_cm_folder){
+        my @all_cm_models = check_folder_files($path, "\.cm"); #All files must end at '.cm'
+        foreach my $file (@all_cm_models){
+            my $complete =  "$path/$file";
+            push @all_models, $complete;
+        }
+    }
+	my %database;
+	my $IN;
+    # Read each CMs and collect its name, build DB
+	foreach my $file (@all_models){
+		next if $file !~ /\.cm$/;
+		open $IN, "< $file" or die;
+		my ($name, $acc);
+		while (<$IN>){
+			chomp;
+			if ($_ =~ /^NAME\s/){
+				$name = (split /\s+|\t/)[1];
+                $database{$name} = $file;
+			} elsif ($_ =~ /^ACC\s/){
+                $acc = (split /\s+|\t/)[1];
+                $database{$acc} = $file;
+            } else{
+				next;
+			}
+		}
+        close $IN;
+	}
+	return \%database;
 }
 
 sub infer_data_from_cm {
@@ -959,6 +1104,7 @@ sub infer_data_from_cm {
 		}
 		my $new_line_cm_families = "$acc\t$score\t$length\t$name\t$family";
 		print $OUT "$new_line_cm_families\n";
+        close $IN;
 	}
 	close $OUT;
 	return;
@@ -988,7 +1134,7 @@ sub cmsearch {
 	}
 	$genome =~ s/"//g;
 	if (-e "$path_cm/${nameCMFinal}" && !-z "$path_cm/${nameCMFinal}"){
-		my $param = "--cpu 5 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm/${nameCMFinal} $genome";
+		my $param = "--cpu 5 -E 0.015 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/${nameCM}_$genomeTag.tab -o $outFolder/${nameCM}_$genomeTag.out $path_cm/${nameCMFinal} $genome";
 		system "$cmsearch_path $param 1> /dev/null";
 	} else {
 		;
@@ -996,11 +1142,34 @@ sub cmsearch {
 	return;
 }
 
+sub check_status {
+	my $state = shift;
+	if ($state != 0) {
+		print_error("The analysis could not be completed. Detected errors when running miRNAture");
+		exit($state >> 8);
+	}
+	return;
+}
+
+sub print_error2 {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD RED "[ERROR] $text\n";
+	exit(1);
+}
+
 sub print_error {
 	my $text = shift;
 	local $Term::ANSIColor::AUTORESET = 1;
 	print BOLD RED "[ERROR] $text\n";
-	die "miRNAture failed to continue working due derected errors\nExiting...\n";
+	die "miRNAture failed to continue working due detected errors\nExiting...\n";
+	return;
+}
+
+sub print_warning {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD YELLOW "[WARNING] $text\n";
 	return;
 }
 

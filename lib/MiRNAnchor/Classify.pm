@@ -2,7 +2,7 @@ package MiRNAnchor::Classify;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(process_all_candidates);
+@EXPORT = qw(process_all_candidates, concatenate_cms_paths);
 
 use Moose;
 use MooseX::Types::Path::Class;
@@ -12,6 +12,8 @@ use File::Copy;
 use Bio::AlignIO;
 use Bio::SimpleAlign;
 use MiRNAnchor::Check;
+
+use MiRNAture::ToolBox;
 
 with 'MiRNAnchor::Tools';
 
@@ -61,6 +63,13 @@ has 'tag_spe_query' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
+);
+
+has 'genome_specie' => (
+	is => 'ro',
+	isa => 'Path::Class::File',
+	coerce => 1,
+	required => 1
 );
 
 has 'accepted_file' => (
@@ -156,12 +165,18 @@ sub load_all_results {
 
 sub process_all_candidates {
 	my $shift = shift;
+    my $variables = shift;
+    my $name_cm_db = shift;
 	my ($db_codes, $acceptedDB, $discardedDB) = load_all_results($shift); 
 	my $finalValidationPath = $shift->output_folder;
+    my $specie_tag = $shift->tag_spe_query;
+    my $genome_path_complete = $variables->[3]->{Specie_data}{Old_Genome};
+    my ($Zvalue, $genome_size_bp) = calculate_Z_value($genome_path_complete, "Genome");
+    my $minBitscore = calculate_minimum_bitscore($genome_size_bp);
 	# Output files
-	open (my $ACCEPTED, ">", $shift->accepted_file) or die; #"accepted_".$shift->tag_spe_query.".miRNAs.txt") or die;
-	open (my $ACCEPTED_NOALIGN, ">", $shift->accepted_noStr_file) or die; #"accepted_".$shift->tag_spe_query."_noalign.txt") or die;
-	open (my $DISCARTED, ">", $shift->discarded_file) or die; #"discarded_".$shift->tag_spe_query.".miRNAs.txt") or die;
+	open (my $ACCEPTED, ">", $shift->accepted_file) or die;
+	open (my $ACCEPTED_NOALIGN, ">", $shift->accepted_noStr_file) or die; 
+    open (my $DISCARTED, ">", $shift->discarded_file) or die; 
 	##
 	foreach my $code (sort keys %{$db_codes}){
 		if (exists $$acceptedDB{$code}){ 
@@ -171,6 +186,7 @@ sub process_all_candidates {
 			my $stockholmFile = "$finalValidationPath/$family/$code/Output/$family.out/$family.stk";	
 			my $maturePosFile = "$finalValidationPath/$family/$code/Output/$family.out/$family-FinalCoor.txt";
 			my $stockholmFileAlternative = "$finalValidationPath/$family/$code/Output/$family.out/${family}corrected.stk";
+            my $fastaFinal = "$finalValidationPath/$family/$code/Output/$family.out/${family}-Final.fasta";
 			# In cases where alterantive folding were created
 			if (-e $stockholmFileAlternative && !-z $stockholmFileAlternative){
 				$stockholmFile = $stockholmFileAlternative;
@@ -193,6 +209,33 @@ sub process_all_candidates {
 			if (-e $stockholmFileOldAlternative && !-z $stockholmFileOldAlternative){
 				$stockholmFileOld = $stockholmFileOldAlternative;
 			}
+            #
+            ##### Extract final fasta and evaluate if truncated with global
+            my $line = $$acceptedDB{$code};
+            my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $specie_tag);
+            #(split /\s+|\t/, $line)[-2]; # Homology Family
+            #(split /\s+|\t/, $line)[3];  # Structural Family
+            # Here evaluate, if exists, with homolgy family. If not, By the structural one.
+            my $fam_sequenceH = (split /\s+|\t/, $line)[-2]; # Homology
+            my $fam_sequenceS = (split /\s+|\t/, $line)[3]; # Structural
+            my @families_CMs = ();
+            push @families_CMs, $fam_sequenceH;
+            push @families_CMs, $fam_sequenceS;
+            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $specie_tag, $code, \@families_CMs); 
+            my ($truncated_value, $bitscore_global_value);
+            #Truncated value
+            if (exists $$truncated_scores_global{$code}{0}{Truncated}){
+                $truncated_value = $$truncated_scores_global{$code}{0}{Truncated}; # Get the best result in position 0.
+            } else {
+                $truncated_value = "NotCalculated";
+            }
+            # Bitscore corrected
+            if (exists $$truncated_scores_global{$code}{0}{Score}){
+                $bitscore_global_value = $$truncated_scores_global{$code}{0}{Score}; # Get the best result in position 0.
+            } else {
+                $bitscore_global_value = -1;
+            }
+            ###
 			# Check the conserved SS is valid
 			my $conservedMatureLocations = get_mature_map_location($maturePosFile); #Get S5p,E5p,S3p,E3p from fam.
 			my $validStructure = validate_secondary_structure_alignment($stockholmFile, $shift->current_dir, $conservedMatureLocations); #Evaluate generated alignment
@@ -210,26 +253,201 @@ sub process_all_candidates {
 				my $old_data = $$db_codes{$code};
 				# Compare distances from annotated and corrected
 				my ($distanceStart, $distanceEnd, $distanceFinal) = compare_positions_miRNAs($new_data, $old_data);
-				if ($strDistance <= 7){
-					print $ACCEPTED "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\n";	
-				} else {
-					print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\n";	
-				}
+                if ($truncated_value eq "no"){ # Global align evaluation, not truncated
+                    if ($bitscore_global_value > $minBitscore){ #Look global score
+                        if ($strDistance <= 7){
+                            print $ACCEPTED "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\t$bitscore_global_value\n";	
+                        } else {
+                            print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\t$bitscore_global_value\n";	
+                        }
+                    } else { #Discard if global score is low
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
+                } else { # Truncated, in relation to the CM model
+                    # Evaluate the bitscore, have to be > log2 2N
+                    if ($bitscore_global_value > $minBitscore){ #Look global score
+                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\t$strDistance\t$distanceStart\t$distanceEnd\t$distanceFinal\t$truncated_value\t$bitscore_global_value\n";	
+                    } else {
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
+                }
 			} elsif ($validStructure =~ m/^No_valid|^NA|^No_valid_No_match/){
-				print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\tNA\tNA\tNA\tNA\n"; 
+                if ($truncated_value eq "no"){ # Global align evaluation, not truncated
+                    if ($bitscore_global_value > $minBitscore){ #Look global score
+                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n"; 
+                    } else {
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
+                } else {
+                    if ($bitscore_global_value > $minBitscore){ #Discuss this one. No valid str + truncated, but valid score
+                        print $ACCEPTED_NOALIGN "$$acceptedDB{$code}\t$validStructure\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n"; 
+                    } else {
+                        print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\t$truncated_value\t$bitscore_global_value\n";	
+                    }
+                }
 			} else {
 				print_error("There is an error in the syntax code $validStructure and $code");
 			}
 		} elsif (exists $$discardedDB{$code}){ #This miRNA was classified as discarted
-			print $DISCARTED "$$db_codes{$code}\tNA\tDISCARTED\tNA\tNA\tNA\tNA\n";	
+			print $DISCARTED "$$db_codes{$code}\tNA\tDISCARDED\tNA\tNA\tNA\tNA\tNA\tNA\n";	
 		} else {
-			print $DISCARTED "$$db_codes{$code}\tNA\tCM_MODEL_DISCARDED\tNA\tNA\tNA\tNA\n";	
+			print $DISCARTED "$$db_codes{$code}\tNA\tCM_MODEL_DISCARDED\tNA\tNA\tNA\tNA\tNA\tNA\n";	
 		}
 	}
 	close $ACCEPTED;
 	close $ACCEPTED_NOALIGN;
 	close $DISCARTED;
 	return;
+}
+
+sub perform_global_evaluation_covariance {
+    my ($file, $pathsCM, $outFolder, $specieT, $code, $family) = @_;
+    my $outfile;
+	if (!-e $file || -z $file){
+		print_error("Sequence file to global evaluation not created\n");
+	} 
+    # $family[0]: Str,  $family[1] = Homology CM
+    if (exists $$pathsCM{"$$family[0]"}){ #Test with Structural CM.
+        my $cm = $$pathsCM{$$family[0]};
+        $outfile = cmsearch_global($$family[0], $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
+    } elsif (exists $$pathsCM{"$$family[1]"}){ # Test with homology CM.
+        my $cm = $$pathsCM{$$family[1]};
+        $outfile = cmsearch_global($$family[1], $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
+    } else {
+        print_error("CM is $family not available for global validation\n");
+    }
+    # Here concatenate and classify the results if they are complete or not
+    #my $outfile = concatenate_tab_files($outFolder, $specieT);
+    # Delete individual files
+    #delete_individual_files($outFile, "\\_global\.tab");
+    #delete_individual_files($outFile, "\\_global\.out");
+    # Build hash with resulting data
+    my $truncated_global = get_result_truncated_global($outfile);
+    return $truncated_global;
+}
+
+sub concatenate_tab_files {
+    my ($outFolder, $specie) = @_;
+    my $concatenatedFile = "$outFolder/${specie}_concatenated_evaluation.tab";
+    open my $OUT, "> $concatenatedFile" or die;
+    my @filesToConcatenate = check_folder_files($outFolder, "\\_global\.tab");
+    foreach my $out (@filesToConcatenate){
+        open my $IN, "< $out" or die;
+        while (<$IN>){
+            chomp;
+            print $OUT "$_\n";
+        }
+    }
+    close $OUT;
+    return $concatenatedFile; 
+}
+
+sub cmsearch_global {
+	#In: out, CM model, genome
+	my ($nameCMFinal, $cm, $sequence, $speTag, $outFolder, $cmsearch_path, $code) = @_; #modes: 1 X.cm 0 other name
+	existenceProgram($cmsearch_path);
+	$sequence =~ s/"//g;
+	if (-e "${cm}" && !-z "${cm}"){
+        # Here detect truncated sequences
+        # Z-score?
+        my $param = "-g --cpu 5 --toponly --nohmmonly --tblout $outFolder/${nameCMFinal}_${speTag}_${code}_global.tab -o $outFolder/${nameCMFinal}_${speTag}_${code}_global.out $cm $sequence";
+		system "$cmsearch_path $param 1> /dev/null";
+	} else {
+		print_error("The CM to global evaluation is not available\n");
+	}
+    my $outfile = "$outFolder/${nameCMFinal}_${speTag}_${code}_global.tab";
+	return $outfile;
+}
+
+sub generate_temporal_fasta_family {
+    my ($dir, $sequences, $family, $specie, $code) = @_;
+    my $out_name = "$dir/${family}_${specie}_${code}_temporal_evaluate.fa";
+    open my $OUT, "> " or die;
+    foreach my $head (sort keys %{$sequences}){
+        print $OUT "$head\n";
+        print $OUT "$$sequences{$head}\n";
+    }
+    close $OUT;
+    return $out_name;
+}
+
+sub get_result_truncated_global {
+    my ($file) = @_;
+    open my $IN, "< $file";
+    my %data;
+    my $count = 0; #Track results
+    while (<$IN>){
+        next if ($_ =~ /^#/);
+        my @complete = split /\s+|\t/, $_;
+        $data{$complete[0]}{$count}{Truncated} = $complete[10]; #Truncated result
+        my $scoreB = $complete[14] - $complete[13]; # Bitscore - bias
+        $data{$complete[0]}{$count}{Score} = $scoreB; # Bitscore
+        $count++;
+    }
+    return \%data;
+}
+
+sub concatenate_cms_paths {
+    my ($default, $user, $other) = @_;
+    my @paths;
+    my %final;
+    if (-d $default) {
+        push @paths, $default;
+    }
+    if (-d $other) {
+        push @paths, $other;
+    }
+    if (-d $user) {
+        push @paths, $user;
+    }
+    return \@paths;
+}
+
+sub concatenate_cms_paths_old {
+    my ($default, $user, $other, $fam) = @_;
+    my @paths;
+    my %final;
+    push @paths, $default;
+    push @paths, $other;
+    push @paths, $user;
+    foreach my $in (@paths){
+        my $cm = "$in/$fam.cm";
+        if (-e $cm && !-z $cm){
+            $final{$fam} = $cm; #Only take one model. If repeated, take last one.
+        }
+    }
+    return \%final;
+}
+
+sub get_fasta_to_global {
+    my ($fasta, $codeStart, $finalValidationPath, $specieTag) = @_;
+    open my $IN, "< $fasta" or die;
+    my $head;
+    my $code;
+    my %sequences;
+    while (<$IN>){
+        chomp;
+        if ($_ =~ /^>/){
+            $head = $_;
+            my @headm = split /\s+|\t/, $head;
+            $code = (split /\s+|\t/,$head)[1];
+            $head = "\>$headm[1] $headm[2] $headm[3] $headm[4] $headm[5]";
+        } elsif ($_ !~ /^>/ ) {
+            if ($code eq $codeStart){
+                $sequences{$head} .= $_;
+            } else {
+                next;
+            }
+        }
+    }
+    close $IN;
+    my $outfile = "$finalValidationPath/${codeStart}_${specieTag}_temporal_file.fa";
+    open my $TEMP, "> $outfile" or die;
+    foreach my $head (sort keys %sequences){
+        print $TEMP "$head\n$sequences{$head}\n";
+    }
+    close $TEMP;
+    return $outfile;
 }
 
 sub edit_pairings {
@@ -539,7 +757,7 @@ sub generate_output_files {
 	open (my $POSITIVE, "<", $shift->accepted_file->stringify);
 	open (my $POSITIVE_NO_STR, "<", $shift->accepted_noStr_file->stringify);
 	open (my $DISCARDED, "<", $shift->discarded_file->stringify);
-	open (my $INFO, "<", $shift->mature_description);
+	open (my $INFO, "<", $shift->mature_description->stringify);
 	my (%info, %positiveHigh, %positiveMed, %positiveAccepted, %negativeLow);
 	#H1601739630	X	-	RF00711	1	90	45932312	45932381	17.0	0.0034	no	mir-449	90	10	Blast	ANCA,DARE,XELA,XETR	anca148299,anca148674,anca149012,dare322,dare719,xela37007,xetr2120,xetr2352	miRNA	1
 	#H1601747417	>patr-RF00711-42 H1601747417 Pan troglogytes mir-449 stem-loop H1601747417 MIMAT0041140/B1600189418/H1601747417 MIMAT0041140/B1600189418/H1601747417-star 10 31 45 67 RF00711 RF00711_1	Accepted	RF00711_1
@@ -674,13 +892,14 @@ sub organise_mess {
 	create_folders($working_path, "GFF3");
 	create_folders($working_path, "BED");
 	create_folders($working_path, "Additional_Support");
+    my $short_specie = $shift->tag_spe_query;
 	opendir DH, $working_path;
 	while (my $file = readdir DH) {
-		if ($file =~ /\.txt$/){
+		if ($file =~ /\.txt$/ && $file =~ /\_$short_specie/){
 			move("$working_path/$file", "$working_path/Additional_Support");
-		} elsif ($file =~ /\.gff3/){
+		} elsif ($file =~ /\.gff3/ && $file =~ /\_$short_specie/){
 			move("$working_path/$file", "$working_path/GFF3");
-		} elsif ($file =~ /\.bed/){
+		} elsif ($file =~ /\.bed/ && $file =~ /\_$short_specie/){
 			move("$working_path/$file", "$working_path/BED");
 		} else {
 			;

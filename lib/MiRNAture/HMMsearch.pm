@@ -13,45 +13,86 @@ with 'MiRNAture::Evaluate';
 my %len;
 
 sub searchHomologyHMM {
-	my ($hmm, $genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore) = @_;
+	my ($genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore, $maxthreshold, $list_fam_file) = @_;
+	##my ($hmm, $genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore, $maxthreshold) = @_;
 	if (!-d "$outHMM/$specie"){ #Check if already exists specie-specific directory
 		create_folders($outHMM,$specie);#Create folder specific to specie
 	}
-	runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
-	my @result_files = check_folder_files("$outHMM/$specie", "\.tab");
-	my $new_out = "$outHMM/$specie";
-	obtainTrueCandidates($specie, $new_out, $hmm);
-	if (!-e "$outHMM/$specie/$specie.$hmm.tab.true.table" || -z "$outHMM/$specie/$specie.$hmm.tab.true.table"){
-		return 1;
+	runNhmmer_parallel($current_HMM_models, $genome, $specie, $outHMM, $nhmmer_path, $zvalue, $list_fam_file);
+	##runNhmmer($genome, $hmm, $specie, $outHMM, $current_HMM_models, $nhmmer_path,$zvalue);
+	#my @result_files = check_folder_files("$outHMM/$specie", "\.tab");
+	##my $new_out = "$outHMM/$specie";
+	##obtainTrueCandidates($specie, $new_out, $hmm);
+	##if (!-e "$outHMM/$specie/$specie.$hmm.tab.true.table" || -z "$outHMM/$specie/$specie.$hmm.tab.true.table"){
+	##	print_error("Not possible to create files with candidate classification");
+	##	#return 1;
+	##} else {
+	#my @result_true = check_folder_files("$outHMM/$specie", "$hmm\\.tab\\.true\\.table");
+	##getSequencesFasta($specie, $genome, $hmm, "$outHMM/$specie", "2", $len_r, $names_r); #Header mode == 2 HMM
+	#my @result_fasta = check_folder_files("$outHMM/$specie", "fasta");
+	##create_folders("$outHMM/$specie","Infernal");#Create folder specific to specie
+	##my $infernal_out_path = "$outHMM/$specie/Infernal";
+	##if (-z "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta" || !-e "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta"){
+	##	print_error("Not possible to create files with candidate classification");
+		#return 1;	
+	##} else {
+	##	$zvalue = $zvalue/2; # Because it is only one strand
+	##	cmsearch_specific_sequence($hmm, $CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
+		#my @result_cmseach = check_folder_files($infernal_out_path, "tab");
+	##	my $molecule = get_family_name($hmm, $families_names);
+	##	create_folders("$outHMM/$specie/Infernal","Final");#Create folder specific to specie
+	##	classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"hmm", $molecule, $bitscores, $len_r, $names_r, $minBitscore, $maxthreshold); #Obtain true candidates
+	##}
+	return;
+	##}
+}
+
+sub searchStructureHMM {
+	my ($hmm, $genome, $specie, $outHMM, $current_HMM_models, $CM_path, $bitscores, $len_r, $names_r, $families_names, $nhmmer_path, $cmsearch_path, $zvalue, $minBitscore, $maxthreshold, $list_fam_file) = @_;
+	create_folders("$outHMM/$specie","Infernal");#Create folder specific to specie
+	my $infernal_out_path = "$outHMM/$specie/Infernal";
+	if (-z "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta" || !-e "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta"){
+		# Were not geneneated candidates
+		return;	
 	} else {
-		my @result_true = check_folder_files("$outHMM/$specie", "$hmm\\.tab\\.true\\.table");
-		getSequencesFasta($specie, $genome, $hmm, "$outHMM/$specie", "2", $len_r, $names_r); #Header mode == 2 HMM
-		my @result_fasta = check_folder_files("$outHMM/$specie", "fasta");
-		create_folders("$outHMM/$specie","Infernal");#Create folder specific to specie
-		my $infernal_out_path = "$outHMM/$specie/Infernal";
-		if (-z "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta" || !-e "$outHMM/$specie/$specie.$hmm.tab.true.table.fasta"){
-			return 1;	
-		} else {
-			$zvalue = $zvalue/2; # Because it is only one strand
-			cmsearch_specific_sequence($hmm, $CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
-			my @result_cmseach = check_folder_files($infernal_out_path, "tab");
-			my $molecule = get_family_name($hmm, $families_names);
-			create_folders("$outHMM/$specie/Infernal","Final");#Create folder specific to specie
-			classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"HMM", $molecule, $bitscores, $len_r, $names_r, $minBitscore); #Obtain true candidates
-		}
-		return;
+	$zvalue = $zvalue/2; # Because it is only one strand
+	##cmsearch_specific_sequence_parallel($CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
+	cmsearch_specific_sequence($hmm, $CM_path, $infernal_out_path, $specie, $cmsearch_path, $zvalue);
+	my @result_cmseach = check_folder_files($infernal_out_path, "tab");
+	my $molecule = get_family_name($hmm, $families_names);
+	create_folders("$outHMM/$specie/Infernal","Final");#Create folder specific to specie
+	classify_2rd_align_results($specie, $hmm, $infernal_out_path, "$infernal_out_path/$specie.$hmm.tab" ,"hmm", $molecule, $bitscores, $len_r, $names_r, $minBitscore, $maxthreshold); #Obtain true candidates
 	}
+	return;
+}
+
+sub cmsearch_specific_sequence_parallel {
+	my ($cm_path, $out_path_infernal, $genome_tag, $cmsearch_path, $Zscore) = @_;
+	existenceProgram($cmsearch_path);
+	##my $cm = $hmm;
+	##my $fasta = "$out_path_infernal/../$genome_tag.$hmm.tab.true.table.fasta";
+	##foreach my $cm_models_path_specific (@$cm_models_path){
+	##	my $model = "$cm_models_path_specific/${cm}.cm";
+	##	if (-e $model && !-z $model){
+	##my $param = "--cpu 5 -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.${cm}.tab $model $fasta";
+	##system "$cmsearch_path $param 1> /dev/null";
+	##	}
+	##}
+	#system("parallel --rpl '.. s:.*/::; s:\.[^/.]+$::; s/([A-Za-z]+\.)(.*)(\.tab\.true\.table)/$2/;' $cmsearch_path -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.{..}.tab {} 1> /dev/null ::: $out_path_infernal/../$genome_tag.*.tab.true.table.fasta");
+	# Here have to resolve the path of CMs:  <25-04-22, cavelandiah> #
+	system("parallel --rpl '.. s/(\.\.\/|\/.*\/)([A-Za-z]+\.)(.*)(\.tab\.true\.table\.fasta)/$3/;' $cmsearch_path -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.{..}.tab {} 1> /dev/null ::: $out_path_infernal/../$genome_tag.*.tab.true.table.fasta");
+	return;
 }
 
 sub cmsearch_specific_sequence {
-	my ($hmm, $cm_models_path, $out_path_infernal, $genome_tag, $cmsearch_path, $Zscore) = @_;
+	my ($hmm,$cm_models_path, $out_path_infernal, $genome_tag, $cmsearch_path, $Zscore) = @_;
 	existenceProgram($cmsearch_path);
 	my $cm = $hmm;
 	my $fasta = "$out_path_infernal/../$genome_tag.$hmm.tab.true.table.fasta";
 	foreach my $cm_models_path_specific (@$cm_models_path){
 		my $model = "$cm_models_path_specific/${cm}.cm";
 		if (-e $model && !-z $model){
-			my $param = "--cpu 5 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.${cm}.tab $model $fasta";
+			my $param = "--cpu 5 -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.${cm}.tab $model $fasta";
 			system "$cmsearch_path $param 1> /dev/null";
 		}
 	}
@@ -61,14 +102,18 @@ sub cmsearch_specific_sequence {
 sub define_final_CMs {
 	my ($outpath, $specie, $str, $len_r) = @_;
 	my @result_cmsearch;
-	if ($str =~ /^HMM$/){
+	unless (-d $outpath){
+		print_result("I did not found true candidates for the CM evaluation on HMM searches");
+		return;
+	}
+	if ($str =~ /^hmm$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
-	} elsif ($str =~ /^INFERNAL$/){
+	} elsif ($str =~ /^rfam$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
 		concatenate_true_cand($specie, $outpath,\@result_cmsearch, $str); #Concantenate all true
 		resolve_mergings($specie, $outpath, "3", $str);
 		return;
-	} elsif ($str =~ /^OTHER_CM$/){
+	} elsif ($str =~ /^mirbase$|^user$/){
 		@result_cmsearch = check_folder_files($outpath, "true\\.table");
 		concatenate_true_cand($specie, $outpath,\@result_cmsearch, $str); #Concantenate all true
 		resolve_mergings($specie, $outpath, "3", $str);
@@ -95,12 +140,34 @@ sub runNhmmer {
 	my $param;
 	foreach my $hmms_path_specific (@$path_hmm){
 		if (-e "$hmms_path_specific/$HMM.hmm"){
-			$param = "--cpu 8 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
+			$param = "--cpu 8 -E 0.015 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
 			system "$nhmmer_path $param 1> /dev/null";
 		} else {
 			next;
 		}
 	}
+	return;
+}
+
+sub runNhmmer_parallel {
+	#In: out, CM model, genome
+	my ($path_hmm, $genome, $specie, $out_folder, $nhmmer_path, $zvalue, $list_cm_file) = @_;
+	existenceProgram($nhmmer_path);
+	my $param;
+	foreach my $hmms_path_specific (@$path_hmm){
+		next if $hmms_path_specific =~ /^$|^NA$/;
+		#system("parallel $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{}\.tab\.true\.table $hmms_path_specific/{}\.hmm $genome 1> /dev/null :::: $list_cm_file");
+		system("parallel $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{/.}\.tab\.true\.table $hmms_path_specific/{/.}\.hmm $genome 1> /dev/null ::: $hmms_path_specific/*\.hmm");
+		#system("parallel --rpl '.. s/(.*)(\.hmm)/$1/;' echo '{/.}' ::: $hmms_path_specific/*.hmm")
+	}
+#	foreach my $hmms_path_specific (@$path_hmm){
+#		if (-e "$hmms_path_specific/$HMM.hmm"){
+#			$param = "--cpu 8 -E 0.015 -Z $zvalue --noali --tblout $out_folder/$specie/$specie.$HMM.tab $hmms_path_specific/$HMM.hmm $genome";
+#			system "$nhmmer_path $param 1> /dev/null";
+#		} else {
+#			next;
+#		}
+#	}
 	return;
 }
 
@@ -130,7 +197,7 @@ sub obtainTrueCandidates {
 sub update_coordinates_to_genome { #Only for HMMs and Blast strategies
 	my ($input_folder, $specie, $strategy, $len_r) = @_;
 	my ($IN, $OUT);
-	if ($strategy =~ /^HMM$/){
+	if ($strategy =~ /^hmm$/){
 		open $IN, "< $input_folder/all_RFAM_$specie.truetable" or die;
 		open $OUT, "> $input_folder/all_RFAM_$specie.truetable.clean" or die;
 	} else {
@@ -167,7 +234,7 @@ sub update_coordinates_to_genome { #Only for HMMs and Blast strategies
 		my $len_cm = $$len_r{$parts[3]};
 		# Here prints the line with the group reference of the merged query candidates
 		# on the blast block file specie_str.miRNA.tab.db.location.database: $parts[-1]
-		if ($strategy =~ /^HMM$/){
+		if ($strategy =~ /^hmm$/){
 			print $OUT "$other[0]\t$other[4]\t$other[1]\t$parts[5]\t$parts[6]\t$realStart\t$realEnd\t$parts[14]\t$parts[15]\t$parts[10]\t$parts[2]\t$len_cm\t$strategy\n";
 		} else {
 			print $OUT "$other[0]\t$other[-1]\t$other[1]\t$parts[5]\t$parts[6]\t$realStart\t$realEnd\t$parts[14]\t$parts[15]\t$parts[10]\t$parts[2]\t$len_cm\t$strategy\n";

@@ -70,7 +70,7 @@ sub recognize_families_homology {
 	my $db_models_relation = shift;
 	my $specie = $shift->tag_spe_query;
 	my $targetfolder = $shift->output_folder->stringify;
-	my $table_db_target = "$targetfolder/miRNA_prediction/Final_Candidates/all_RFAM_${specie}_Final.ncRNAs_homology.txt.db";
+	my $table_db_target = "$targetfolder/miRNA_prediction/Final_Candidates/all_RFAM_${specie}_final.ncRNAs_homology.txt.db";
 	my $target_fasta = $shift->fasta_sequences->stringify;
 	modify_table($table_db_target, $db_models_relation);
 	modify_fasta($target_fasta, $specie, $db_models_relation);
@@ -80,7 +80,7 @@ sub recognize_families_homology {
 sub identify_RFAM_families {
 	my $shift = shift;
 	my %rfam_families_list;	
-	my @files = check_folder_files($shift->fasta_sequences->stringify, "\_".$shift->tag_spe_query."\.\.\*\.fa|\_".$shift->tag_spe_query."\.\.\*"."\.fasta"); #Get all fasta files
+	my @files = check_folder_files_miranchor($shift->fasta_sequences->stringify, "\_".$shift->tag_spe_query."\.\.\*\.fa|\_".$shift->tag_spe_query."\.\.\*"."\.fasta"); #Get all fasta files
 	if (scalar @files == 0){
 		die "Does not exists fasta candidates in the declared folder\n";
 	}
@@ -116,33 +116,13 @@ sub get_genome_validation_list {
 	my $shift = shift;
 	my $genomes_folder = $shift->precalculated_path->stringify."/Genomes_miRBase";
 	my $genomes_list;
-	my $out_genomes_file = $shift->precalculated_path->stringify."/all_genomes_list.txt";
-
-	# Check the existence of Rfam genomes folder
+	# Check the existence of genomes folder
 	if (-d $genomes_folder){
 		$genomes_list = infer_list_genomes($genomes_folder);	
 	} else {
-		print_error("The genomes folder Genomes_RFAM did not exists! please copy accordingly inside the Pre-calculated folder ".$shift->precalculated_path->stringify);
+		print_error("The genomes folder Genomes_miRBase did not exists! please copy accordingly inside the Pre-calculated folder ".$shift->precalculated_path->stringify);
 	}
-
-	# Check if file exists, if not create it 
-	if (!-e $out_genomes_file || -z $out_genomes_file){ #Check if file of genomes exists
-		if ($genomes_list){
-			open (my $OUT, ">", $out_genomes_file) or die "Final list file can't opened\n";
-			foreach my $genome (@$genomes_list){
-				print $OUT $genome."\n";
-			}
-			close $OUT;
-		} else {
-			print_error("There is not inferred list of genomes, unfortunately I can't continue, look the location of the folder Genomes_RFAM");
-		}
-	}  
-	if (-e $shift->subject_genome_path->stringify && !-z $shift->subject_genome_path->stringify){
-		open (my $OUT, ">>", $out_genomes_file) or die "Final list file can't oppened\n";
-		print $OUT $shift->subject_genome_path->stringify."\n";
-		close $OUT;
-	} 
-	return $out_genomes_file;
+    return $genomes_list;
 }
 
 sub infer_list_genomes {

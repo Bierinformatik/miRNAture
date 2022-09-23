@@ -2,7 +2,7 @@ package MiRNAnchor::Tools;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(check_folder_files load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam read_data_share end_close);
+@EXPORT = qw(check_folder_files2 load_genomes_location_file create_folder create_folder_environment copy_files copy_folders change_name create_genome_list_mirfix include_subject_genome setup_all_to_run_mirfix_group write_mirfix_specific_family_individual run_mirfix_individual wait_slurm_process check_if_file_exists print_error print_result print_process filter_wrong_alignments detect_multifamily_rfam setup_all_to_run_mirfix_group_subset run_mirfix_individual_subset load_correspondence_models_rfam read_data_share end_close evaluated_family);
 
 use Moose::Role;
 use Data::Dumper;
@@ -10,8 +10,9 @@ use File::Copy;
 use File::Copy::Recursive qw(dircopy);
 use Term::ANSIColor qw(:constants); 
 use MiRNAnchor::ExternalPrograms;
+use File::Find;
 
-=head1 check_folder_files 
+=head1 check_folder_files_miranchor
 	Title: check_folder_files
 	Usage: check_folder_files(<PATH_DIR_TO_SEARCH>, PATTERN);
 	Function: Get list files that have specific pattern. 
@@ -19,7 +20,7 @@ use MiRNAnchor::ExternalPrograms;
 		menctioned pattern in its name. 
 =cut 
 
-sub check_folder_files {
+sub check_folder_files_miranchor {
 	my ($dir, $prefix) = @_;
 	opendir(DIR, $dir);
 	my @files = grep(/$prefix$/, readdir(DIR));
@@ -75,7 +76,7 @@ sub create_folder_environment {
 	my ($dir, $dir2, $dir3);
 	my $dir0 = "$working_path/$acc_RFAM";
 	create_folder($dir0);
-	if ($mode eq "RFAM"){
+	if ($mode eq "rfam"){
 		my $dir1 = "$working_path/$acc_RFAM/$class";
 		create_folder($dir1);
 		my $dir2 = "$working_path/$acc_RFAM/$class/$acc_mirbase";
@@ -235,7 +236,7 @@ sub setup_all_to_run_mirfix_group {
 		mapping_file => "$location/BaseFiles/${name}.mappingtest.txt",
 		mature_file => "$location/BaseFiles/${name}_maturetest.fa",
 		extension => "10",
-		log_level => "ERROR"
+		log_level => "DEBUG"
 	);
 	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){
@@ -253,9 +254,9 @@ sub setup_all_to_run_mirfix_group {
 
 sub write_mirfix_specific_family_individual {
 	my ($dir_now, $name, $param, $MIRFIX_path, $code, $outAddress, $tagSpe) = @_;
-	create_folder($dir_now); # Create base working dir
-	create_folder("$dir_now/$outAddress"); #Create folder specific to specie
-	create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to specie
+    ##create_folder($dir_now); # Create base working dir
+    ##create_folder("$dir_now/$outAddress"); #Create folder specific to specie
+    ##create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to specie
 	my $OUTTEMPC;
 	if (-e "$outAddress/${name}_${code}.sh"){
 		open $OUTTEMPC, "> $outAddress/${name}_${code}_${tagSpe}.sh";
@@ -287,7 +288,7 @@ sub setup_all_to_run_mirfix_group_subset {
 		mapping_file => "$location/BaseFiles/${subset}.mappingtest.txt",
 		mature_file => "$location/BaseFiles/${subset}_maturetest.fa",
 		extension => "10",
-		log_level => "ERROR"
+		log_level => "DEBUG"
 	);
 	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){
@@ -326,7 +327,7 @@ sub run_mirfix_individual {
 	my $short_spe = substr($tagSpe, 0, 3);
 	my $short = substr($name,-5);
 	$short = "${short_spe}${short}";
-	system "sbatch --job-name=${short} --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$dir_now/$outAddress/LOGs/out_${name}_${code}_${tagSpe}.out --error=$dir_now/$outAddress/LOGs/error_${name}_${code}_${tagSpe}.out $dir_now/$outAddress/${name}_${code}_${tagSpe}.sh &";	
+	system "sbatch --job-name=${short} --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$outAddress/LOGs/out_${name}_${code}_${tagSpe}.out --error=$outAddress/LOGs/error_${name}_${code}_${tagSpe}.out $outAddress/${name}_${code}_${tagSpe}.sh &";	
 	#system "qsub -S /bin/sh -cwd -l h_vmem=4G -pe smp 5 -m bes -V -q normal.q -o $dir_now/$outAddress/LOGs/out_${name}_${code}.out -e $dir_now/$outAddress/LOGs/error_${name}_${code}.out $dir_now/$outAddress/${name}_${code}.sh &";
 	sleep(2); #I detected some delay on the sge system while I summited the job and it started to be recognized as job on job table
 	return;
@@ -334,7 +335,7 @@ sub run_mirfix_individual {
 
 sub run_mirfix_individual_subset {
 	my ($name, $dir_now, $code, $outAddress, $tagSpe, $subset) = @_;	
-	system "sbatch --job-name=${subset}_${code}_${tagSpe}_$subset --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$dir_now/$outAddress/LOGs/out_${subset}_${code}_${tagSpe}_$subset.out --error=$dir_now/$outAddress/LOGs/error_${subset}_${code}_${tagSpe}_$subset.out $dir_now/$outAddress/${subset}_${code}_${tagSpe}_$subset.sh &";	
+	system "sbatch --job-name=${subset}_${code}_${tagSpe}_$subset --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$outAddress/LOGs/out_${subset}_${code}_${tagSpe}_$subset.out --error=$outAddress/LOGs/error_${subset}_${code}_${tagSpe}_$subset.out $outAddress/${subset}_${code}_${tagSpe}_$subset.sh &";	
 	#system "qsub -S /bin/sh -cwd -l h_vmem=4G -pe smp 5 -m bes -V -q normal.q -o $dir_now/$outAddress/LOGs/out_${name}_${code}.out -e $dir_now/$outAddress/LOGs/error_${name}_${code}.out $dir_now/$outAddress/${name}_${code}.sh &";
 	sleep(2); #I detected some delay on the sge system while I summited the job and it started to be recognized as job on job table
 	return;
@@ -371,6 +372,13 @@ sub check_if_file_exists {
 		$answer = 0;
 	}
 	return $answer;
+}
+
+sub print_error2 {
+	my $text = shift;
+	local $Term::ANSIColor::AUTORESET = 1;
+	print BOLD RED "[ERROR] $text\n";
+	exit(1);
 }
 
 sub print_error {
@@ -456,6 +464,22 @@ sub create_folders {
 		mkdir($dir, 0755);
 	}
 	return;
+}
+
+=head1 evaluated_family 
+    Title: evaluated_family 
+    Usage: evaluated_family(mirna_fam);
+    Function: Check if folder exists. 
+    Returns: '1' if does not exists, otherwise '0'.
+=cut 
+
+sub evaluated_family {
+	my ($fam, $outpath_eval) = @_;
+	my $dir = "$outpath_eval/$fam";
+	if (-d $dir){ #If DIR does exists
+		return 1;
+	}
+	return 0;
 }
 #sub read_data_share {
 #	my $data_location = dist_dir('Bio-miRNAture');

@@ -27,6 +27,10 @@ sub load_database_query {
 		my $str = $filesdb;
 		$str =~ s/(${specie}\_)([0-9]+)(\.miRNA\.tab\.db\.location\.database)/$2/g;
 		my $complete = "${folder}${filesdb}";
+        if(!-e $complete || -z $complete){
+           print_error("The database file $complete did not exists"); 
+           die;
+        }
 		open $IN, "< $complete" or die "The database file is corrupted\n";
 		while (<$IN>){
 			chomp;
@@ -56,25 +60,31 @@ sub resolve_mergings {
 	my $file;
 	my $tto = 0;
 	my $database_grouped_queries;
-	if ($str =~ /^HMM$/){
+	if ($str =~ /^hmm$/){
 		$file = "${dir}/all_RFAM_$specie.truetable.clean"; #Adjusted HMM coordinates
-	} elsif ($str =~ /^INFERNAL$|^OTHER_CM$/){
+	} elsif ($str =~ /^rfam$|^mirbase$|^user$/){
 		$file = "${dir}/all_RFAM_$specie.truetable"; #INFERNAL direct coordinates
-	} elsif ($str =~ /^ALL$|^Final$|^COMPLETE$/) {
+	} elsif ($str =~ /^ALL$|^COMPLETE$/) {
 		my $database_folder = "${dir}/../../";
 		my $pattern_file_db = "miRNA\\.tab\\.db\\.location\\.database"; #All database files
 		# Load all database files to get query references
 		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $specie);
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
+    } elsif ($str =~ /^final$/) {
+		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Final file concatenated
 	} elsif ($str =~ /^Merging$/){
 		$file = "${dir}/all_RFAM_${specie}_Final.all";
 	} elsif ($str =~ /^\d+$/) {
 		$file = "${dir}/all_RFAM_${specie}_${str}.truetable.clean"; #Adjusted Blast specific str coordinates
 	} else {
-		die "Str is not recognized\n";
+		print_error("$str is not recognized");
 	}
 	if (!-e $file || -z $file) {
 		print_result("No valid candidates were found by $str method");
+		if ($str eq "final") {
+			print_result("miRNAture did not detected candidates at the $str mode");
+			exit(0);
+		} 
 		return;
 	}
 	open $IN, "< $file" or die;
@@ -124,7 +134,7 @@ sub resolve_mergings {
 sub direct_flow {
 	my ($number, $values) = @_;
 	if ($number == 0){
-		error();
+		print_error("No candidates on the merging process. Critical error!");
 	} elsif ($number == 1 ){
 		foreach my $i (${$values}[0]){
 			my $fam2 = get_uniq($$i[10]);
@@ -413,7 +423,7 @@ sub fusion_all {
 			} elsif ($a == 6 || $a == 7 || $a == 9 || $a == 10 || $a == 11 || $a == 12){ #Text comparison, merge
 				push_best($cand1[0][$a], $cand2[0][$a], 0);
 			} else { #text comparison, merge by comma
-				error();
+				print_error("Comparison names are not consistent when merging");
 			}
 		}	
 	} elsif ($mode == 1){ #CM names are diferent merge with greater values and names with comma
@@ -458,6 +468,7 @@ sub push_best {
 		if ($test1 eq $test2){
 			$best = 2; #$test1;	
 		} else {
+            #TODO: Here look the way how concatenate correctly the text, because sometime is also numbers.
 			$best = 3; #"($test1,$test2)";
 		}
 	} else {
@@ -488,21 +499,36 @@ sub push_to_new {
 }
 
 sub generate_final_ncRNAs {
-	my ($blast_file, $hmm_file, $infernal_file, $other_file, $out_folder, $specie) = @_;
+	my ($blast_file, $hmm_file, $infernal_file, $other_file, $user_file, $out_folder, $specie) = @_;
 	my (@all_files, @all_filesT);
-	push @all_filesT, $blast_file;
-	push @all_filesT, $hmm_file;
-	push @all_filesT, $infernal_file;
-	push @all_filesT, $other_file;
-	foreach my $file (@all_filesT){
-		if (-z $file || !-e $file){
-			print_result("$file is empty or is missing!");
+	push @all_filesT, $blast_file; # 0
+	push @all_filesT, $hmm_file; # 1
+	push @all_filesT, $infernal_file; # 2
+	push @all_filesT, $other_file; # 3
+	push @all_filesT, $user_file; # 4
+	
+	for (my $i = 0; $i <= 4; $i++) {
+		if (-z $all_filesT[$i] || !-e $all_filesT[$i]){
+			;#print_result("$file is empty or is missing!");
 		} else {
-			push @all_files, $file;
+			my $mode_run;
+			if ($i == 0) {
+				$mode_run = "blast";
+			} elsif ($i == 1){
+				$mode_run = "hmm";
+			} elsif ($i == 2){
+				$mode_run = "rfam";
+			} elsif ($i == 3){
+				$mode_run = "mirbase";
+			} elsif ($i == 4){
+				$mode_run = "user_cm";
+			}
+			print_result("Detected homology candidates by $mode_run mode");
+			push @all_files, $all_filesT[$i];
 		}
 	}
-	concatenate_true_cand($specie, $out_folder, \@all_files, "Final"); #Concantenate all true
-	resolve_mergings($specie, $out_folder, "5", "Final");
+	concatenate_true_cand($specie, $out_folder, \@all_files, "final"); #Concantenate all true
+	resolve_mergings($specie, $out_folder, "5", "final");
 	return;
 }
 

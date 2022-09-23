@@ -30,7 +30,7 @@ my (%names_r, %names_r_inverse, %bitscores, %lengs, %families_names, %len_other)
 sub load_all_databases {
 	my ($modeT, $datapath, $user) = @_;
 	if ($modeT =~ /^Basic$/){ #Only include RFAM
-		open my $BASIC, "< $datapath/all_RFAM_scores.txt" or die "Critical error: Does not have the file $datapath/all_RFAM_scores.txt, which provides all scores to miRNAture\n";
+		open my $BASIC, "< $datapath/all_rfam_scores.txt" or die "Critical error: Does not have the file $datapath/all_rfam_scores.txt, which provides all rfam scores\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$BASIC>){
 			chomp;
@@ -44,7 +44,7 @@ sub load_all_databases {
 		close $BASIC;
 		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
 	} elsif ($modeT =~ /^Additional$/){ #Include miRBase and User
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -56,7 +56,7 @@ sub load_all_databases {
 			$families_names{$fields[0]} = $fields[-1];
 		}
 		close $OTHER;
-		open my $USER, "< $user/all_user_scores.txt" or die "Critical error: Does not have the file $user/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $USER, "< $user/all_user_scores.txt" or die "Critical error: Does not have the file $user/all_user_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$USER>){
 			chomp;
@@ -69,8 +69,8 @@ sub load_all_databases {
 		}
 		close $USER;
 		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
-	} elsif ($modeT =~ /^mirbase$/){ #Include miRBase and User
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+	} elsif ($modeT =~ /^mirbase$/){ #Include miRBase
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -83,6 +83,20 @@ sub load_all_databases {
 		}
 		close $OTHER;
 		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
+	} elsif ($modeT =~ /^user$/){ #Include miRBase
+		open my $USER, "< $user/all_user_scores.txt" or die "Critical error: Does not have the file $user/all_user_scores.txt, which provides all scores to miRNAture\n";
+		#RF00006    34.00   96  Vault   misc_RNA
+		while (<$USER>){
+			chomp;
+			my @fields = split /\s+|\t/, $_;
+			$bitscores{$fields[0]} = $fields[1];
+			$lengs{$fields[0]} = $fields[2];
+			$names_r{$fields[0]} = $fields[3];
+			$names_r_inverse{$fields[3]} = $fields[0];
+			$families_names{$fields[0]} = $fields[-1];
+		}
+		close $USER;
+		return \%bitscores, \%lengs, \%names_r, \%names_r_inverse, \%families_names;
 	} elsif ($modeT =~ /^Joined$/){ #When both modes are used other + infernal 
 		#Clear previously defined hashes
 		undef %names_r;
@@ -92,7 +106,7 @@ sub load_all_databases {
 		undef %families_names;
 		undef %len_other;
 		#
-		open my $BASIC, "< $datapath/all_RFAM_scores.txt" or die "Critical error: Does not have the file $datapath/all_RFAM_scores.txt, which provides all scores to miRNAture\n";
+		open my $BASIC, "< $datapath/all_rfam_scores.txt" or die "Critical error: Does not have the file $datapath/all_rfam_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$BASIC>){
 			chomp;
@@ -104,7 +118,7 @@ sub load_all_databases {
 			$families_names{$fields[0]} = $fields[-1];
 		}
 		close $BASIC;
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -138,7 +152,7 @@ sub load_all_databases {
 		undef %families_names;
 		undef %len_other;
 		#
-		open my $BASIC, "< $datapath/all_RFAM_scores.txt" or die "Critical error: Does not have the file $datapath/all_RFAM_scores.txt, which provides all scores to miRNAture\n";
+		open my $BASIC, "< $datapath/all_rfam_scores.txt" or die "Critical error: Does not have the file $datapath/all_rfam_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$BASIC>){
 			chomp;
@@ -150,7 +164,7 @@ sub load_all_databases {
 			$families_names{$fields[0]} = $fields[-1];
 		}
 		close $BASIC;
-		open my $OTHER, "< $datapath/all_other_scores.txt" or die "Critical error: Does not have the file $datapath/all_other_scores.txt, which provides all scores to miRNAture\n";
+		open my $OTHER, "< $datapath/all_mirbase_scores.txt" or die "Critical error: Does not have the file $datapath/all_mirbase_scores.txt, which provides all scores to miRNAture\n";
 		#RF00006    34.00   96  Vault   misc_RNA
 		while (<$OTHER>){
 			chomp;
@@ -171,12 +185,12 @@ sub load_all_databases {
 sub concatenate_true_cand {
 	my ($specie, $dir, $files_true, $str) = @_;
 	my $output_file;
-	if ($str !~ /^HMM$|^INFERNAL$|^Final$|^OTHER_CM$/){ #Str is not Infernal or HMM, only blast
+	if ($str !~ /^hmm$|^rfam$|^final$|^mirbase$|^user$/){ #Str is not rfam or hmm, only blast
 		foreach my $input_file (@$files_true){
 			system "cat $dir/$input_file >> $dir/all_RFAM_${specie}_${str}.truetable.temp";
 		}
 		$output_file = "$dir/all_RFAM_${specie}_${str}.truetable.temp";
-	} elsif ($str =~ /^Final$/){
+	} elsif ($str =~ /^final$/){
 		foreach my $input_file (@$files_true){
 			system "cat $input_file >> $dir/all_RFAM_${specie}_${str}.truetable.temp";
 		}
@@ -197,13 +211,12 @@ sub concatenate_true_cand {
 	while (<$GENERATED>){
 		chomp;
 		# JH126831.1.-.75502.75785.41	-	mir-10	RF00104	cm	1	74	159	220	+	no	1	0.26	0.2	15.5	0.0021	!	-	74
-		if ($str =~ /^ALL$|^Final$/){
-			print $OUT "$_\n";
-		} else { #Here Blast, Infernal and HMM modes
-			my @split = split /\s+|\t/, $_;
-			my @other = split /\./, $split[0];
-			print $OUT "$_\n";
-		}
+		#if ($str =~ /^ALL$|^final$/){
+		print $OUT "$_\n";
+		#} else { #Here Blast, Infernal and HMM modes
+		#	my @split = split /\s+|\t/, $_;
+		#	my @other = split /\./, $split[0];
+		#	print $OUT "$_\n";
 	}
 	close $OUT;
 	return;
@@ -261,7 +274,13 @@ sub cleancmsearch {
 				$max = $$lengs{$valuesT[3]};
 			}
 		} elsif ($mode == 2){
-			$bitscoreC = 1; #
+			# Other_CMs
+			if ($$bitscores{$valuesT[3]} == 0){ #CMs did not reported bitscore threshold
+				$bitscoreC = $defined_nGA;
+			} else {
+				$bitscoreC = $valuesT[14]/$$bitscores{$valuesT[3]}; #nGA
+			}
+			#$bitscoreC = 1; #
 			if (exists $$lengs{$valuesT[2]}){
 				$max = $$lengs{$valuesT[2]};
 			} elsif (exists $$lengs{$valuesT[3]}){
@@ -276,6 +295,7 @@ sub cleancmsearch {
 			#if ($evalue > 100){
 			print $OUT2 "$ln\t$max\n";
 		} else {
+			# $defined_nGA is the proportion of nBit that discriminate btw true|false:  <26-11-21, cavelandiah> #
 			if ($bitscoreC < $defined_nGA || $bitsc <= $minBitscore){ #Defined log2(N) <= x & nx >= nGA 
 				print $OUT2 "$ln\t$max\n";
 			} else {
@@ -299,8 +319,9 @@ sub get_family_name {
 	if (exists $$families_names{$acc}){
 		$name = $$families_names{$acc};
 	} else {
-		$name = "lncRNA";
-		print_error("Your $acc has not description of the ncRNA family!");
+		#TODO: Future references to search other ncRNAs
+		#$name = "NA";
+		print_error("Your $acc has not description field of the ncRNA family!");
 	}
 	return $name;
 }
@@ -319,14 +340,17 @@ sub index_new_old_contig_names {
 
 sub format_final_table {
 	my ($input_folder, $specie, $families_names, $names_r_inverse, $database_names_contigs) = @_;
-	my $file_in = "$input_folder/all_RFAM_${specie}_Final.truetable.joined.table"; 
-	my $file_out = "$input_folder/all_RFAM_${specie}_Final.ncRNAs_homology.txt.temp";
+	my $file_in = "$input_folder/all_RFAM_${specie}_final.truetable.joined.table"; 
+	my $file_out = "$input_folder/all_RFAM_${specie}_final.ncRNAs_homology.txt.temp";
 	my $index_names = index_new_old_contig_names($database_names_contigs); # tagnameNumb => contigName
+	if (-z $file_in){
+		print_result("No candidates were found in the $specie specie\n");
+		exit(0);
+	}
 	open my $INF, "< $file_in" or die "The file $file_in not exists\n";  #all_RFAM_Dive_Final.truetable.joined.table
 	open my $OUTF, "> $file_out" or die;  
 	while (<$INF>){
 		chomp;
-		#print "$_\n";
 		my @split = split /\s+|\t/, $_;
 		my ($ncRNA_name, $family_ncRNA);
 		if ($split[10] !~ /,/){
@@ -374,10 +398,6 @@ sub perform_detection_repeated_loci {
 	foreach my $mirna_acc (sort keys %database){
 		my $candidates = $database{$mirna_acc};
 		my $number = scalar @$candidates;
-		if ($mode =~ /relax/){ #If relax: take all repeats and selects all candidates
-			$selection_number = $number;
-			$threshold_repeat = 0;
-		}
 		if ($number >= $threshold_repeat){ #Select those families that reported high number loci
 			my @sorted_bit = sort { $a->[7] <=> $b->[7] } @$candidates; #Organize by bitscore
 			my $selected = select_best_score_candidates(\@sorted_bit, $selection_number); #Select the top X candidates
@@ -456,9 +476,8 @@ sub get_specie_name {
 	my ($spe, $str) = @_;
 	my $specie_out;
 	if ($spe =~ /^\w+/ && $str =~ /^0$/){
-		$specie_out = "Infernal";
+		$specie_out = "CM";
 	} elsif ($spe =~ /^\w{2,4}\d+/ && $str =~ /\d+/ && $str !~ /^0$/){
-		#} elsif ($spe =~ /^anca|^brfl|^cael|^ciin|^cisa|^dare|^lach|^oidi|^pema|^sce|^xetr/){
 		$specie_out = $spe;
 		$specie_out =~ s/^(\w{2,4})(\d+|\_.*)/$1/g;
 		$specie_out = uc($specie_out);
@@ -492,11 +511,11 @@ sub get_str_name {
 	my $query_2 = shift;
 	my $q_out;
 	if ($query_2 =~ /^0$|^0D$/){
-		$q_out = "Infernal";
-	} elsif ($query_2 =~ /^HMM/){
-		$q_out = "HMM";
+		$q_out = "cmseach";
+	} elsif ($query_2 =~ /^hmm/){
+		$q_out = "hmm";
 	} else { #numbers from 1 to 10
-		$q_out = "Blast";
+		$q_out = "blast";
 	}
 	return $q_out;
 }

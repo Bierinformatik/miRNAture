@@ -1,0 +1,88 @@
+<tool id="mirnature" name="miRNAture" version="1.01+galaxy0" python_template_version="3.5" profile="21.05">
+    <description>Computational detection of microRNA candidates</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="requirements" />
+    <expand macro="version_command" />
+    <command detect_errors="exit_code"><![CDATA[
+        #set conda="mamba"
+        #import re
+        miRNAture -stage homology 
+        -sublist $subset_models  
+        -dataF 'Precalculated-Data-tutorial'
+        -specie_genome $specie_genome 
+        -specie_name $specie_name
+        -specie_tag $specie_tag 
+        -workdir 'output'
+        -mode "${",".join(map(str, $homology_mode))}"
+        -pe '0'
+        #if re.match(r'blast',str($homology_mode))
+            -strategy "${",".join(map(str, $blast_strategy))}" 
+        #end if
+        -rep 'relax,150,100' > 'output_tool.txt'
+        ]]></command>
+    <inputs>
+        <param format="fasta" multiple="true" name="specie_genome" type="data"
+            label="Input genome or sequence"
+            help="Input sequence to be processed by miRNAture" />
+        <!--TEXT-->
+        <param name="specie_name" type="text" label="Scientific specie name as: Genera_specie" />
+        <param name="specie_tag" type="text" label="Species tag to identify through experiment" />
+        <!--Binary-->
+        <conditional name="activate_subset">
+            <!--Binary-->
+            <param name="subset_models_des" type="boolean" label="Subset default miRNA families"
+                truevalue="1" falsevalue="0" help="Make a selection of specific miRNA families to be search" />
+            <when value="1">
+                <param format="txt" multiple="true" name="subset_models" type="data"
+                    label="List of miRNA models to be searched"
+                    help="Input sequence to be processed by miRNAture" optional="true"/>
+            </when>
+        </conditional>
+        <!--<param name="parallel" type="boolean" label="Run parallel"
+        truevalue="1" falsevalue="0" help="Use parallel modules" />-->
+            
+        <!--Static list-->
+        <param name="stage" type="select" value="value2" label="Stages to run">
+            <option value="value1">complete</option>
+            <option value="value2">homology</option>
+            <option value="value3">validation</option>
+            <option value="value4">evaluation</option>
+            <option value="value5">summarise</option>
+        </param>
+        <!--Check Boxes-->
+        <param name="homology_mode" type="select" display="checkboxes" multiple="true" label="Homology mode">
+            <option value="ex1">blast</option>
+            <option value="ex2">rfam</option>
+            <option value="ex3">mirbase</option>
+            <option value="ex4">hmm</option>
+            <option value="ex5">final</option>
+        </param>
+        <!--Integer/float list-->
+        <param name="blast_strategy" type="select" value="value8" label="Blast strategy">
+            <option value="value1">1</option>
+            <option value="value2">2</option>
+            <option value="value3">3</option>
+            <option value="value4">4</option>
+            <option value="value5">5</option>
+            <option value="value6">6</option>
+            <option value="value7">7</option>
+            <option value="value8">8</option>
+            <option value="value9">9</option>
+        </param>
+    </inputs>
+
+    <outputs>
+        <!--Maybe create a final html file pointing all the output files-->
+        <!--In that case look for the output files on the out folder-->
+        <collection type="list" name="report" format="yaml">
+            <discover_datasets pattern="(?P&lt;designation&gt;.*)" directory="output" visible="true" />
+        </collection>
+    </outputs>
+    <help><![CDATA[
+        Usage:
+        ./miRNAture [-options]
+        ]]></help>
+    <expand macro="citations" />
+</tool>

@@ -1,5 +1,37 @@
 Revision history for Bio-miRNAture
 
+1.01    Apr 12 2022.
+        # Updates
+        - Implemented subseting HMMs and CMs as symlinks to be run in parallel.
+        - Correction warning messages when miRNAture did not found candidates.
+        - All modes run in parallel using:
+          O. Tange (2018): GNU Parallel 2018, Mar 2018, ISBN 9781387509881, DOI https://doi.org/10.5281/zenodo.1146014
+        - hmm searches now running by default rfam, mirbase (and user) models.
+        - Re-organized homology running modes from:
+            Blast,HMM,Infernal,OTHER_CM,Final
+          to
+            blast,hmm,rfam,mirbase,user,final
+        - Transverse search added to find specific files over folders. 
+        - Included flag '-nbitscore_cutoff' which control the normalized bitscore threshold (nBit).
+          nBit = Bitscore / Defined-gathering-score.
+        - Included 'no_homology' search mode to perform validations and subsequent analysis.
+        - Support of multiple runs at the same time without I/O temporal files collision.
+        - Automatic creation of output folder declared on the -w flag.
+        - Inclusion of a global alignment (cmsearch -g) to validate structural curated sequences in
+          comparison to reference covariance model (from structural evaluation if available or 
+          used on the homology stage).
+        - Extension of homology fasta sequences before structural validation with MIRfix.
+        - Search on genome intervals and not in the complete genome. MIRfix is faster looking for candidates and
+          re-mapping correct candidates is done on previous calculated genome regions.
+        - Added -E 0.015 to get valid candidates. Since the pipeline is not dealing with candidates that reported
+          greater E-values.
+        - Broken evaluation could be restarted, miRNAture evaluates folder structure and structurally evaluate
+          candidates.
+        ### Corrected bugs
+        - Temporal file folders moved to TemporalFiles/ folder.
+        - Corrected cleaning of temporal files.
+        - Remove of genome.txt file and related functions.
+
 1.00    Feb 1 2021.
         First version, released on an unsuspecting world.
 

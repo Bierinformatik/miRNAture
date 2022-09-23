@@ -100,13 +100,15 @@ has 'mature_description' => (
 
 sub process_fasta_sequences {
 	my $shift = shift;
-	my $fasta_query = (check_folder_files($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.*\.fasta"))[0];
+    #my $fasta_query = (check_folder_files($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.*\.fasta"))[0];
+	my $fasta_query = (check_folder_files_miranchor($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.fasta"))[0];
 	my $fasta_candidates = read_fasta_results($shift->source_miRNAs_fasta."/".$fasta_query);
 	$shift->fasta_results($fasta_candidates);
 	my $accepted = $shift->accepted_file->stringify;
 	my $discarded = $shift->discarded_file->stringify;
 	open (my $OUT1, ">", $accepted);
 	open (my $OUT2, ">", $discarded);
+    # Here is the final table generated in homology stage:  <30-08-21, cavelandiah> #
 	my $database_codes = load_database_miRNAs($shift->final_miRNA_database->stringify);
 	$shift->db_codes($database_codes);
 	return;
@@ -161,10 +163,10 @@ sub check_candidate {
 
 sub validate_secondary_structure_alignment {
 	my ($sto, $current_dir, $positionsBest) = @_;
-	my $result = system("evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
+	my $result = system("/homes/biertank/cristian/Projects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
 	my $evaluation_result;
 	if ($result == 0){ #Success!
-		$evaluation_result = `evaluate_conserved_str.py $sto $positionsBest 2>&1`;
+		$evaluation_result = `/homes/biertank/cristian/Projects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>&1`;
 		chomp $evaluation_result;
 	} else { #Failed to read the file, didn't generated
 		$evaluation_result = "NA";
@@ -273,11 +275,16 @@ sub infer_length_query {
 sub update_coordinates {
 	my ($shift, $fasta_query, $matureInfoLine, $old_info_miRNA, $chrName) = @_;
 	#my $genome = "$splitGenome/$chrName.fa"; #Pointer to the splitted Chromosome
-	my $genome = $shift->subject_genome_path_original->stringify;
-	check_blast_database($genome);
+	# Here, reference the homology sub-genome:  <30-08-21, cavelandiah> #
+    my $genome = $shift->subject_genome_path->stringify;
+    check_blast_database($genome);
+    # Here is the homology reference:  <30-08-21, cavelandiah> #
+    # H1630334830 scaffold_8  -   MIPF0000493 1   81  551771  551885  41.5    9.4e-06 no  MIPF0000493 81  0   Infernal    Infernal    MIPF0000493 miRNA   MIPF0000493
 	my $sequence_code = (split /\s+|\t/, $old_info_miRNA)[0];
-	my ($selected_fasta_query, $subject_len) = infer_length_query($fasta_query, $sequence_code); # Selects only the subject sequence and infer length
-	my ($chr, $start, $end, $strand, $queryLen) = run_blast($genome, $selected_fasta_query, $subject_len, $chrName);
+    # Here is the sequence to search and its length:  <30-08-21, cavelandiah> #
+	my ($selected_fasta_query, $subject_len) = infer_length_query($fasta_query, $sequence_code); 
+    # Here chr name is the sequence_code on the subset genome:  <30-08-21, cavelandiah> #
+    my ($chr, $start, $end, $strand, $queryLen) = run_blast($genome, $selected_fasta_query, $subject_len, $sequence_code);
 	if ($strand =~ /^-1$/){
 		$strand = "-";
 	} else {
@@ -306,42 +313,59 @@ sub change_to_dna {
 
 sub run_blast {
 	my ($genome, $query, $query_len, $chrName) = @_;
-	#my $query2 = change_to_dna($query);
 	my @params = (  -program => 'blastn',
 		-outfile => "$query.out",
 		-database => $genome,
-		-F => "F", #Disable low complexity
+		-F => "F", #Not disable low complexity
 		-W => 30);
 	my $factory =  Bio::Tools::Run::StandAloneBlast->new(@params);
 	my $blast_report = $factory->blastall($query);
 	my $output = Bio::SearchIO->new(-format => "blast", 
 		-file => "$query.out",
 		-best_hit_only => 1,
-		-hit_filter => sub { my $hit = shift;
-			$hit->name eq "$chrName"; 
-		}
+		-hit_filter => sub { 
+            my $hit = shift;
+            $hit->name =~ /^$chrName/;
+        }
 	);
-	my ($chr, $start, $end, $strand, $queryLen, $identity) = get_blast_information($output, $query_len, $chrName);
-	system "rm $query"; #Delete temp fasta
-	system "rm $query.out"; #Delete BLAST output 
+	my ($chr, $start, $end, $strand, $queryLen, $identity, $id_scaffold) = get_blast_information($output, $query_len, $chrName);
+    # Based on blast results update coordinates respect to complete genome:  <30-08-21, cavelandiah> #
+    ($chr, $start, $end) = update_data_sub_region($id_scaffold, $start, $end);
+    system "rm $query"; #Delete temp fasta
+    system "rm $query.out"; #Delete BLAST output 
 	return ($chr, $start, $end, $strand, $queryLen);
+}
+
+sub update_data_sub_region {
+    # Update blast info with the data from the subregion:  <30-08-21, cavelandiah> #
+    #>H1630337473 Oikopleura_dioicaNW MIPF0000493 scaffold_1#2804270#2804881
+    my ($id_scaffold, $start, $end) =  @_;
+    my @all_scaff = split /\s+|\t/, $id_scaffold;
+    my @data = split /\#/, $all_scaff[-1];
+    my $realChr = $data[0];
+    my $nstart = $data[1] + $start;
+    my $nend = $data[1] + $end;
+    return ($realChr, $nstart, $nend);
 }
 
 sub get_blast_information {
 	my ($output, $query_len, $chrName) = @_;
-	my ($chr, $start, $end, $strand, $queryLen, $identity);
+	my ($chr, $start, $end, $strand, $queryLen, $identity, $id_scaff);
 	my $indicator = 0;
 	while (my $result = $output->next_result){
 		if ($indicator == 0){
 			while (my $hit = $result->next_hit){
 				while (my $hsp = $hit->next_hsp){
 					if ($indicator == 0){
+                        # H1630333994 Oikopleura dioicaNW MIPF0000493 stem-loop
 						$chr = $hit->name;
 						$start = $hsp->start('hit');
 						$end = $hsp->end('hit');
 						$strand = $hsp->strand('hit');
 						$queryLen = $hsp->length('query');
 						$identity = $hsp->percent_identity;
+                        # Oikopleura_dioicaNW MIPF0000493 scaffold_364#3319#3933
+                        $id_scaff = $hit->description;
 						my $nstrand;
 						if ($strand == 1){
 							$nstrand = "+";
@@ -365,7 +389,8 @@ sub get_blast_information {
 	$strand = test_no_empty_variables($strand);
 	$queryLen = test_no_empty_variables($queryLen);
 	$identity = test_no_empty_variables($identity);
-	return ($chr, $start, $end, $strand, $queryLen, $identity);
+    $id_scaff = test_no_empty_variables($id_scaff);
+	return ($chr, $start, $end, $strand, $queryLen, $identity, $id_scaff);
 }
 
 sub test_no_empty_variables {

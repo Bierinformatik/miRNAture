@@ -14,6 +14,7 @@ use MiRNAnchor::Tools;
 use MiRNAnchor::Validate;
 use MiRNAnchor::Check;
 use MiRNAnchor::Classify;
+use MiRNAture::ToolBox;
 
 ### Input data
 my $miRNA_fasta_path = ""; #Path of fasta sequences from candidates grouped by RFAM family
@@ -60,19 +61,31 @@ my $start_config = MiRNAnchor::Main->new (
     tag_spe_query => $tag_specie
 );
 
+my $configFile = read_config_file("$working_path/miRNAture_configuration_${tag_specie}.yaml"); #Read old config file
 my $db_models_relation = load_correspondence_models_rfam("$RFAM_mirbase_source/../", $user_data); #Load databases correspondence to do validation.
 $start_config->check_existence_folder_output;
-my $genomes_file = $start_config->get_genome_validation_list;
+my $genome_location = $start_config->get_genome_validation_list;
 $start_config->recognize_families_homology($db_models_relation); #Include in final files the annotation family
 my $RFAM_families = $start_config->identify_RFAM_families;  #Identify families already with the corresponding validation family
-my $outTempAddress = ".mirfixTempIndividual";
-my $genome_location = load_genomes_location_file($genomes_file); #Load database genomes
+my $outTempAddress = "$working_path/TemporalFiles/.mirfixTempIndividual";
+if (-e $outTempAddress){
+    ;
+} else {
+    create_folder($outTempAddress);
+    create_folder("$outTempAddress/LOGs");
+}
 
 my %all = ();
 my @all_results;
 
 # Iterate Rfam Model
 foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only to the targeted ones
+    ### Evaluate if the family was previously evaluated, in cases of broken runs.
+    my $evaluated = evaluated_family($rfam_defined_models, $working_path."/miRNA_validation/".$tag_specie);
+    if ($evaluated == 1){ # Family has been evaluated
+        print_result("The family $rfam_defined_models has been previously evaluated");
+        next;
+    }
     my $eval = detect_multifamily_rfam($rfam_defined_models);
     my $rfam_precalculated_specific = $start_config->precalculated_path."/".$rfam_defined_models; #Data from working RFAM family.
     if (!-d $rfam_precalculated_specific){
@@ -95,7 +108,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
                 my $subset = "${rfam_defined_models}_${num}"; #Set Name
                 create_environment_detailed_subset($start_config->output_folder, $rfam_defined_models, $code_header, $address, $subset, $tag_specie);
                 copy_rfam_files_group_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $subset, $tag_specie);
-                create_genome_file_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genomes_file, $subset, $tag_specie);
+                create_genome_file_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $subset, $tag_specie);
                 process_query_fasta_group_subset($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $subset, $tag_specie); #Include subject fasta sequences
                 $specific_query_path = $start_config->output_folder."/$address/$tag_specie/$rfam_defined_models/$subset/$code_header";
                 include_subject_genome($specific_query_path, "BaseFiles", $subset, $genome_location, $start_config->subject_genome_path);
@@ -109,7 +122,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
         } else {
             create_environment_detailed($start_config->output_folder, $rfam_defined_models, $code_header, $address, $tag_specie);
             copy_rfam_files_group($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $tag_specie);
-            create_genome_file($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genomes_file, $tag_specie);
+            create_genome_file($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $tag_specie);
             process_query_fasta_group($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $tag_specie); #Include subject fasta sequences
             $specific_query_path = $start_config->output_folder."/$address/$tag_specie/$rfam_defined_models/$code_header";
             include_subject_genome($specific_query_path, "BaseFiles",$rfam_defined_models, $genome_location, $start_config->subject_genome_path);
@@ -189,6 +202,7 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
         accepted_file => $working_path."/".$address."/".$start_config->tag_spe_query."/".$rfam_defined_models."/".$rfam_defined_models.".accepted",
         mature_description => $working_path."/".$address."/".$start_config->tag_spe_query."/".$rfam_defined_models."/".$rfam_defined_models.".out",
     );
+    # Generate reference table from homology to re-map corrected miRNA:  <30-08-21, cavelandiah> #
     $family_check->process_fasta_sequences; #Start all required files and variables
     $family_check->check_candidate; #Based on produced files, run the steps of evaluation for each ACC number from CM models
     $family_check->concatenate_results("$working_path/$address", $start_config->tag_spe_query); #all_accepted/all_discarded
@@ -202,6 +216,7 @@ my $classification = MiRNAnchor::Classify->new(
     discarted_mirnas => $working_path."/".$address."/all_discarded_".$tag_specie."_miRNAs.txt", # Concatenated pre-discarded
     mature_description => $working_path."/".$address."/all_mature_".$tag_specie."_miRNAs_description.txt", # Concatenated mature info
     precalculated_path => $RFAM_mirbase_source,
+    genome_specie => $original_genome,
     tag_spe_query => $tag_specie,
     accepted_file => $working_path."/".$address."/accepted_".$tag_specie.".miRNAs.txt", #Out accepted file
     accepted_noStr_file => $working_path."/".$address."/accepted_".$tag_specie."_noalign.txt", #Out accepted file with cand that destroyed alignment
@@ -215,8 +230,16 @@ my $classification = MiRNAnchor::Classify->new(
     gff_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.gff3",
     bed_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.bed",
 );
-
-$classification->process_all_candidates; #Generate evaluation at STO align level
+### Build database CMs names
+## CM RFAM:
+my $cm_rfam = $configFile->[3]->{"Default_folders"}{"CM_folder"};
+# Other CM:
+my $cm_other = $configFile->[3]->{"Default_folders"}{"Other_CM_folder"};
+# CM User
+my $cm_user = $configFile->[3]->{"Default_folders"}{"User_CM_folder"};
+my $list_cms = concatenate_cms_paths($cm_rfam, $cm_user, $cm_other);
+my $name_cm_database = infer_name_database_cm($list_cms); 
+$classification->process_all_candidates($configFile, $name_cm_database); #Generate evaluation at STO align level
 $classification->generate_output_files; ## Finally create GFF3/BED files
 $classification->organise_mess("$working_path/$address");
 

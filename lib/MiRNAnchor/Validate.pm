@@ -14,7 +14,8 @@ with 'MiRNAnchor::Tools';
 
 sub process_query_fasta_specific {
 	my ($fasta_query_path, $family, $working_path, $tag) = @_;
-	my $fasta_query = (check_folder_files($fasta_query_path, ".*\_$tag.$family\.*\.fasta"))[0]; 	
+    #my $fasta_query = (check_folder_files($fasta_query_path, ".*\_$tag.$family\.*\.fasta"))[0]; 	
+    my $fasta_query = (check_folder_files_miranchor($fasta_query_path, ".*\_$tag\.$family\.fasta"))[0]; 	
 	#>aeae-RF00103-856 B1566465451 Aedes aegypti RF00103 stem-loop
 	if (!-e $fasta_query_path."/".$fasta_query && -z $fasta_query_path."/".$fasta_query) {
 		print_error("The input fasta file ".$fasta_query_path."/".$fasta_query." is empty or not exists!");
@@ -153,17 +154,11 @@ sub create_genome_file {
 	my $new_path = "$working_path/$address/$tag/$family/$code";
 	open (my $OUT, ">", "$new_path/BaseFiles/${family}_genomes_list.txt") or die "Can't create mapping file\n";
 	open (my $FASTA, "<", "$old_path/Output/$family.out/${family}-Final.fasta"); #Final Fasta file
-	my @genome;
-	open (my $GENOME, "<", $genome_location) or die "Genome file couldn't open\n";
-	while(<$GENOME>){
-		chomp;
-		push @genome, $_;
-	}
-	close $GENOME;
-	while (<$FASTA>){
+    while (<$FASTA>){
 		if ($_ =~ /^>/){
 			my $specie_code = (split /\s+|\t/, $_)[2];
-			create_genome_list_mirfix($new_path, "BaseFiles", $family, \@genome, $specie_code);		
+            #create_genome_list_mirfix($new_path, "BaseFiles", $family, \@genome, $specie_code);		
+			create_genome_list_mirfix($new_path, "BaseFiles", $family, $genome_location, $specie_code);		
 		} else {
 			next;
 		}
@@ -181,17 +176,10 @@ sub create_genome_file_subset {
 	$num =~ s/(RF.*)([0-9]+)/$2/g;
 	open (my $OUT, ">", "$new_path/BaseFiles/${family2}_genomes_list.txt") or die "Can't create mapping file\n";
 	open (my $FASTA, "<", "$old_path/Output_${num}/$family.out/${family}-Final.fasta") or die; #Final Fasta file
-	my @genome;
-	open (my $GENOME, "<", $genome_location) or die "Genome file couldn't open\n";
-	while(<$GENOME>){
-		chomp;
-		push @genome, $_;
-	}
-	close $GENOME;
-	while (<$FASTA>){
+    while (<$FASTA>){
 		if ($_ =~ /^>/){
 			my $specie_code = (split /\s+|\t/, $_)[2];
-			create_genome_list_mirfix($new_path, "BaseFiles", $family2, \@genome, $specie_code);		
+			create_genome_list_mirfix($new_path, "BaseFiles", $family2, $genome_location, $specie_code);		
 		} else {
 			next;
 		}

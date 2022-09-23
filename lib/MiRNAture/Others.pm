@@ -9,11 +9,11 @@ with 'MiRNAture::ToolBox';
 with 'MiRNAture::Evaluate';
 with 'MiRNAture::Cleaner';
 
-has 'cm_model' => (
-	is => 'ro',
-	isa => 'Str',
-	required => 1,
-);
+##has 'cm_model' => (
+##	is => 'ro',
+##	isa => 'Str',
+##	required => 1,
+##);
 
 has 'genome_subject' => (
 	is => 'ro',
@@ -79,7 +79,15 @@ sub search_homology_other {
 	my $shift = shift;
 	my $zscore = shift;
 	my $minBitscore = shift;
-	searchOthershomology($shift, $zscore, $minBitscore);
+	my $maxthreshold = shift;
+	searchOthershomology($shift, $zscore, $minBitscore, $maxthreshold);
+	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie, $shift->subject_specie."\.tab");
+	for (my $i = 0; $i <= $#result_files; $i++) {
+		my $cm_model = $result_files[$i];
+		$cm_model =~ s/(MIPF[0-9]+|.*)(\_.*)(\.tab)/$1/g;
+		my $molecule = "NA";
+		classify_2rd_align_results($shift->subject_specie, $cm_model, $shift->output_folder."/".$shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/".$cm_model."\_".$shift->subject_specie."\.tab", "mirbase", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore, $maxthreshold);
+	}
 	return;
 }	
 

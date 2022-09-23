@@ -8,7 +8,7 @@ use Getopt::Long qw(HelpMessage GetOptionsFromArray);
 use Pod::Usage;
 use YAML::Tiny;
 use Term::ANSIColor;
-use Cwd qw(getcwd);
+use Cwd qw(getcwd abs_path);
 
 use lib "lib";
 use Mir::ConfigurationFile;
@@ -28,12 +28,15 @@ my $name_specie = ""; #Scientific name of specie
 my $specie_tag = ""; #Label of specie
 my $subset_models; #Subset of models provided by the user
 my $rep_cutoff = ""; # Homology cutoff to speed-up the searches 
+my $maxthresholdBit = ""; # nBitscore threshold to clean data: 0-1
 my $parallel_run = 0;
+my $parallel_linux = 0;
 my $current_path = getcwd;
 my $stagesRun = "";
 my $mirfix_path = "";
 my $path_blast_queries = "";
 my $user_folder = "";
+my $debug = 0;
 my $help;
 my $man;
 my %opts;
@@ -51,10 +54,13 @@ GetOptions (
 	'blastQueriesFolder|blstq=s' => \$path_blast_queries,
 	'stage|stg=s' => \$stagesRun,
 	'repetition_cutoff|rep=s' => \$rep_cutoff,
+    'nbitscore_cutoff|nb_cut=f' => \$maxthresholdBit,
 	'user_models|usrM=s' => \$user_folder,
 	'help|h' => \$help,
 	 man => \$man,
-	'parallel_slurm|pe=i' => \$parallel_run,
+	'parallel_slurm|ps=i' => \$parallel_run,
+	'parallel_linux|pe=i' => \$parallel_linux,
+	'debug_mode|dbug=i' => \$debug,
 ) or pod2usage (
 	-verbose => 99,
 	-sections => "NAME"
@@ -64,6 +70,20 @@ pod2usage ( -verbose => 2 ) if $man;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
+
+# Relative paths correction for input paths
+if ($subset_models && $subset_models =~ /\/\.\.\/|^\.\//){
+	$subset_models = abs_path($subset_models);
+}
+if ($path_blast_queries =~ /\/\.\.\//){
+	$path_blast_queries = abs_path($path_blast_queries);
+}
+if ($work_folder =~ /\/\.\.\//){
+	$work_folder = abs_path($work_folder);
+}
+if ($specie_genome_path =~ /\/\.\.\//){
+	$specie_genome_path = abs_path($specie_genome_path);
+}
 
 my $config_file = Mir::ConfigurationFile->new (
 	stage => $stagesRun,
@@ -77,13 +97,20 @@ my $config_file = Mir::ConfigurationFile->new (
 	mirfix_path => $mirfix_path,
 	mode => $mode,
 	repetition_rules => $rep_cutoff,
+    nbitscore_cut => $maxthresholdBit,
 	blast_strategy => \@strategy,
 	blast_queries_path => $path_blast_queries,
 	user_folder => $user_folder,
-	parallel => $parallel_run
+	parallel_linux => $parallel_linux,
+	parallel => $parallel_run,
+	debug_mode => $debug
 );
 $config_file->start;
 $config_file->generate_copy_genome;
+
+# Build defaul models lists based on selected modes:  <22-04-22, cavelandiah> #
+my $default_models = $config_file->models_list_hash();
+$config_file->concatenate_models($default_models);
 
 my $variables;
 if ($config_file->stage =~ /^summarise$/){
@@ -107,10 +134,10 @@ if ($config_file->stage =~ /^homology$/){
 		$config_file->config_file, $variables
 	);
 	$homology_searches->generate_file_mirnature(
-		$variables, $config_file->config_file
+		$variables, $config_file->config_file, $debug 
 	);
 	$homology_searches->run_miRNAture($variables);
-	$homology_searches->clean_cache($variables, "Homology");
+	$homology_searches->clean_cache($variables, "homology");
 } elsif ($config_file->stage =~ /^validation$/){
 	my $validation_mirnas = Mir::miRNAnchor->new(
 		all_parameters => $variables
@@ -118,11 +145,29 @@ if ($config_file->stage =~ /^homology$/){
 	$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
 	$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
 	$validation_mirnas->run_miRNAnchor($variables);
-	$homology_searches->clean_cache($variables, "Validation");
+	$homology_searches->clean_cache($variables, "validation");
 } elsif ($config_file->stage =~ /^complete$/){
 	$homology_searches->create_folder_environment($config_file->config_file, $variables);
-	$homology_searches->generate_file_mirnature($variables, $config_file->config_file);
+	$homology_searches->generate_file_mirnature($variables, $config_file->config_file, $debug);
 	$homology_searches->run_miRNAture($variables);
+	my $validation_mirnas = Mir::miRNAnchor->new(
+		all_parameters => $variables
+	);
+	$validation_mirnas->include_folder_environment($config_file->config_file, $variables);
+	$validation_mirnas->generate_file_mirnanchor($variables, $config_file->config_file);
+	$validation_mirnas->run_miRNAnchor($variables);
+	my $evaluation_results = Mir::Eval->new(
+		all_parameters => $variables
+	);
+	$evaluation_results->create_folder_environment($config_file->config_file, $variables);
+	$evaluation_results->test_input_files($config_file->config_file, $variables);
+	$evaluation_results->perform_evaluation($variables); #Add MFE & final fasta
+	my $summary_results = Mir::Summarise->new(
+		all_parameters => $variables
+	);
+	$summary_results->generate_summary_file($config_file->config_file, $variables);
+	$homology_searches->clean_cache($variables, "all");
+} elsif ($config_file->stage =~ /^no_homology$/){
 	my $validation_mirnas = Mir::miRNAnchor->new(
 		all_parameters => $variables
 	);
@@ -153,7 +198,7 @@ if ($config_file->stage =~ /^homology$/){
 	);
 	$summary_results->generate_summary_file($config_file->config_file, $variables);
 } else {
-	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise' or even better 'complete'.");
+	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise', 'no_homology' or even better 'complete'.");
 }
 end_close();
 
@@ -194,17 +239,25 @@ Path of blast query sequences in FASTA format to be searched on the subject sequ
 Path to pre-calculated data directory containing RFAM and miRBase covariance, hidden markov models, 
 and necessary files to run MIRfix. 
 
+=item -debug_mode/dbug <0|1>
+
+Activate the DEBUG mode on miRNAture run modes.
+
 =item -mfx/-mirfix_path <PATH>
 
 Alternative path of the MIRfix.py program.
 
-=item -m/-mode <Blast, HMM, Other_CM, Infernal, Final>
+=item -m/-mode <blast,hmm,rfam,mirbase,user,final>
 
-Homology search modes: Blast, HMM, Other_CM, Infernal and/or Final. It is possible to perform individual analysis, but it is always recommended to include the I<Final> option.
+Homology search modes: blast, hmm, rfam, mirbase, infernal, user and/or final. It is possible to perform individual analysis, but it is always recommended to include the I<final> option to merge multiple results.
 
-=item -pe/-parallel_slurm <0|1>
+=item -ps/-parallel_slurm <0|1>
 
 Activate SLURM resource manager to submit parallel jobs (1) or not (0). 
+
+=item -pe/-parallel <0|1>
+
+Activate parallel jobs processing (1) or not (0). 
 
 =item -rep/-repetition_cutoff <relax,Number_Loci,Candidates_to_evaluate>
 

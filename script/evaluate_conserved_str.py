@@ -22,7 +22,7 @@ def evaluate_if_no_structure(str):
 def get_final_block(query_string, start, stop_symbol='Def'):
     block = query_string[start:]
     end = start
-    for i in range(0, len(block) -1):
+    for i in range(len(block)):
     #for character in list(block):
         if stop_symbol != 'Def':  # Here, to clean the first part
             if block[i] == stop_symbol:  # corresponds to the stop symbol
@@ -74,7 +74,8 @@ def generate_tuples_positions_matching(block5, block3):
             temporal_positions.append(positions)
             j = j + 1
         elif block5_list[i] == '(' and block3_list[j] != ')':  # ( .
-            for l in range(j,(len(block3) - 1),1):
+            #for l in range(j,(len(block3) - 1),1):
+            for l in range(j,(len(block3)),1):
                 if block5_list[i] == '(' and block3_list[l] == ')':
                     k = len(block3_list) - l  # Reverse coord len(block)- pos
                     positions = (i, k)
@@ -157,7 +158,7 @@ def convert_matching_positions(matching_positions, factor5, factor3):
 def validate_folding_miRNA(block5, block3):
     number_match_5p = count_matching_sites(block5, '(')
     number_match_3p = count_matching_sites(block3, ')')
-    if number_match_5p > 16 and number_match_3p > 16: # Based on Tarver et.al (2012) 
+    if number_match_5p > 16 and number_match_3p > 16: # Based on Tarver et.al (2012)
         if number_match_5p == number_match_3p:
             temporal = "Valid_All"
         else:
@@ -178,7 +179,7 @@ if __name__ == '__main__':
     align = AlignIO.read(seq, "stockholm")
     # Obtain information from secondary structure
     structure = align.column_annotations['secondary_structure']  # Obtain SStr
-    startConsMature = int(locations.split(",")[0])-1 
+    startConsMature = int(locations.split(",")[0])-1
     endConsMature = int(locations.split(",")[1])
     structure = structure[startConsMature:endConsMature]
     # Obtain blocks from consensus miRNA

@@ -9,11 +9,11 @@ with 'MiRNAture::ToolBox';
 with 'MiRNAture::Evaluate';
 with 'MiRNAture::Cleaner';
 
-has 'cm_model' => (
-	is => 'ro',
-	isa => 'Str',
-	required => 1,
-);
+##has 'cm_model' => (
+##	is => 'ro',
+##	isa => 'Str',
+##	required => 1,
+##);
 
 has 'genome_subject' => (
 	is => 'ro',
@@ -67,6 +67,13 @@ has 'cmsearch_program_path' => (
 	coerce => 1,
 );
 
+##has 'list_models' => (
+##	is => 'ro',
+##	isa => 'Path::Class::Dir',
+##	coerce => 1,
+##	required => 1,
+##);
+
 sub create_folders_cm {
 	my $shift = shift;
 	create_folders($shift->output_folder->stringify, "");
@@ -76,8 +83,15 @@ sub create_folders_cm {
 }
 
 sub search_homology_CM {
-	my ($shift, $zscore, $minBitscore) = @_;
-	searchCMhomology($shift, $zscore,$minBitscore);
+	my ($shift, $zscore, $minBitscore,$maxthreshold) = @_;
+	searchCMhomology($shift, $zscore,$minBitscore,$maxthreshold);
+	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie, $shift->subject_specie."\.tab");
+	for (my $i = 0; $i <= $#result_files; $i++) {
+		my $cm_model = $result_files[$i];
+		$cm_model =~ s/(RF[0-9]+)(.*)(\.tab)/$1/g;
+		my $molecule = get_family_name($cm_model, $shift->families_names_CM);
+		classify_2rd_align_results($shift->subject_specie, $cm_model, $shift->output_folder."/".$shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/".$cm_model."\_".$shift->subject_specie.".tab" ,"rfam", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore, $maxthreshold);
+	}
 	return;
 }	
 
