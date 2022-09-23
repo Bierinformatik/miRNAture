@@ -2,8 +2,14 @@
 Tutorial
 ========
 
-Annotating (some) coelacanth miRNAs
-***********************************
+Through this step-by-step tutorial you could make use of key options from 
+``miRNAture`` to annotate the *bona fide* miRNA complement on selected contigs 
+from the coelacanth (*Latimeria chalumnae*) genome. All the required files to
+execute this tutorial are included in the ``miRNAture`` source files in the `miRNAture/Tutorial` 
+folder.
+
+Annotating let-7 on coelacanth
+******************************
 
 .. figure:: coel.jpg
     :width: 320px
@@ -14,384 +20,173 @@ Annotating (some) coelacanth miRNAs
     
     *Latimeria chalumnae*. Source: `Alberto Fernandez Fernandez / CC BY-SA <https://upload.wikimedia.org/wikipedia/commons/f/fa/Latimeria_Chalumnae_-_Coelacanth_-_NHMW.jpg>`_
 
-Throught this step-by-step tutorial you could make use of key options from 
-``miRNAture`` to annotate the *bona fide* miRNA complement on selected contigs 
-from the coelacanth (*Latimeria chalumnae*) genome, based on the current miRNA
-annotation, retrieved from ``Ensembl`` release 100. The following table shows
-the features from selected contigs that composed the fasta file with subject
-sequences:
+Based on the miRNA annotation retrieved from ``Ensembl`` release 100, the
+coelacanth genome featured 8 let-7 locus distributed along 6 contigs. For purposes of this
+tutorial, 3 contigs were selected with variable number of miRNA/let-7 annotations, as follows:
 
-==============  ===========  ============ 
-  Contig        Length (Mb)  Numb. miRNAs
-==============  ===========  ============
-JH126571.1      5.98145           5      
-JH126620.1      3.03251           8      
-AFYH01291077.1  0.00106           1      
-==============  ===========  ============
+==============  ===========  ============ ==========
+  Contig        Length (Mb)  Numb. miRNAs Let-7 loci
+==============  ===========  ============ ==========
+JH126571.1      5.981           5            1
+JH129429.1      0.248           3            3
+AFYH01291077.1  0.001           1            0
+==============  ===========  ============ ==========
 
-Your task will be the identification of homologous miRNAs on the described
-contigs. To perform this taks, ``miRNAture`` makes use of pairwise alignments
-with ``blastn`` and the use of hidden Markov models using ``nhmmer``. To the
-validation steps rounds of structural alignments, using ``cmsearch``, would be
-applied. The final validation step, will be performed by ``MIRfix`` in order to
-annotate the correct positions of candidate mature regions along the detected
-hairpin sequence. 
-
-As you can imagine, there would be created both, a high number of input and output
-files and classification rules to parse and select the candidate miRNA regions.
-But, do not worry too much about this! life is too short to perform all of this
-task by hand! and ``miRNAture`` will help to perform all the heavy and
-painstaking work. 
+The main goal is the identification of the let-7 loci on the referred 
+contigs. To do so, the `Tutorial` folder contained all the input files in `Data/`, 
+required wrapper to `miRNAture` on `Code/` and a `Results/` folder where
+all prediction will be stored. As you can imagine, homology comparisons are prone 
+to create both, a high number of input and output files. `miRNAture` avoids manual
+curation to the detected hits, life is too short to perform all of those steps by hand! 
 
 Folder structure
-================
+=================
 
 The folder tree on miRNAture looks like::
     
     $ tree -L 1 miRNAture/
     miRNAture/
-    ├── Code
+    ├── Build.PL
+    ├── Changes
+    ├── ignore.txt
+    ├── index.md
+    ├── lib/
     ├── LICENSE
-    ├── Manuscript
-    └── README.md
+    ├── MANIFEST
+    ├── META.json
+    ├── META.yml
+    ├── mirnature_logo.png
+    ├── miRNAture-Manual/
+    ├── miRNAture.yml
+    ├── README
+    ├── README.md
+    ├── README.rst
+    ├── script/
+    ├── t/
+    ├── Tutorial/
+    └── xt/  
 
-Out target folder is located on ``Code/Tutorial``::
+Our target folder is located in ``Tutorial/``::
     
-    $ cd Code/Tutorial
+    $ cd Tutorial/
     $ tree -L2 .
-    Tutorial
+    Tutorial/
     ├── Code
-    │   └── run_miRNAture.sh
+    │   ├── list_miRNAs_to_search.txt
+    │   ├── Precalculated-Data-tutorial
+    │   ├── tutorial_test_selected_models.sh
+    │   └── User_Test_Data
     ├── Data
-    │   ├── annotated_miRNAs_latch.gff3
     │   ├── latimeria_chalumnae_genome.fa
-    │   ├── Latimeria_chalumnae.LatCha1.100.gff3
     │   └── QueriesToTest
     └── Results
+    
+The ``Tutorial`` folder is composed by the subfolders: ``Code/``, where all 
+the necessary scripts to run ``miRNAture`` are located. ``Data/`` keeps the described 
+contigs from coelacanth in a multi-fasta file:``latimeria_chalumnae_genome.fa``. In the same
+folder, in ``QueriesToTest/`` let-7 annotations from 11 metazoans [#species]_ were provided
+as queries.
 
-The ``Tutorial`` folder is composed by the subfolders: ``Code/``, where all the
-necessary scripts to run ``miRNAture`` are located. ``Data/`` keeps the
-described genome from coelacanth in a multi-fasta format in 
-``latimeria_chalumnae_genome.fa``. Another key folder is ``QueriesToTest/``,
-where the miRNAs from 11 chordates were provided to serve as query sequences.
-Detailed list of query species and their correspondent files are described on
-``QueriesToTest/queries_description.txt``. The set of files inside ``Data/``
-corresponds to the current and filtered miRNA annotation of coelacanth retrieved 
-from ``Ensembl`` release 100: ``Latimeria_chalumnae.LatCha1.100.gff3`` and
-``annotated_miRNAs_latch.gff3`` in ``GFF3`` format, respectively. The last
-``Results`` folder will conserve all the output files generated by
-``miRNAture``. 
+.. note::
+    Together with the query files, the file `queries_description.txt` is required to
+    control which dataset of sequences that will be used by the `blastn` comparisons. Three
+    columns are needed to be recognized:
+    
+    <Name_fasta_file.fa> miRNA <Origin_of_sequence>
+    
+    The first one corresponds to the file name, the second one have to be miRNA, the third
+    one is the name of the source specie in the format: `Genera specie`. If you do not know
+    the source, a valid name would be: Unknown specie. If ommited, ``miRNAture`` will create
+    automatically this file using all fasta files in this folder with an Unknown origin.
+
+The ``Results/`` folder will conserve all the output files generated by ``miRNAture``. 
 
 Input files
 ===========
-As described earlier, to run ``miRNAture`` just go directly to ``Code/``, located 
-on the ``Tutorial/`` folder::
+To run ``miRNAture`` just go directly to ``Code/`` folder::
 
     $ cd Code/
-    $ ls -ls
-    4 -rwxr-xr-x 1 cristian students 598 Jul  8 18:47 run_miRNAture.sh
+    $ tree -L 1 .
+    .
+    ├── list_miRNAs_to_search.txt
+    ├── Precalculated-Data-tutorial
+    ├── tutorial_test_selected_models.sh
+    └── User_Test_Data
 
-As you noted, exists a bash file inside this folder which will organize all our
-code to run ``miRNAture``. This way is preferred, if you think about increase
-the reproducibility of your computational experiments. Looking in detail this code will give 
-you a general idea to run ``miRNAture``:
+In this path, the ``tutorial_test_selected_models.sh`` file is ``bash`` script that will organize 
+all our code to run ``miRNAture``. This way is preferred in terms of reproducibility means of your
+computational experiments. This code will give you a general idea to run ``miRNAture``, let's explain 
+this in detail:
 
 .. code-block:: bash
 
     #!/bin/bash
-    
-    # Declare input folder
+
     current=$( pwd )
-    
-    # Step 1: Activate conda environment
-    conda activate miRNAture
-
-    # Step 2: Input files/folders
-    specie_tag="Latch"
+    specie_tag="Lach"
     specie_genome="$current/../Data/latimeria_chalumnae_genome.fa"
-    specie_name="Latimeria_chalumnnae"
+    specie_name="Latimeria_chalumnae"
+
     workdir="$current/../Results"
-    mirfix_path="/homes/biertank/cristian/Projects/MIRfix/scripts/MIRfix.py"
-    mode="Blast,HMM,Infernal,Final"
-    strategy="1,2,3,4,9,10,ALL"
+    mkdir -p $workdir
+    mode="Blast,HMM,Infernal,Other_CM,Final"
+    strategy="5,6,ALL"
     blastQueriesFolder="$current/../Data/QueriesToTest"
-    
-    # Step 3: Running miRNAture
-    cd $current/../../../Code/
-    
-    # Step 3.1: Run homology-searches:
-    ./miRNAture -stage homology -speG $specie_genome -speN $specie_name \
-     -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0 \
-     -str $strategy -blastq $blastQueriesFolder
+    user_models="$current/User_Test_Data"
+    data_precalculated_folder="$current/Precalculated-Data-tutorial"
 
-    #Step 3.2: Validate miRNAs annotating their mature sequences:
-    ./miRNAture -stage validation -speG $specie_genome -speN $specie_name \
-     -speT $specie_tag -w $workdir -mfx $mirfix_path -m $mode -pe 0 \
-     -str $strategy -blastq $blastQueriesFolder
+    ### Step by step: homology->validation->evaluation->summarise
+    # Run only homology-searches
+    #miRNAture -stage homology -sublist $current/list_miRNAs_to_search.txt \ 
+    #    -dataF $data_precalculated_folder -speG $specie_genome -speN $specie_name \
+    #    -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy \
+    #    -blastq $blastQueriesFolder -rep relax,150,100 -usrM $user_models
+    # Run detection matures
+    #miRNAture -stage validation -dataF $data_precalculated_folder -speG $specie_genome \
+    #    -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0 -usrM $user_models
+    # Run the complete analysis
+    #miRNAture -stage evaluation -dataF $data_precalculated_folder -speG $specie_genome \
+    #    -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0
+    # Create summarise report
+    #miRNAture -stage summarise -dataF $data_precalculated_folder -speG $specie_genome \
+    #    -speN $specie_name -speT $specie_tag -w $workdir -m $mode -pe 0
 
-The last script shows three steps that are required to run ``miRNAture``:
-
-1. Activate the ``conda`` environment called miRNAture. The installation and
-   activation of this environment is required previously to run ``miRNAture``.
-   All the dependences are described on the file ``miRNAture.yml``, located on
-   the ``miRNAture/Code/`` folder.
-2. Declare the name of input and output locations. ``miRNAture`` detects
-   different flags with their correspondent values. The basic configuration is
-   composed by:
-   
-   * Specie genome: Current target sequence
-   * Specie name: Scientific name of the specie which belongs the subject
-     sequence(s).
-   * Specie tag: Tag of the specie name, suggested one takes the first two
-     letters from the Genera joined with the first two from the specie (i.e Homo
-     sapiens = hosa, Didemnum vexillum = dive, Latimeria chalumnae = lach).
-   * Working directory: Output directory, final path of ``miRNAture`` results.
-   * MIRfix path: path of MIRfix on your system.
-   * Running mode: Select at least one, or any combination of the miRNA search strategies between:
-     ``Blast``, ``HMM`` or/and ``Infernal. At the same time, to merge the complete results
-     from those homology search modes, write at the end ``Final``.
-   * Blast strategies: Write the numbers of desired ``blastn`` strategies.
-     Possible strategies are: ``1,2,3,4,5,6``. At the same time, to merge all results
-     put at the end ``ALL``. 
-   * Path of ``blastn`` queries: Declare the path of annotated query sequences of
-     miRNAs. In this case is enough to indicate the folder name.
-3. Run ``miRNAture``. Setup all the command line options based on the described
-   input files on step 2. The list of complete flags can be found at::
-   
-    $ ./miRNAture --help
-    Usage:
-    ./miRNAture [-options]
-   
-    Options:
-    -help       print this documentation
-    
-    -man        Prints the manual page and exits.
-
-    -stage      Selects the running mode of miRNAture. The options are:
-                'homology', 'validation' or 'complete'.
-    
-    -speG       path of target genome or genomic sequence to be analyzed
-    
-    -speN       Specie or sequence source's scientific name. The format must
-                be: Genera_specie, separated by '_'.
-    
-    -speT       Tag of the specie, sequence or project. Just for future
-                reference.
-    
-    -w          Path of working directory
-    
-    -mfx        Path of the MIRfix
-                <https://github.com/Bierinformatik/MIRfix> program:
-                "MIRfix.py"
-    
-    -m          Homology search modes: Blast,HMM,Infernal and Final. It is
-                possible to perform individual analysis, but it is always
-                desirable include the Final option.
-    
-    -str        This flag is blast specific. It corresponds to the selected
-                blast strategies used to search miRNAs. It might be
-                indicated along with -m Blast or in case you refer it in
-                your selected mode.
-    
-    -blstq      Path of blast queries sequences in fasta format to be
-                searched on the subject sequence.
-
-Searching miRNAs
-================
-
-The most important step will be performed! Based on the last configurations on
-the script ``run_miRNAture.sh``, ``miRNAture`` will be executed on the designed
-coelacanth sequences. The idea is to perform independently each of the stages, 
-*homology-searches* and *detection of mature*, for demonstrative 
-purposes. In case that you require to run the complete pipeline, just adjust the
-parameter **-stage** to the *complete* option. 
+    # Run miRNAture complete
+    miRNAture -stage complete -sublist $current/list_miRNAs_to_search.txt \
+        -dataF $data_precalculated_folder -speG $specie_genome -speN $specie_name \
+        -speT $specie_tag -w $workdir -m $mode -pe 0 -str $strategy \
+        -blastq $blastQueriesFolder -rep relax,150,100 -usrM $user_models
 
 
-Homology search
-^^^^^^^^^^^^^^^
 
-As mentioned, we are going to execute the *homology-search* stage. To activate
-this stage in ``miRNAture`` please verify the flag value to be **-stage homology**.
-In brief, our *target* coelacanth sequences would be annotated using a set of
-miRNA *queries* that belong from the following chordate species, (V: vertebrata, T:
-tunicata and C:cephalochordata) and one echinoderm (E):
+Activate the ``conda`` environment called miRNAture. The installation and activation of this environment is required previously to run ``miRNAture``.  All the dependences are described on the file ``miRNAture.yml``, located on the ``miRNAture/Code/`` folder.
 
-* *Anolis carolinensis* (V)
-* *Branchiostoma belcheri* (C)
-* *Branchiostoma floridae* (C)
-* *Ciona robusta* (T)
-* *Ciona savignyi* (T)
-* *Danio rerio* (V)
-* *Eptatretus burgeri* (V)
-* *Petromyzon marinus* (V)
-* *Strongylocentrotus purpuratus* (E)
-* *Xenopus laevis* (V)
-* *Xenopus tropicalis* (V)
+The last script shows two steps that are required to run ``miRNAture``:
 
-We are going to test all the capability of ``miRNAture``, using at the same time
-all the available modes: ``Blast``, ``HMM``, ``Infernal`` and the final 
-concatenation with ``Final``. Specifically for the pairwise-comparisons with
-``Blast`` mode, we are going to use only 3 strategies: 1,9,10 and the final
-concatenation and comparison with ``ALL``, but feel free to choose more or less
-strategies. 
+Declare the name of input and output locations. This will help to assign ``miRNAture`` flags and easily reproduce the experiment. In this case, we used the following options (flags indicated in parenthesis):
 
-Then, just let it run typing::
+        * Processing stage (``-stage``): Running stage on ``miRNAture``. In this case was selected ``complete`` to run all the stages. To run step by step, this flag accepts: ``homology``, ``validation``, ``evaluation`` and ``summarise``. You should run all of them in this order to obtain the same final results as ``complete`` option.
+        * Subset of miRNA models to run (``-sublist``): Subset of miRNA families references to be searched on the target sequence. See ``list_miRNAs_to_search.txt`` file as an example. If not provided all miRNA RFAM models will be searched. 
+        * Pre-calculated data location (``-dataF``): Location of pre-calculated data required by ``miRNAture``. It included hidden markov, covariance models and curated input files to annotate mature sequences [#ImportantNote]_.
+        * Specie genome (``-speG``): Current target sequence.
+        * Specie name (``-speN``): Scientific name of the specie which belongs the subject sequence(s).
+        * Specie tag (``-speT``): Tag of the specie name, suggested one takes the first two letters from the Genera joined with the first two from the specie (i.e `Homo sapiens` = Hosa).
+        * Working directory (``-w``): Output directory, final path of ``miRNAture`` results.
+        * Running mode (``-m``): Select at least one, or any combination of the miRNA search strategies between: ``Blast``, ``HMM``, ``Infernal`` and ``Other_CM``. At the same time, to merge the complete results from those homology search modes, write at the end ``Final``.
+        * Parallel jobs using SLURM (``-pe``): Activate (1) or not (0).
+        * Blast strategies (``-str``): Write the numbers of desired ``blastn`` strategies.  Possible strategies are: ``1,2,3,4,5,6``. To merge all results put at the end ``ALL``. 
+        * Path of ``blastn`` queries (``-blastq``): Declare the path of annotated query sequences of miRNAs. In this case is enough to indicate the folder name.
+        * Homology repetition detection (``-rep``): Setup number of maximum loci number that will be evaluated by the mature annotation stage. By default, miRNAture will detect miRNA families that report high number of loci (> 200 loci). Then, it will select the top 100 candidates in terms of alignment scores, as candidates for the validation stage (``default,200,100``). Modify this values using ``relax,Number_Loci,Candidates_to_evaluate``.
+        * User hidden markov/covariance models (``-usrM``): Directory with additional hidden Markov (HMMs) or covariance models (CMs) provided by the user to be searched on the target sequence.
 
-    $./run_miRNAture.sh homology
+Then, run ``miRNAture`` through this script::
 
-A long descriptive output will be printed on the screen. Keep an eye on the ``Results/``
-folder where the action is taking place. 
-
-   .. note:: Keep in mind that ``run_miRNAture.sh`` was created as an example to run ``miRNAture`` but it does not mean that is the only way to do that. Change it according your requirements.
-
-
-Homology search results
-^^^^^^^^^^^^^^^^^^^^^^^
-
-To refer directly to the results, type::
-
-    $ cd ../Results/
-    $ tree -L 1
-    Results/
-    ├── Blast
-    ├── Final_Candidates
-    ├── HMMs
-    ├── Infernal
-    ├── miRNAture_log_190609072022.log
-    ├── miRNAture_log_22505108072023.log
-    ├── miRNAture_log_23590008072025.log
-    ├── miRNAture_log_4209072026.log
-    └── mirnature_runLatch.sh
-
-If everything goes well, you could see 4 log files ``miRNA_log_*.log``, a
-script generated automatically to run the search strategy on ``miRNAture`` 
-(``mirnature_runLatch.sh``) and the folders with homology comparisons: ``Blast/``, 
-``HMMs`` and direct structure comparison: ``Infernal`` and the ``Final_Candidates``
-with the final set of homology predicted miRNAs. Next, go directly to the
-``Final_Candidates`` folder::
-
-    $ cd Final_Candidates/
-    $ tree -L 1
-    ├── all_RFAM_Latch_Final.ncRNAs_homology.txt
-    ├── all_RFAM_Latch_Final.truetable
-    ├── all_RFAM_Latch_Final.truetable.discarded.table
-    ├── all_RFAM_Latch_Final.truetable.joined.table
-    ├── all_RFAM_Latch_Final.truetable.joined.table.db
-    ├── all_RFAM_Latch_Final.truetable.temp
-    └── Fasta
-
-Where the most important file is ``all_RFAM_Latch_Final.ncRNAs_homology.txt``,
-which reported all the merged candidates to miRNAs on the subject contigs
-from coelacanth. The results are summarised on the following table:
-
-==============  ===========  ============  =============== 
-  Contig        Length (Mb)  Numb. miRNAs  miRNAture Pred. 
-==============  ===========  ============  ===============
-JH126571.1      5.98145           5          122
-JH126620.1      3.03251           8          106
-AFYH01291077.1  0.00106           1          0
-==============  ===========  ============  ===============
-
-The final results could be discriminated by the annotation method (Blast, HMM or
-Infernal):
-
-==============  =====  ===  ========  =============== 
-  Contig        Blast  HMM  Infernal  miRNAture Pred. 
-==============  =====  ===  ========  ===============
-JH126571.1        22    7      93            122
-JH126620.1        35    6      65            106
-==============  =====  ===  ========  ===============
-
-and even, this set of computational annotations could be visualized on a broad
-genome context, generating for example a `BED <https://www.ensembl.org/info/website/upload/bed.html>`_ file and uploading it at the Coelacanth Ensembl Genome Browser, using some Linux commands as follows::
-
-    $awk '{print $1"\t"$6"\t"$7"\t"$8"\t"$2"\t"$3}'
-    all_RFAM_Latch_Final.ncRNAs_homology.txt > predicted_miRNAture.bed
-
-Next, just upload the track on the corresponding Genome Ensembl hub (as explained in more detail `here <https://www.ensembl.org/info/website/upload/index.html>`_) as a Custom Track.
-
-Certainly, after uploading this miRNAs coordinates you would visualize this results:
-
-.. figure:: general_view.png
-    :width: 600px
-    :align: center
-    :height: 99px
-    :alt: Genome Browser Coel
-    :figclass: align-center
+    $ ./tutorial_test_selected_models.sh
  
-
-This image corresponds to the region ``JH126620.1:788915-822338``, which
-according to the Ensembl annotation, exists 4 miRNA genes
-of the families: mir-130 (ENSLACG00000021481), mir-454 (ENSLACG00000019256),
-and two of mir-130 (ENSLACG00000020131, ENSLACG00000019975)
-
-Here, ``miRNAture`` detected the same families, with overlapping regions on the
-previously reported miRNAs on *L. chalumnae*.
-
-.. figure:: firstTwo.png
-    :width: 600px
-    :align: center
-    :height: 99px
-    :alt: Genome Browser Coel
-    :figclass: align-center
- 
-And this is the second cluster, with two families, the overlapping is the same
-but in one miRNA the family prediction and the strand differ:
-
-.. figure:: secondTwo.png
-    :width: 600px
-    :align: center
-    :height: 99px
-    :alt: Genome Browser Coel
-    :figclass: align-center
- 
-For that reason, those candidates required a complementary evaluation of their current detection and correct positioning of the *mature* miRNA sequences. 
-As a final result, you could check that all the reported miRNAs on the contigs
-JH126571.1 and JH126620.1 were identified. The reported miRNA on AFYH01291077.1,
-was predicted as a miRNA using RFAM, but currently there is no information about
-the family or mature products. ``miRNAture`` detected this candidate on the
-direct Infernal searches, but it did not show an acceptable homology (for
-mir-105 family) and folding values (Bitscore: 13.4 and E-value 7.8), see file
-``Results/miRNA_predictionInfernal/Latch/RF00670_Latch.tab``.
-
-On the other side, ``miRNAture`` detected new candidates that currently are not
-reported on the genome annotation.
-
-Validation of miRNA candidates
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-An additional output was generated on the ``Final_results/`` folder and contained
-all the resulted fasta sequences from the last 228 hairpin candidates, organized
-by their Rfam family. Based on those regions, validated by sequence and
-structure homology, the idea is to evaluate the annotation of candidate *mature*
-regions that are contained in this hairpin-loop and validate their annotation
-with an additional layer, supported by the structural alignments of sequences
-selected from other organisms.
-
-To do that, please execute again the script::
-    
-    $./run_miRNAture.sh validate
-
-which essentially have the same input parameters, except for the ``-stage validation`` flag
-that was changed to tell ``miRNAture`` that the second stage have to be
-activated.
-
-In this step, each detected miRNA candidate were grouped by their Rfam miRNA family. 
-Based on this reference, previously calculated data from the family is retrieved. This 
-input data, required to perform the correction of the *mature* sequences using the
-``MIRfix`` program, was inferred as a product of this study [#f1]_ and
-comprises this set of files:
-    
-    * The set of Rfam hairpin sequences.
-    * The mature sequences annotated for each Rfam hairpin sequence.
-    * The genomes/contigs/sequences that contained the Rfam sequences.
-    * A mapping file, which explicity declares the relation between hairpin and
-      their mature sequences.
-
-For more details refer to the ``MIRfix`` `repository <https://github.com/Bierinformatik/MIRfix>`_ .
-Automatically, ``miRNAture`` structure all your data and generate the required
-input files to perform the *mature* annotation.
-
+.. note::
+    The list of complete flags can be found typing: ``miRNAture -h`` or ``miRNAture -man``.
+   
 .. rubric:: Footnotes
 
-.. [#f1] From the *seed* sequences from ``Rfam`` v.12.2 and additionally the sequences from ``Rfam`` and ``miRBase`` that reported *mature* sequences.
+.. [#species] *Anolis carolinensis*, *Branchiostoma belcheri*, *Branchiostoma floridae*, *Ciona robusta*, *Ciona savignyi*, *Danio rerio*, *Eptatretus burgeri*, *Petromyzon marinus*, *Strongylocentrotus purpuratus*, *Xenopus laevis* and *Xenopus tropicalis*.
+.. [#ImportantNote] Pre-calculated data should be downloaded from https://zenodo.org/record/4531376#.YDqO4-bTVTZ
