@@ -39,6 +39,7 @@ my $path_blast_queries = "";
 my $user_folder = "";
 my $debug = 0;
 my $help;
+my $ver;
 my $man;
 my %opts;
 GetOptions (
@@ -62,14 +63,14 @@ GetOptions (
 	'parallel_slurm|ps=i' => \$parallel_run,
 	'parallel_linux|pe=i' => \$parallel_linux,
 	'debug_mode|dbug=i' => \$debug,
-    'version|v' => \$VERSION,
+    'version|v' => \$ver,
 ) or pod2usage (
 	-verbose => 99,
 	-sections => "NAME"
 );
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
-pod2usage ( -verbose => 99, -sections => "VERSION" ) if $VERSION;
+pod2usage ( -verbose => 99, -sections => "VERSION" ) if $ver;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
@@ -209,6 +210,7 @@ __END__
 
 
 =head1 NAME
+
 C<miRNAture> - Computational detection of microRNA candidates
 
 =head1 VERSION
