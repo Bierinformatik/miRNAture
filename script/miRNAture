@@ -17,6 +17,7 @@ use Mir::miRNAnchor;
 use Mir::Eval;
 use Mir::Summarise;
 use MiRNAnchor::Tools;
+our $VERSION = '1.10';
 
 ### Input data
 my $mode = ""; #run mode
@@ -38,6 +39,7 @@ my $path_blast_queries = "";
 my $user_folder = "";
 my $debug = 0;
 my $help;
+my $ver;
 my $man;
 my %opts;
 GetOptions (
@@ -61,12 +63,14 @@ GetOptions (
 	'parallel_slurm|ps=i' => \$parallel_run,
 	'parallel_linux|pe=i' => \$parallel_linux,
 	'debug_mode|dbug=i' => \$debug,
+    'version|v' => \$ver,
 ) or pod2usage (
 	-verbose => 99,
 	-sections => "NAME"
 );
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
+pod2usage ( -verbose => 99, -sections => "VERSION" ) if $ver;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
@@ -103,7 +107,7 @@ my $config_file = Mir::ConfigurationFile->new (
 	user_folder => $user_folder,
 	parallel_linux => $parallel_linux,
 	parallel => $parallel_run,
-	debug_mode => $debug
+	debug_mode => $debug,
 );
 $config_file->start;
 $config_file->generate_copy_genome;
@@ -206,13 +210,18 @@ __END__
 
 
 =head1 NAME
+
 C<miRNAture> - Computational detection of microRNA candidates
+
+=head1 VERSION
+
+miRNAture v.1.10 (Sept 21th, 2022)
 
 =head1 SYNOPSIS
 
 ./miRNAture [-options]
 
-=head1 Authors:
+=head1 AUTHORS:
 
 I<Cristian A. Velandia Huerto>
 I<Joerg Fallmann>
@@ -304,7 +313,6 @@ be contain a corresponding HMMs/ and CMs/ folders, which the user models will be
 
 Working directory path to write all miRNAture results.
 
-
 =back
 
 =head1 DESCRIPTION
@@ -320,13 +328,14 @@ and detected mature regions and corresponding FASTA files. At the same time, a
 summary file with the MFE, precursor length and number of loci of each annotated 
 miRNA family.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 I<Cristian A. Velandia Huerto>
 I<Joerg Fallmann>
 I<Peter F. Stadler>
 
 =head1 BUGS, CAVEATS, COMPLAINS or DONATIONS 
+
 Write directly to cristian at bioinf.uni-leipzig.de
 
 =cut 
