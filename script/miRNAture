@@ -36,6 +36,7 @@ my $stagesRun = "";
 my $mirfix_path = "";
 my $path_blast_queries = "";
 my $user_folder = "";
+my $version = "1.1";
 my $debug = 0;
 my $help;
 my $man;
@@ -61,12 +62,14 @@ GetOptions (
 	'parallel_slurm|ps=i' => \$parallel_run,
 	'parallel_linux|pe=i' => \$parallel_linux,
 	'debug_mode|dbug=i' => \$debug,
+    'version|v' => \$version,
 ) or pod2usage (
 	-verbose => 99,
 	-sections => "NAME"
 );
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
+pod2usage ( -verbose => 3 ) if $version;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
@@ -103,7 +106,7 @@ my $config_file = Mir::ConfigurationFile->new (
 	user_folder => $user_folder,
 	parallel_linux => $parallel_linux,
 	parallel => $parallel_run,
-	debug_mode => $debug
+	debug_mode => $debug,
 );
 $config_file->start;
 $config_file->generate_copy_genome;
@@ -208,11 +211,14 @@ __END__
 =head1 NAME
 C<miRNAture> - Computational detection of microRNA candidates
 
+=head1 VERSION
+v.1.1 (Sept 21th, 2022)
+
 =head1 SYNOPSIS
 
 ./miRNAture [-options]
 
-=head1 Authors:
+=head1 AUTHORS:
 
 I<Cristian A. Velandia Huerto>
 I<Joerg Fallmann>
@@ -320,7 +326,7 @@ and detected mature regions and corresponding FASTA files. At the same time, a
 summary file with the MFE, precursor length and number of loci of each annotated 
 miRNA family.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 I<Cristian A. Velandia Huerto>
 I<Joerg Fallmann>
