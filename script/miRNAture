@@ -17,6 +17,7 @@ use Mir::miRNAnchor;
 use Mir::Eval;
 use Mir::Summarise;
 use MiRNAnchor::Tools;
+our $VERSION = '1.10';
 
 ### Input data
 my $mode = ""; #run mode
@@ -36,7 +37,6 @@ my $stagesRun = "";
 my $mirfix_path = "";
 my $path_blast_queries = "";
 my $user_folder = "";
-my $version = "1.1";
 my $debug = 0;
 my $help;
 my $man;
@@ -62,14 +62,14 @@ GetOptions (
 	'parallel_slurm|ps=i' => \$parallel_run,
 	'parallel_linux|pe=i' => \$parallel_linux,
 	'debug_mode|dbug=i' => \$debug,
-    'version|v' => \$version,
+    'version|v' => \$VERSION,
 ) or pod2usage (
 	-verbose => 99,
 	-sections => "NAME"
 );
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
-pod2usage ( -verbose => 3 ) if $version;
+pod2usage ( -verbose => 3 ) if $VERSION;
 pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
@@ -212,7 +212,7 @@ __END__
 C<miRNAture> - Computational detection of microRNA candidates
 
 =head1 VERSION
-v.1.1 (Sept 21th, 2022)
+v.1.10 (Sept 21th, 2022)
 
 =head1 SYNOPSIS
 
