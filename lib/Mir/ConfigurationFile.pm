@@ -424,7 +424,7 @@ sub write_header {
 	my $yaml_file = YAML::Tiny->read($shift->config_file);
 	my ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $MIRfix, $mirnatureHomology, $mirnanchor) = obtain_paths_programs();
 	$yaml_file->[0]->{"miRNAture"}{"Author"} = 'Cristian A. Velandia-Huerto, Joerg Fallmann, Peter F. Stadler';
-	$yaml_file->[0]->{"miRNAture"}{"Version"} = 'v.1.0.1';
+	$yaml_file->[0]->{"miRNAture"}{"Version"} = 'v.1.10';
 	$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Apr 30 2021';
 	#$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Mon Mar 16 19:02:25 CET 2020';
 	$yaml_file->[1]->{"Data_user"}{"User"} = `whoami | tr -d '\n'`;
@@ -580,7 +580,7 @@ sub start {
 	print "Computational detection of microRNA candidates\n";
     	#print "v.1.0 Mar 16, 2020\n";
         #      "v.1.0 Feb 1, 2021\n";
-	print "v.1.0.1 Apr 30, 2021\n";
+	print "v.1.10 Sept 30th, 2022\n";
 	print "Cristian A. Velandia-Huerto, Jöerg Fallmann, Peter F. Stadler\n";
 	print "Bioinformatics Leipzig\n";
 	print "University of Leipzig\n";

@@ -311,7 +311,6 @@ be contain a corresponding HMMs/ and CMs/ folders, which the user models will be
 
 Working directory path to write all miRNAture results.
 
-
 =back
 
 =head1 DESCRIPTION
@@ -334,6 +333,7 @@ I<Joerg Fallmann>
 I<Peter F. Stadler>
 
 =head1 BUGS, CAVEATS, COMPLAINS or DONATIONS 
+
 Write directly to cristian at bioinf.uni-leipzig.de
 
 =cut 
