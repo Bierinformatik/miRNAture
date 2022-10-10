@@ -148,7 +148,7 @@ perform mature annotation has to be downloaded before run the full **miRNAture**
 pipeline. Available datasets are listed below:
 
 - **New dataset** containing metazoan curated miRBase v.22.1 families.
-  Recommended for use with `miRNAture` v.1.1. 
+  Recommended for use with `miRNAture` v.1.1. Download [here](https://doi.org/10.5281/zenodo.7180160). 
 - Required data to re-annotate human miRNAs: include CMs and HMMs build from
   miRBase without human sequences. Stored in Zenodo
   [here](https://zenodo.org/record/4531376#.YCQS8EMo_ys).
