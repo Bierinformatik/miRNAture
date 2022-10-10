@@ -18,11 +18,11 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'miRNAture'
-copyright = '2021, miRNAture'
+copyright = '2022, miRNAture'
 author = 'Cristian A. Velandia Huerto, Joerg Fallmann and Peter F. Stadler'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '1.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -35,12 +35,12 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.bibtex'
+    'sphinx.ext.autosectionlabel',
+    'sphinxcontrib.bibtex',
 ]
 
-## Biblio
-bibtex_bibfiles = ['biblio.bib']
-
+# Biblio
+bibtex_bibfiles = ['../biblio.bib']
 bibtex_default_style = 'plain'
 
 
@@ -67,11 +67,6 @@ html_theme = 'alabaster'
 
 # Enable numref
 numfig = True
-
-# Add the extension
-extensions = [
-   'sphinx.ext.autosectionlabel',
-]
 
 # Make sure the target is unique
 autosectionlabel_prefix_document = True

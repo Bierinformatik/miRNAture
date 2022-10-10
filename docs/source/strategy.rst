@@ -57,7 +57,7 @@ Current workflow is depicted in :numref:`workflow`:
 
 .. _workflow:
 
-.. figure:: ../../mirnature3.png
+.. figure:: miRNAture3.png
    :width: 600
    :alt: ``miRNAture`` workflow
    :align: center
