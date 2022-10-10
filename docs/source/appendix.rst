@@ -5,7 +5,7 @@ Appendix
 Pre-processing miRBase data:
 ----------------------------
 
-The ``MIRfix`` pipeline :cite:p:`Yazbeck:19a` provides the general core of
+The ``MIRfix`` pipeline :cite:`Yazbeck:19a` provides the general core of
 functions to curate *bona fide* metazoan microRNA annotations. To make use of
 this curation process, it is fundamental to organize the input data in a
 specific format, as referenced in more detail in :cite:`Yazbeck:19a`. In
@@ -94,7 +94,7 @@ validating about 79% (1111) of the families and setting the curation dataset use
 
 
 Construction of Hidden Markov and Covariance Models:
----------------------------------------------------
+----------------------------------------------------
 
 As described in :cite:`Velandia:2021`, a set of quality-filtering steps could be
 used to construct family structural alignments and their corresponding
@@ -127,8 +127,7 @@ Displacement mutation, probability=0.1. The implementation were performed in
 
 Finally, hidden Markov (HMMs) and covariance (CMs) models were build as
 described in :cite:`Velandia:2021` using ``RNAalifold`` :cite:`Lorenz2011`
-and ``Infernal`` package v.1.1.2 :cite:``.
-
+and ``Infernal`` package v.1.1.2 :cite:`Nawrocki:2013`.
 
 .. rubric:: Footnotes
 
