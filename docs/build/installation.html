@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Installation</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/romnnn_sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Strategy" href="strategy.html" />
+  <link rel="prev" title="Introduction" href="introduction.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <div class="home-link-container">
+      <router-link to="index.html" class="home-link">
+      
+        <span class="site-name">miRNAture</span>
+    </router-link>
+  </div>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Search</span>
+    <div class="searchformwrapper">
+      <form autocomplete="off" class="search" action="search.html" method="get">
+        <input type="text" name="q" autocomplete="off" />
+        <input type="submit" value="Go" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#mirnature">Contents:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 "><a href="introduction.html" class="reference internal ">Introduction</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Installation</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#installation" class="reference internal">Installation</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="strategy.html" class="reference internal ">Strategy</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="tutorial.html" class="reference internal ">Tutorial</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="license.html" class="reference internal ">License</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="help.html" class="reference internal ">Need Help</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Installation</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="introduction.html"
+       title="previous chapter">← Introduction</a>
+  </li>
+  <li class="next">
+    <a href="strategy.html"
+       title="next chapter">Strategy →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>The easiest way to install <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> is through <cite>conda</cite>. To do so, please first install
+Conda <a class="footnote-reference brackets" href="#conda" id="id1">1</a>.</p>
+<p>To speed up installation of dependencies and packages we suggest to use mamba <a class="footnote-reference brackets" href="#mamba" id="id2">2</a>, for
+this just run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">mamba</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p>You can use <cite>mamba</cite> as drop-in replacement for <cite>conda</cite> by simply replacing the call to <cite>conda</cite>
+with a call to <cite>mamba</cite>.</p>
+<p><em>Install via Conda</em></p>
+<p>To install <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> from <cite>conda</cite> in a specific <cite>mirnature</cite> environment simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">mirnature</span> <span class="n">mirnature</span>
+</pre></div>
+</div>
+<p>if <cite>mamba</cite> is available, else run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">mirnature</span> <span class="n">mirnature</span>
+</pre></div>
+</div>
+<p><em>Manual install, resolve dependencies via Conda</em></p>
+<p>Create a <cite>mirnature</cite> <cite>conda</cite> environment with the file <cite>miRNAture.yml</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">mirnature</span> <span class="o">-</span><span class="n">f</span> <span class="n">miRNAture</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>Activate the environment containing all dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">mirnature</span>
+</pre></div>
+</div>
+<p>followed by the manual steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">perl</span> <span class="n">Build</span><span class="o">.</span><span class="n">PL</span>
+<span class="o">./</span><span class="n">Build</span>
+<span class="o">./</span><span class="n">Build</span> <span class="n">test</span>
+<span class="o">./</span><span class="n">Build</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>which will install <code class="docutils literal notranslate"><span class="pre">miRNAture</span></code> in the <cite>mirnature</cite> <cite>conda</cite> environment.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="conda"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">https://docs.conda.io/projects/conda/en/latest/user-guide/install/</a></p>
+</dd>
+<dt class="label" id="mamba"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/mamba-org/mamba">https://github.com/mamba-org/mamba</a></p>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="introduction.html"
+       title="previous chapter">← Introduction</a>
+  </li>
+  <li class="next">
+    <a href="strategy.html"
+       title="next chapter">Strategy →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2021, miRNAture.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1 with <a href="https://github.com/romnnn/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>

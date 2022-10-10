@@ -1,0 +1,104 @@
+.. miRNAture documentation master file, created by
+   Cristian Velandia on Tue Jul 7 23:21:30 2020.
+
+miRNAture
+=========
+
+Computational detection of microRNA candidates.
+
+Introduction
+^^^^^^^^^^^^
+MicroRNAs (miRNAs) have been characterized as an important regulators 
+in almost all animals and plants, as well as in unicellular eukaryotes :cite:`Moran:17`. 
+Since their discovery in 1993 :cite:`Lee1993` and subsequently in their recognition as 
+a biological entity later from 2000 :cite:`Reinhart2000`, microRNAs were identified 
+as key regulators on the temporal control of heterochronic genes on the nematode 
+*Caenorhabditis elegans* and subsequently in another metazoan species :cite:`Pasquinelli:00`. 
+This recognition were complemented by a complete characterization of their 
+typical features as: a stem-loop structure, well-conservation over multiple metazoan clades
+and typical expression patterns as an isolated locus or co-expression of polycistronic miRNA
+transcripts :cite:`Lagos-Quintana:2001,Lau:2001,Lee:2001,Reinhart2000`.
+
+Now, metazoan miRNAs have been recognized as a conserved group of short ncRNAs, 
+typically ~ 22 nt, with important roles as post-transcriptional regulators of the gene expression 
+affecting a sizeable number of mRNAs and expressed in all developmental
+process and diseases :cite:`Bartel:18`. Their canonical biogenesis starts in the form of primary
+precursors (pri-miRNAs) transcribed from long non-coding RNAs or protein-coding transcripts,
+mostly from introns :cite:`Zeidler:2020`. Later, derived from hairpin-like precursors excised in 
+the nucleus (pre-miRNAs), their acting form is subsequently further processed as 
+miRNA/miRNA* duplexes on the cytoplasm and incorporated into the RISC complex.
+Target specificity is achieved by complementarity between the miR and mRNA sequence.
+(see more details in :cite:`Bartel:18`).
+
+Current classification of annotated miRNAs into families are available in miRBase [#f1]_ and
+mirGeneDB [#f2]_ databases. As an example, the human genome reported 1984 miRNA precursors in 
+the miRBase v.22.1 :cite:`Kozomara:19` and the corresponding mature products were estimated ~2300
+:cite:`Alles:19`. Focusing on the *confidently canonical* miRNAs reported in :cite:`Fromm:15`,
+the number of miRNAs is 519. Those differences are explained on the basis of multiple 
+*miRNA* detection methods as well as the intrinsic definitions to define a *canonical miRNA*.
+
+Despite
+The computational detection of miRNA precursors is possible despite their small sizes, 
+due the often extreme level of sequence conservation (cite).
+
+
+In this computational approach we focus on the *canonical* miRNAs processed by Drosha and Dicer, with a set of common features defined by :cite:`Tarver:12`.
+
+``miRNAture`` is used to annotate homologs of metazoan microRNAs, discovered by means of
+sequence, structural validation and correct position of their *mature* sequences,
+detected on a harboring-hairpin-loop structure. This computational strategy enables 
+an automated annotation workflow to search *bona fide* miRNA candidates, based
+on pairwise comparisons and hidden Markov profiles, at sequence level. The
+secondary structure is evaluated using covariance models and evaluating the
+correct folding of the hairpin sequences, based on the position of the *mature*
+sequences. 
+
+Strategy
+^^^^^^^^
+Current approaches to computational miRNA detection relies on homology relationships 
+or detection of hairpin-loop candidates with lower folding energy. A complete set of 
+tools to automatize this task have been assembled on ``miRNAture``. This current 
+approach combines two different sequence-homology modes, using ``blast`` or ``HMMer``, and 
+a secondary structure validation step, performed by the ``INFERNAL`` package. Combination 
+of different strategies and the modification of default covariance models, let ``miRNAture``
+report not only the homology relationships, but also define positions of *mature* sequences 
+and the correct miRNA annotation, supported by multiple family specific alignments.
+Current workflow is depicted as follows:
+
+.. image:: ../../mirnature3.png
+   :width: 600
+
+Installation
+^^^^^^^^^^^^
+Download the source code or clone the miRNAture project located on Github_.
+On the ``Code/`` folder execute the file:: 
+
+    ./activate_environment_conda.sh
+
+Which will create the ``miRNAture`` conda repository (based on the
+``miRNAture.yml`` file) and will install all the required programs to run
+``miRNAture``.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+   
+   tutorial
+   license
+   help
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+.. rubric:: Footnotes
+
+.. [#f1] https://www.mirbase.org/
+.. [#f2] https://www.mirgenedb.org/
+.. _Github: https://github.com/Bierinformatik/miRNAture
+
+.. bibliography::

@@ -1,0 +1,13 @@
+========
+Strategy
+========
+
+Current approaches to computational miRNA detection relies on homology relationships 
+or detection of hairpin-loop candidates with lower folding energy. A complete set of 
+tools to automatize this task have been assembled on ``miRNAture``. This current 
+approach combines two different sequence-homology modes, using ``blast`` or ``HMMer``, and 
+a secondary structure validation step, performed by the ``INFERNAL`` package. Current workflow 
+is depicted as follows:
+
+.. image:: ../../mirnature3.png
+   :width: 600

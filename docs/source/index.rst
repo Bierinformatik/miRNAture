@@ -1,0 +1,23 @@
+.. miRNAture documentation master file, created by
+   Cristian Velandia on Tue Jul 7 23:21:30 2020.
+
+=========
+miRNAture
+=========
+
+Computational detection of microRNA candidates
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+
+   introduction
+   installation
+   quick_start
+   strategy
+   tutorial
+   appendix
+   license
+   help
+
+.. bibliography::
