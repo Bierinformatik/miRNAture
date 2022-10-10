@@ -40,7 +40,7 @@ extensions = [
 ]
 
 # Biblio
-bibtex_bibfiles = ['../biblio.bib']
+bibtex_bibfiles = ['biblio.bib']
 bibtex_default_style = 'plain'
 
 
