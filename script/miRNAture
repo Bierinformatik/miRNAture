@@ -108,6 +108,8 @@ my $config_file = Mir::ConfigurationFile->new (
 	parallel_linux => $parallel_linux,
 	parallel => $parallel_run,
 	debug_mode => $debug,
+	evaluation_results_folder => $work_folder."/Final_miRNA_evaluation",
+	mirnanchor_folder => $work_folder."/miRNA_validation",
 );
 $config_file->start;
 $config_file->generate_copy_genome;
@@ -200,7 +202,8 @@ if ($config_file->stage =~ /^homology$/){
 	my $summary_results = Mir::Summarise->new(
 		all_parameters => $variables
 	);
-	$summary_results->generate_summary_file($config_file->config_file, $variables);
+	$summary_results->generate_summary_file($config_file->config_file, 
+											$variables, $config_file->evaluation_results_folder);
 } else {
 	print_error("Until now the stage: <".$config_file->stage."> does not exists!, try one of the available ones: 'homology', 'validation', 'evaluation', 'summarise', 'no_homology' or even better 'complete'.");
 }
@@ -250,7 +253,7 @@ and necessary files to run MIRfix.
 
 =item -debug_mode/dbug <0|1>
 
-Activate the DEBUG mode on miRNAture run modes.
+Activate the Perl DEBUGGER to run miRNAture.
 
 =item -mfx/-mirfix_path <PATH>
 
@@ -284,9 +287,9 @@ included as homology 'potential' candidates.
 
 This flag is blast mode specific. It corresponds to blast strategies that would be used to search miRNAs. It must be indicated along with -m I<Blast> flag. 
 
-=item -stg/-stage <'homology','validation','evaluation','summarise','complete'>
+=item -stg/-stage <'homology','no_homology','validation','evaluation','summarise','complete'>
 
-Selects the stage to be run on miRNAture. The options are: 'homology', 'validation', 'evaluation', 'summarise' or 'complete'.
+Selects the stage to be run on miRNAture. The options are: 'homology', 'no_homology', 'validation', 'evaluation', 'summarise' or 'complete'.
 
 =item -speG/-specie_genome <PATH>
 

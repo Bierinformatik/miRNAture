@@ -61,7 +61,7 @@ GetOptions (
     'blast_queries|blstq=s' => \$blastQueriesFolder,
     'data_folder|data=s' => \$data_folder,
     'parallel|ps=i' => \$parallel_run, # Parallel SLURM
-    'parallel_linux|pe=i' => \$parallel_linux, # Parallel SLURM
+    'parallel_linux|pe=i' => \$parallel_linux, # Parallel LINUX
     'new_models|nmodels=s{1,2}' => \@cm_model_others,
 ) or pod2usage(2);
 @strategy = split (/,/, join(',',@strategy));

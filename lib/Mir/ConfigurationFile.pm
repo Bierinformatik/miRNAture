@@ -194,6 +194,21 @@ has 'nbitscore_cut' => (
 	#default => 0.32 # By default this nBit= 0.32, cutoff bitscore
 );
 
+
+has 'evaluation_results_folder' => (
+	is => 'ro',
+	isa => 'Path::Class::Dir',
+	coerce => 1,
+	required => 1,
+);
+
+has 'mirnanchor_folder' => (
+	is => 'ro',
+	isa => 'Path::Class::Dir',
+	coerce => 1,
+	required => 1,
+);
+
 sub _folder_set {
     my ($self) = @_;
     if (!$self->user_folder){
@@ -561,12 +576,56 @@ sub get_last_name {
 		goto NAME;        
 	} else {
 		if (length $last_name > 0){
-			return $last_name;
+			my $last_name_final = evaluate_variables_file($last_name);
+			return $last_name_final;
 		} else {
 			return $nameOriginal;
 		}
 	}    
 }
+
+sub evaluate_variables_file {
+	my $temp_file = shift;
+	my $valid_content = test_contents_file($temp_file);
+	if ($valid_content == 1) {
+		return $temp_file;
+	}
+	# Information not in selected file. Evaluate
+	# previous one.
+	my $previous_file = $temp_file;
+	$previous_file =~ s/(miRNAture_configuration_.*)(\-)(\d+)(.yaml)/$1/g;
+	# Previous file
+	my $count = $3-1;
+	NAME2:
+	my $test_name = "$previous_file-$count.yaml";
+	if (-e $test_name && !-z $test_name && $count > 0){
+		my $valid_content2 = test_contents_file($test_name);
+		if ($valid_content2 == 1) {
+			return $test_name;
+		} else {
+			$count--;
+			goto NAME2;
+		}
+	} else {
+		my $basic = "$previous_file.yaml";
+		return $basic;
+	}
+}
+
+sub test_contents_file {
+	my $temp_file = shift;
+	open my $FILE, "< $temp_file" or die;
+	while (<$FILE>){
+		chomp;
+		if ($_ =~ m/Output\_miRNAnchor\_folder/) {
+			close $FILE;
+			return 1;
+		}
+	}
+	close $FILE;
+	return 0;
+}
+
 sub start {
 	print "\n";
 	print ".__________________________________________________________________________.\n";

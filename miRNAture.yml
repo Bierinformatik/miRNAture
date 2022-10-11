@@ -12,6 +12,7 @@ dependencies:
   - infernal=1.1.2
   - mirfix=2.0.0
   - nettle=3.3
+  - parallel=20220922
   - perl-sub-name=0.21
   - perl-yaml-tiny=1.73  
   - perl=5.26.2

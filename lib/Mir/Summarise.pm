@@ -22,12 +22,13 @@ sub generate_summary_file {
 	my $shift = shift;
 	my $config_file = shift;
 	my $variables = shift;
-	my $validatedStr = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/high_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $validatedNoStr = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/medium_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $discarded = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/NO_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $out_summary_file = $variables->[4]->{"User_results"}{"Evaluation_results_folder"}."/miRNAture_summary_".$shift->all_parameters->[3]->{Specie_data}->{Tag}.".txt";
+	my $evaluation_folder = shift;
+	my $validatedStr = $evaluation_folder."/high_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
+	my $validatedNoStr = $evaluation_folder."/medium_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
+	my $discarded = $evaluation_folder."/NO_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
+	my $out_summary_file = $evaluation_folder."/miRNAture_summary_".$shift->all_parameters->[3]->{Specie_data}->{Tag}.".txt";
 	calculate_summary_file($validatedStr, $validatedNoStr, $discarded, $out_summary_file);
-	get_final_output($variables);
+	get_final_output($variables, $evaluation_folder);
 	return;
 }
 
@@ -173,7 +174,7 @@ sub process_table_small {
 
 sub get_final_output {
 	my $shift = shift;
-	my $working_path = $shift->[4]->{"User_results"}{"Evaluation_results_folder"};
+	my $working_path = shift;
 	create_folders($working_path, "Tables");
 	create_folders($working_path, "Fasta");
 	create_folders($working_path, "MFE");

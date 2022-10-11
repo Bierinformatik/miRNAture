@@ -59,7 +59,9 @@ sub evaluate_input_flags {
 		print_error("The mode $parallel mode is not valid!");
 	}
 	if ($parallel_linux == 1 || $parallel_linux == 0){
-		;	
+		if ($parallel_linux == 1) {
+			existenceProgram("parallel");
+		}
 	} else {
 		print_error("The mode $parallel_linux mode is not valid!");
 	}
