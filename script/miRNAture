@@ -171,7 +171,7 @@ if ($config_file->stage =~ /^homology$/){
 	my $summary_results = Mir::Summarise->new(
 		all_parameters => $variables
 	);
-	$summary_results->generate_summary_file($config_file->config_file, $variables);
+	$summary_results->generate_summary_file($config_file->config_file, $variables, $config_file->evaluation_results_folder);
 	$homology_searches->clean_cache($variables, "all");
 } elsif ($config_file->stage =~ /^no_homology$/){
 	my $validation_mirnas = Mir::miRNAnchor->new(
@@ -189,7 +189,7 @@ if ($config_file->stage =~ /^homology$/){
 	my $summary_results = Mir::Summarise->new(
 		all_parameters => $variables
 	);
-	$summary_results->generate_summary_file($config_file->config_file, $variables);
+	$summary_results->generate_summary_file($config_file->config_file, $variables, $config_file->evaluation_results_folder);
 	$homology_searches->clean_cache($variables, "All");
 } elsif ($config_file->stage =~ /^evaluation$/){
 	my $evaluation_results = Mir::Eval->new(
