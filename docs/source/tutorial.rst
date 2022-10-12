@@ -2,14 +2,14 @@
 Tutorial
 ========
 
-Through this step-by-step tutorial you could make use of key options from 
-``miRNAture`` to annotate the *bona fide* miRNA complement on selected contigs 
-from the coelacanth (*Latimeria chalumnae*) genome. All the required files to
-execute this tutorial are included in the ``miRNAture`` source files in the `miRNAture/Tutorial` 
-folder.
+Through this step-by-step tutorial you could make use of key options from
+``miRNAture`` to annotate the miR-181 family on selected contigs from the
+coelacanth (*Latimeria chalumnae*). All the required files to execute this
+tutorial are included in the ``miRNAture`` source files in the
+`miRNAture/Tutorial` folder.
 
-Annotating let-7 on coelacanth
-******************************
+Annotating miR-181 on coelacanth
+********************************
 
 .. figure:: coel.jpg
     :width: 320px
@@ -18,7 +18,7 @@ Annotating let-7 on coelacanth
     :alt: Coelacanth image
     :figclass: align-center
     
-    *Latimeria chalumnae*. Source: `Alberto Fernandez Fernandez / CC BY-SA <https://upload.wikimedia.org/wikipedia/commons/f/fa/Latimeria_Chalumnae_-_Coelacanth_-_NHMW.jpg>`_
+    *L. chalumnae*. Source: `Alberto Fernandez Fernandez / CC BY-SA <https://upload.wikimedia.org/wikipedia/commons/f/fa/Latimeria_Chalumnae_-_Coelacanth_-_NHMW.jpg>`_
 
 Based on the miRNA annotation retrieved from ``Ensembl`` release 100, the
 coelacanth genome featured 8 let-7 locus distributed along 6 contigs. For purposes of this
