@@ -236,7 +236,7 @@ sub setup_all_to_run_mirfix_group {
 		mapping_file => "$location/BaseFiles/${name}.mappingtest.txt",
 		mature_file => "$location/BaseFiles/${name}_maturetest.fa",
 		extension => "10",
-		log_level => "DEBUG"
+		log_level => "INFO"
 	);
 	my $parameters = $param_mirfix->build_parameters;	
 	if ($gridengine == 0){

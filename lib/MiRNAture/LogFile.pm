@@ -70,7 +70,7 @@ sub _header_log {
 }
 
 sub create_header {
-	my $header = "######\n###  miRNAture : search miRNAs against a sequence\n###  Authors: Cristian A. Velandia-Huerto, Jöerg Fallmann and Peter F. Stadler\n###  Version: v.1.10 Sept 21th, 2022\n###  Bioinformatics Department, Universität Leipzig\n###  Freely distributed under a BSD open source license.\n######\n";
+	my $header = "######\n###  miRNAture \n###  Authors: Cristian A. Velandia-Huerto, Jöerg Fallmann and Peter F. Stadler\n###  Version: v.1.1 Sept 21th, 2022\n###  Bioinformatics Department, Universität Leipzig\n###  Freely distributed under a BSD open source license.\n######\n";
 	return $header;
 }
 
