@@ -2,7 +2,7 @@
 Installation
 ============
 
-The easiest way to install ``miRNAture`` is through `conda`. To do so, please first install
+The easiest way to install ``miRNAture`` is through ``conda``. To do so, please first install
 Conda [#conda]_.
 
 To speed up installation of dependencies and packages we suggest to use mamba [#mamba]_, for 
@@ -10,22 +10,22 @@ this just run::
     
     conda install mamba -c conda-forge
 
-You can use `mamba` as drop-in replacement for `conda` by simply replacing the call to `conda` 
-with a call to `mamba`.
+You can use ``mamba`` as drop-in replacement for ``conda`` by simply replacing the call to ``conda`` 
+with a call to ``mamba``.
 
-*Install via Conda*
+*Install via ``conda``*
 
-To install ``miRNAture`` from `conda` in a specific `mirnature` environment simply run::
+To install ``miRNAture`` from ``conda`` in a specific ``mirnature`` environment simply run::
 
     mamba create -n mirnature mirnature
 
-if `mamba` is available, else run::
+if ``mamba`` is available, else run::
 
     conda create -n mirnature mirnature
 
-*Manual install, resolve dependencies via Conda*
+*Manual install, resolve dependencies via ``conda``*
 
-Create a `mirnature` `conda` environment with the file `miRNAture.yml`::
+Create a `mirnature` ``conda`` environment with the file ``miRNAture.yml``::
 
     mamba env create -n mirnature -f miRNAture.yml
 
@@ -40,7 +40,7 @@ followed by the manual steps::
     ./Build test
     ./Build install
 
-which will install ``miRNAture`` in the `mirnature` `conda` environment.
+which will install ``miRNAture`` in the `mirnature` ``conda`` environment.
 
 .. rubric:: Footnotes
 
