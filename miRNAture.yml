@@ -15,7 +15,7 @@ dependencies:
   - perl-sub-name=0.21
   - perl-yaml-tiny=1.73  
   - perl=5.26.2
-  - perl-bioperl=1.7.2
+  - perl-bioperl=1.7.8
   - perl-module-build=0.4224
   - perl-moose=2.2011
   - perl-moosex-types=0.50
@@ -28,4 +28,4 @@ dependencies:
   - r-base=3.5.1
   - r-dplyr=0.8.5
   - rmblast=2.9.0
-  - viennarna=2.4.17
+  - viennarna=2.5.1
