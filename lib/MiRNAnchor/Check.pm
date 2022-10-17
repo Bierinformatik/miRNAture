@@ -8,7 +8,7 @@ use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
 use Bio::SearchIO;
-use Bio::Tools::Run::StandAloneBlast;
+use Bio::Tools::Run::StandAloneBlastPlus;
 
 my %mappedCoordinates; #Mapped coordinates back to genome
 
@@ -313,26 +313,42 @@ sub change_to_dna {
 
 sub run_blast {
 	my ($genome, $query, $query_len, $chrName) = @_;
-	my @params = (  -program => 'blastn',
-		-outfile => "$query.out",
-		-database => $genome,
-		-F => "F", #Not disable low complexity
-		-W => 30);
-	my $factory =  Bio::Tools::Run::StandAloneBlast->new(@params);
-	my $blast_report = $factory->blastall($query);
-	my $output = Bio::SearchIO->new(-format => "blast", 
+	my @params = (  
+		-db_name => $genome,
+		-db_data => $genome,
+		-create => 1
+	);
+	my $factory = Bio::Tools::Run::StandAloneBlastPlus->new(@params);
+	# Create blast+ db:  <18-10-22, cavelandiah> #
+	$factory->make_db();
+	my $blast_report = $factory->blastn(
+										-query => $query,
+										-outfile => "$query.out",
+									    -method_args => [
+														  -evalue => 0.01,
+														  -word_size => 30,
+														  -perc_identity => 95,
+														  -dust => 'no'
+													  ],
+										-hit_filter => sub { 
+											my $hit = shift;
+											$hit->name =~ /^$chrName/;
+										}
+									);
+	my $output = Bio::SearchIO->new(
+		-format => "blast", 
 		-file => "$query.out",
 		-best_hit_only => 1,
 		-hit_filter => sub { 
-            my $hit = shift;
-            $hit->name =~ /^$chrName/;
-        }
+			my $hit = shift;
+			$hit->name =~ /^$chrName/;
+		}
 	);
 	my ($chr, $start, $end, $strand, $queryLen, $identity, $id_scaffold) = get_blast_information($output, $query_len, $chrName);
-    # Based on blast results update coordinates respect to complete genome:  <30-08-21, cavelandiah> #
-    ($chr, $start, $end) = update_data_sub_region($id_scaffold, $start, $end);
-    system "rm $query"; #Delete temp fasta
-    system "rm $query.out"; #Delete BLAST output 
+	# Based on blast results update coordinates respect to complete genome:  <30-08-21, cavelandiah> #
+	($chr, $start, $end) = update_data_sub_region($id_scaffold, $start, $end);
+	system "rm $query"; #Delete temp fasta
+	system "rm $query.out"; #Delete BLAST output 
 	return ($chr, $start, $end, $strand, $queryLen);
 }
 

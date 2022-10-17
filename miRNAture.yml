@@ -5,12 +5,11 @@ channels:
   - r
   - defaults
 dependencies:
-  - blast=2.9.0
-  - blast-legacy=2.2.26
+  - blast=2.13.0
   - clustalo=1.2.4
   - hmmer=3.3
   - infernal=1.1.2
-  - mirfix=2.0.0
+  - mirfix=2.1.0
   - nettle=3.3
   - parallel=20220922
   - perl-sub-name=0.21
