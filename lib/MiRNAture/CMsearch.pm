@@ -19,7 +19,7 @@ sub cmsearch_rfam_parallel {
 	$genome =~ s/"//g;
 	foreach my $path_cm_specific (@$path_cm){
 		next if $path_cm_specific =~ /^$/;
-		system("parallel $cmsearch_path -E 0.015 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/{/.}_$genomeTag.tab -o $outFolder/{/.}_$genomeTag.out $path_cm_specific/{/.}\.cm $genome 1> /dev/null ::: $path_cm_specific/RF*\.cm");
+		system("parallel --will-cite $cmsearch_path -E 0.015 --notrunc -Z $zscore --nohmmonly --tblout $outFolder/{/.}_$genomeTag.tab -o $outFolder/{/.}_$genomeTag.out $path_cm_specific/{/.}\.cm $genome 1> /dev/null ::: $path_cm_specific/RF*\.cm");
 	}
 	return;
 }

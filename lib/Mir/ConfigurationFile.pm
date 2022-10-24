@@ -475,12 +475,11 @@ sub obtain_paths_programs {
 	my $clustalo = collect_data("clustalo");
 	my $RNAalifold = collect_data("RNAalifold");
 	my $mirfix = collect_data("MIRfix.py");
-    ###my $mirnatureHomology = collect_data("miRNAture.pl");
-    ###my $mirnanchor = collect_data("miRNAnchor.pl");
-    ##TEMPORAL
-    my $mirnatureHomology = "/homes/biertank/cristian/Projects/miRNAture_v1/script/miRNAture.pl";
-    my $mirnanchor = "/homes/biertank/cristian/Projects/miRNAture_v1/script/miRNAnchor.pl";
-	##TODO
+    my $mirnatureHomology = collect_data("miRNAture.pl");
+    my $mirnanchor = collect_data("miRNAnchor.pl");
+    ##TEMPORAL TODO
+    #my $mirnatureHomology = "~/Proyects/miRNAture_v1/script/miRNAture.pl";
+    #my $mirnanchor = "~/Proyects/miRNAture_v1/script/miRNAnchor.pl";
     return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix, $mirnatureHomology, $mirnanchor);
 }
 

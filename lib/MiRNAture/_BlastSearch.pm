@@ -434,7 +434,7 @@ sub runBlastn_parallel {
 	if ($parallel == 1){
 		print_process("Going into parallel running!");
 		# Ciona_savignyi.cisa.new.fasta -> Cirp_3.miRNA.cisa.tab
-		system("parallel  --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${specie}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
+		system("parallel --will-cite --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${specie}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
 	}
 	return; 
 }
@@ -629,7 +629,7 @@ sub runcmSearch_parallel {
 	if ($parallel == 1){
 	foreach my $cm_path_specific (@$cm_models_path){
 		next if $cm_path_specific =~ /^$|^NA/;
-		system("parallel $cmsearch_path -E 0.015 --notrunc -Z $Zvalue --noali --nohmmonly --toponly --tblout $out_path_infernal/${query_file_modified}.{/.}.tab {} $query_file 1> /dev/null ::: $cm_path_specific/*.cm");
+		system("parallel --will-cite $cmsearch_path -E 0.015 --notrunc -Z $Zvalue --noali --nohmmonly --toponly --tblout $out_path_infernal/${query_file_modified}.{/.}.tab {} $query_file 1> /dev/null ::: $cm_path_specific/*.cm");
 		}
 	} 	
 	return;

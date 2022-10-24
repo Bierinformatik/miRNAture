@@ -163,10 +163,12 @@ sub check_candidate {
 
 sub validate_secondary_structure_alignment {
 	my ($sto, $current_dir, $positionsBest) = @_;
-	my $result = system("/homes/biertank/cristian/Projects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
+	my $result = system("evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
+    #my $result = system("~/Proyects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
 	my $evaluation_result;
 	if ($result == 0){ #Success!
-		$evaluation_result = `/homes/biertank/cristian/Projects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>&1`;
+        #$evaluation_result = `~/Proyects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>&1`;
+		$evaluation_result = `evaluate_conserved_str.py $sto $positionsBest 2>&1`;
 		chomp $evaluation_result;
 	} else { #Failed to read the file, didn't generated
 		$evaluation_result = "NA";
