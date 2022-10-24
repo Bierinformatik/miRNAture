@@ -80,7 +80,7 @@ sub cmsearch_specific_sequence_parallel {
 	##}
 	#system("parallel --rpl '.. s:.*/::; s:\.[^/.]+$::; s/([A-Za-z]+\.)(.*)(\.tab\.true\.table)/$2/;' $cmsearch_path -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.{..}.tab {} 1> /dev/null ::: $out_path_infernal/../$genome_tag.*.tab.true.table.fasta");
 	# Here have to resolve the path of CMs:  <25-04-22, cavelandiah> #
-	system("parallel --rpl '.. s/(\.\.\/|\/.*\/)([A-Za-z]+\.)(.*)(\.tab\.true\.table\.fasta)/$3/;' $cmsearch_path -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.{..}.tab {} 1> /dev/null ::: $out_path_infernal/../$genome_tag.*.tab.true.table.fasta");
+	system("parallel --will-cite --rpl '.. s/(\.\.\/|\/.*\/)([A-Za-z]+\.)(.*)(\.tab\.true\.table\.fasta)/$3/;' $cmsearch_path -E 0.015 --notrunc -Z $Zscore --nohmmonly --noali --toponly --tblout $out_path_infernal/${genome_tag}.{..}.tab {} 1> /dev/null ::: $out_path_infernal/../$genome_tag.*.tab.true.table.fasta");
 	return;
 }
 
@@ -157,7 +157,7 @@ sub runNhmmer_parallel {
 	foreach my $hmms_path_specific (@$path_hmm){
 		next if $hmms_path_specific =~ /^$|^NA$/;
 		#system("parallel $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{}\.tab\.true\.table $hmms_path_specific/{}\.hmm $genome 1> /dev/null :::: $list_cm_file");
-		system("parallel $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{/.}\.tab\.true\.table $hmms_path_specific/{/.}\.hmm $genome 1> /dev/null ::: $hmms_path_specific/*\.hmm");
+		system("parallel --will-cite $nhmmer_path -E 0.01 -Z $zvalue --noali --tblout $out_folder/$specie/$specie\.{/.}\.tab\.true\.table $hmms_path_specific/{/.}\.hmm $genome 1> /dev/null ::: $hmms_path_specific/*\.hmm");
 		#system("parallel --rpl '.. s/(.*)(\.hmm)/$1/;' echo '{/.}' ::: $hmms_path_specific/*.hmm")
 	}
 #	foreach my $hmms_path_specific (@$path_hmm){
