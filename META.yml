@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0.4224'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:

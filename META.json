@@ -3,7 +3,7 @@
    "author" : [
       "Cristian A Velandia Huerto <cristian@bioinf.uni-leipzig.de>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "gpl_3"
