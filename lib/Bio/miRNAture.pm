@@ -4,7 +4,7 @@ use v5.31.1;
 use strict;
 use warnings;
 
-our $VERSION = 1.1;
+our $VERSION = v1.1;
 
 =head1 NAME
 
