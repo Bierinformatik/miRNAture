@@ -10,7 +10,7 @@ dependencies:
   - clustalo >=1.2.4
   - hmmer >=3.3.2
   - infernal >=1.1.4
-  - mirfix >=2.1.0
+  - mirfix >=2.1.1
   - parallel >=20220922
   - perl >=5.32.1
   - perl-bioperl >=1.6.924
