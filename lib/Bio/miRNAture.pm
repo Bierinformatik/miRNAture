@@ -1,83 +1,112 @@
 package Bio::miRNAture;
 
-use v5.26.2;
+use v5.31.1;
 use strict;
 use warnings;
 
-our $VERSION = 1.0.0;
+our $VERSION = v1.1;
 
 =head1 NAME
 
 C<miRNAture> - Computational detection of microRNA candidates
 
+=head1 VERSION
+
+miRNAture v.1.1 (Sept 21th, 2022)
+
 =head1 SYNOPSIS
 
 ./miRNAture [-options]
+
+=head1 AUTHORS:
+
+I<Cristian A. Velandia Huerto>
+I<Joerg Fallmann>
+I<Peter F. Stadler>
 
 =head1 OPTIONS
 
 =over 12
 
-=item -help           
+=item -h/-help           
 
-Print this documentation
+Print this documentation.
 
 =item -man 
 
-Prints the manual page and exits.
+Prints an extended help page and exits.
 
-=item -blstq <PATH>
+=item -blstq/-blastQueriesFolder <PATH>
 
-Path of blast query sequences in fasta format to be searched on the subject sequence.
+Path of blast query sequences in FASTA format to be searched on the subject sequence.
 
-=item -mfx <PATH>
+=item -dataF/-datadir <PATH>
+
+Path to pre-calculated data directory containing RFAM and miRBase covariance, hidden markov models, 
+and necessary files to run MIRfix. 
+
+=item -debug_mode/dbug <0|1>
+
+Activate the Perl DEBUGGER to run miRNAture.
+
+=item -mfx/-mirfix_path <PATH>
 
 Alternative path of the MIRfix.py program.
 
-=item -m <Blast, HMM, Other_CM, Infernal, Final>
+=item -m/-mode <blast,hmm,rfam,mirbase,user,final>
 
-Homology search modes: Blast, HMM, Other_CM, Infernal and/or Final. It is possible to perform individual analysis, but it is always recommended to include the I<Final> option.
+Homology search modes: blast, hmm, rfam, mirbase, infernal, user and/or final. It is possible to perform individual analysis, but it is always recommended to include the I<final> option to merge multiple results.
 
-=item -pe <0|1>
+=item -ps/-parallel_slurm <0|1>
 
 Activate SLURM resource manager to submit parallel jobs (1) or not (0). 
 
-=item -rep <default,200,100|relax,Number_Loci,Candidates_to_evaluate>
+=item -pe/-parallel <0|1>
 
-Setup number of maximum loci number that will be evaluated by the mature's annotation stage. It will detect the families that reported high number of loci, > 200 by default or a number X defined by the user. Then, it will select the top 100 candidates in terms of alignment scores to be evaluated in the next stage. The options are: 'default' and 'relaxed':
-    -'default,200,100': Will label miRNA families with > 200 loci as repetititive. From them, the best 100 will be evaluated by the annotation stage, meanwhile the remaining will be reported as 'potential' candidates on the homology part.
-    -'relax,Number_Loci,Candidates_to_evaluate': Allow the user to select the threshold to consider the families as repetitive, defined in the second number (Number_Loci). The number of candidates prone to be evaluated are defined by the third number (Candidates_to_evaluate).
+Activate parallel jobs processing (1) or not (0). 
 
-=item -str <1,2,3,4,5,6,7,8,9,10>
+=item -rep/-repetition_cutoff <relax,Number_Loci,Candidates_to_evaluate>
+
+Setup number of maximum loci number that will be evaluated by the mature's annotation stage. By default, 
+miRNAture will detect miRNA families that report high number of loci (> 200 loci). Then, it will select
+the top 100 candidates in terms of alignment scores, as candidates for the validation stage (default,200,100). 
+The designed values could be modified by the following flag: 'relax,Number_Loci,Candidates_to_evaluate'.
+This option allows to the user to select the threshold values to detect repetitive families. The first 
+parameter is <relax>, which tells miRNAture to change the default configuration. The next one, <Number_Loci> 
+is the threshold of loci number to classify a family as repetitive. The last one, <Candidates_to_evaluate>, 
+is the number of candidates prone to be evaluated in the next evaluation section. The rest candidates are
+included as homology 'potential' candidates.
+
+=item -str/-strategy <1,2,3,4,5,6,7,8,9,10>
 
 This flag is blast mode specific. It corresponds to blast strategies that would be used to search miRNAs. It must be indicated along with -m I<Blast> flag. 
 
+=item -stg/-stage <'homology','no_homology','validation','evaluation','summarise','complete'>
 
-=item -stage <'homology','validation','evaluation','summarise','complete'>
+Selects the stage to be run on miRNAture. The options are: 'homology', 'no_homology', 'validation', 'evaluation', 'summarise' or 'complete'.
 
-Selects the stage to be run on miRNAture. The options are: 'homology', 'validation', 'evaluation', 'summarise' or 'complete'.
+=item -speG/-specie_genome <PATH>
 
-=item -speG <PATH>
+Path of target sequences to be analyzed in FASTA format.
 
-Path of target sequences to be analyzed in fasta format.
-
-=item -speN <Genera_specie>
+=item -speN/-specie_name <Genera_specie>
 
 Specie or sequence source's scientific name. The format must be: I<Genera_specie>, separated by '_'.
 
-=item -speT <TAG_NAME>
+=item -speT/-specie_tag <TAG_NAME>
 
 Experiment tag. Will help to identify the generated files along miRNA output files.
 
-=item -sublist <FILE_WITH_CM_NAMES>
+=item -sublist/-subset_models <FILE_WITH_CM_NAMES>
 
 Target list of CMs to be searched on subject genome/sequences. If not indicated, miRNAture will run all RFAM v14.4 metazoan miRNA models.
 
-=item -usrM <PATH>
+=item -usrM/-user_models <PATH>
 
-Directory with additional hidden markov (HMMs) or covariance models (CMs) provided by the user.
+Directory with additional hidden Markov (HMMs) or covariance models (CMs) provided by the user. This must
+be contain a corresponding HMMs/ and CMs/ folders, which the user models will be identified.
 
-=item -w <OUT_PATH>
+=item -w/-workdir <OUT_PATH>
 
 Working directory path to write all miRNAture results.
 
@@ -102,13 +131,13 @@ I<Cristian A. Velandia Huerto>
 I<Joerg Fallmann>
 I<Peter F. Stadler>
 
-=head1 LICENSE
-
-GPL-3.0
-
 =head1 BUGS, CAVEATS, COMPLAINS or DONATIONS 
 
 Write directly to cristian at bioinf.uni-leipzig.de
+
+=head1 LICENSE
+
+GPL-3.0
 
 =cut 
 

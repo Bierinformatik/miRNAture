@@ -9,7 +9,7 @@ use lib "lib/MiRNAture";
 
 with 'MiRNAture::ToolBox';
 
-our $VERSION = v1.0.0;
+our $VERSION = v1.1;
 
 has 'all_parameters' => (
 	is => 'ro',

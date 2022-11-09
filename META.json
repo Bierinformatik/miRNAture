@@ -21,28 +21,64 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "1.8",
+            "BioPerl" : "0",
+            "Carp" : "1.5",
+            "Class::Load" : "0",
+            "Config" : "5.032001",
             "Cwd" : "3.75",
-            "Exporter" : "5.72",
+            "Data::OptList" : "0.112",
+            "Encode" : "3.19",
+            "Encode::Alias" : "2.25",
+            "Encode::Config" : "2.05",
+            "Encode::Encoding" : "2.08",
+            "Encode::MIME::Name" : "1.03",
+            "Exporter" : "5.74",
+            "Exporter::Heavy" : "5.74",
+            "Fcntl" : "1.13",
             "File::Basename" : "2.85",
             "File::Copy" : "2.32",
             "File::Copy::Recursive" : "0.45",
-            "File::Share" : "0.25",
-            "File::ShareDir" : "1.00",
-            "FindBin" : "1.51",
-            "Getopt::Long" : "2.5",
-            "JSON" : "4.02",
-            "List::MoreUtils" : "0.428",
-            "List::Util" : "1.52",
-            "Math::BigFloat" : "1.999806",
+            "File::Spec" : "3.75",
+            "File::Spec::Unix" : "3.75",
+            "Getopt::Long" : "2.52",
+            "IO::String" : "1.08",
+            "IO::Stringy" : "2.113",
+            "List::Util" : "1.63",
+            "Module::Implementation" : "0.09",
+            "Module::Runtime" : "0.016",
             "Moose" : "2.2011",
             "MooseX::Types::Path::Class" : "0.09",
-            "POSIX" : "1.76",
+            "POSIX" : "1.94",
+            "Params::Util" : "1.102",
+            "Params::Util::PP" : "1.102",
+            "Pod::Escapes" : "1.07",
+            "Pod::Simple" : "3.4",
+            "Pod::Simple::BlackBox" : "3.4",
+            "Pod::Simple::LinkSection" : "3.4",
+            "Pod::Text" : "4.14",
             "Pod::Usage" : "1.69",
-            "Scalar::Util" : "1.52",
+            "Scalar::Util" : "1.63",
             "Statistics::R" : "0.34",
-            "Term::ANSIColor" : "4.06",
+            "Storable" : "3.15",
+            "Sub::Install" : "0.928",
+            "Term::ANSIColor" : "5.01",
+            "Tie::Hash" : "1.05",
+            "XSLoader" : "0.24",
             "YAML::Tiny" : "1.73",
-            "perl" : "v5.26.2"
+            "base" : "2.23",
+            "bytes" : "1.07",
+            "constant" : "1.33",
+            "if" : "0.0608",
+            "integer" : "1.01",
+            "lib" : "0.65",
+            "overload" : "1.31",
+            "overloading" : "0.02",
+            "parent" : "0.238",
+            "perl" : "v5.32.1",
+            "vars" : "1.05",
+            "warnings" : "1.47",
+            "warnings::register" : "1.04"
          }
       },
       "test" : {
@@ -54,7 +90,7 @@
    "provides" : {
       "Bio::miRNAture" : {
          "file" : "lib/Bio/miRNAture.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       },
       "MiRNAnchor::Check" : {
          "file" : "lib/MiRNAnchor/Check.pm"
@@ -124,7 +160,7 @@
       },
       "Mir::Eval" : {
          "file" : "lib/Mir/Eval.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       },
       "Mir::Summarise" : {
          "file" : "lib/Mir/Summarise.pm"
@@ -134,13 +170,13 @@
       },
       "Mir::miRNAture" : {
          "file" : "lib/Mir/miRNAture.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       },
       "miRNAtureValidationCM" : {
          "file" : "lib/MiRNAture/ValidationCM.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v1.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

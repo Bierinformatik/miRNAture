@@ -1,53 +1,122 @@
-Bio-miRNAture
+NAME
+    "miRNAture" - Computational detection of microRNA candidates
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+VERSION
+    miRNAture v.1.1 (Sept 21th, 2022)
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+SYNOPSIS
+    ./miRNAture [-options]
 
+AUTHORS:
+    *Cristian A. Velandia Huerto* *Joerg Fallmann* *Peter F. Stadler*
 
-INSTALLATION
+OPTIONS
+    -h/-help    Print this documentation.
 
-To install this module, run the following commands:
+    -man        Prints an extended help page and exits.
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+    -blstq/-blastQueriesFolder <PATH>
+                Path of blast query sequences in FASTA format to be searched
+                on the subject sequence.
 
-SUPPORT AND DOCUMENTATION
+    -dataF/-datadir <PATH>
+                Path to pre-calculated data directory containing RFAM and
+                miRBase covariance, hidden markov models, and necessary
+                files to run MIRfix.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+    -debug_mode/dbug <0|1>
+                Activate the Perl DEBUGGER to run miRNAture.
 
-    perldoc Bio::miRNAture
+    -mfx/-mirfix_path <PATH>
+                Alternative path of the MIRfix.py program.
 
-You can also look for information at:
+    -m/-mode <blast,hmm,rfam,mirbase,user,final>
+                Homology search modes: blast, hmm, rfam, mirbase, infernal,
+                user and/or final. It is possible to perform individual
+                analysis, but it is always recommended to include the
+                *final* option to merge multiple results.
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-miRNAture
+    -ps/-parallel_slurm <0|1>
+                Activate SLURM resource manager to submit parallel jobs (1)
+                or not (0).
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Bio-miRNAture
+    -pe/-parallel <0|1>
+                Activate parallel jobs processing (1) or not (0).
 
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Bio-miRNAture
+    -rep/-repetition_cutoff <relax,Number_Loci,Candidates_to_evaluate>
+                Setup number of maximum loci number that will be evaluated
+                by the mature's annotation stage. By default, miRNAture will
+                detect miRNA families that report high number of loci (> 200
+                loci). Then, it will select the top 100 candidates in terms
+                of alignment scores, as candidates for the validation stage
+                (default,200,100). The designed values could be modified by
+                the following flag:
+                'relax,Number_Loci,Candidates_to_evaluate'. This option
+                allows to the user to select the threshold values to detect
+                repetitive families. The first parameter is <relax>, which
+                tells miRNAture to change the default configuration. The
+                next one, <Number_Loci> is the threshold of loci number to
+                classify a family as repetitive. The last one,
+                <Candidates_to_evaluate>, is the number of candidates prone
+                to be evaluated in the next evaluation section. The rest
+                candidates are included as homology 'potential' candidates.
 
-    Search CPAN
-        https://metacpan.org/release/Bio-miRNAture
+    -str/-strategy <1,2,3,4,5,6,7,8,9,10>
+                This flag is blast mode specific. It corresponds to blast
+                strategies that would be used to search miRNAs. It must be
+                indicated along with -m *Blast* flag.
 
+    -stg/-stage
+    <'homology','no_homology','validation','evaluation','summarise','complet
+    e'>
+                Selects the stage to be run on miRNAture. The options are:
+                'homology', 'no_homology', 'validation', 'evaluation',
+                'summarise' or 'complete'.
 
-LICENSE AND COPYRIGHT
+    -speG/-specie_genome <PATH>
+                Path of target sequences to be analyzed in FASTA format.
 
-This software is Copyright (c) 2021 by Cristian A Velandia Huerto.
+    -speN/-specie_name <Genera_specie>
+                Specie or sequence source's scientific name. The format must
+                be: *Genera_specie*, separated by '_'.
 
-This is free software, licensed under:
+    -speT/-specie_tag <TAG_NAME>
+                Experiment tag. Will help to identify the generated files
+                along miRNA output files.
 
-  The GNU General Public License, Version 3, June 2007
+    -sublist/-subset_models <FILE_WITH_CM_NAMES>
+                Target list of CMs to be searched on subject
+                genome/sequences. If not indicated, miRNAture will run all
+                RFAM v14.4 metazoan miRNA models.
+
+    -usrM/-user_models <PATH>
+                Directory with additional hidden Markov (HMMs) or covariance
+                models (CMs) provided by the user. This must be contain a
+                corresponding HMMs/ and CMs/ folders, which the user models
+                will be identified.
+
+    -w/-workdir <OUT_PATH>
+                Working directory path to write all miRNAture results.
+
+DESCRIPTION
+    miRNAture detects *bona fide* miRNA candidates through sequence homology
+    searches and validation steps using structural alignments with
+    pre-defined or/and modified miRNA-specific covariance models. The
+    miRNAture pipeline is composed of three modules: (1) Homology search
+    operating on miRNA precursors, (2) prediction of the positioning of
+    mature miRNAs within the precursor mature annotation, and (3) an
+    Evaluation scheme designed to identify false positive miRNA annotations.
+    This multi-stage approach generates annotation files in BED/GFF3 from
+    precursors and detected mature regions and corresponding FASTA files. At
+    the same time, a summary file with the MFE, precursor length and number
+    of loci of each annotated miRNA family.
+
+AUTHORS
+    *Cristian A. Velandia Huerto* *Joerg Fallmann* *Peter F. Stadler*
+
+BUGS, CAVEATS, COMPLAINS or DONATIONS
+    Write directly to cristian at bioinf.uni-leipzig.de
+
+LICENSE
+    GPL-3.0
 
