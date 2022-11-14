@@ -10,8 +10,8 @@
   </token>
     <xml name="requirements">
         <requirements>
-        <requirement type="package">mamba</requirement>
-        <requirement type="package">mirnature</requirement>
+        <requirement type="package" version="20220922">parallel</requirement>
+        <requirement type="package" version="1.1">mirnature</requirement>
             <yield/>
         </requirements>
     </xml>
@@ -20,8 +20,5 @@
             <citation type="doi">10.3390/genes12030348</citation>
             <yield />
         </citations>
-    </xml>
-    <xml name="version_command">
-        <version_command>1.01</version_command>
     </xml>
 </macros>

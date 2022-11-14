@@ -4,26 +4,29 @@
         <import>macros.xml</import>
     </macros>
     <expand macro="requirements" />
-    <expand macro="version_command" />
     <command detect_errors="exit_code"><![CDATA[
-        #set mirnature="script/miRNAture"
-        #set conda="mamba"
-        cd /scratch/bioinf/Proyects/miRNAture_v1/ &
+        ##Last data path from: https://doi.org/10.5281/zenodo.7180160
+        ##MIRNATURE_DATA_PATH=\$(dirname \$(which miRNAture))/../share/blockclust_data &&
+
         #import re
-        mirnature -stage $stage 
-        -subset_models $subset_models 
-        -nbitscore_cut $bitscore_cut 
-        -datadir '/scratch/bioinf/Proyects/miRNAture_v1/Galaxy/miRNAture/data_test'
-        -specie_genome $specie_genome 
-        -specie_name $specie_name
-        -specie_tag $specie_tag 
-        -workdir '/scratch/bioinf/Proyects/miRNAture_v1/Galaxy/miRNAture/output'
+        mkdir -p output &&
+        miRNAture 
+        -stage '$stage' 
+        #if '$subset_models_des' == 1:
+            -sublist '$subset_models'  
+        #end if
+        -nbitscore_cut '0.32'
+        -dataF '$__tool_directory__/Dataset_mirnature_tutorial'
+        -specie_genome '$specie_genome' 
+        -specie_name '$specie_name'
+        -specie_tag '$specie_tag' 
+        -workdir 'output/'
         -mode "${",".join(map(str, $homology_mode))}"
+        -pe '0'
         #if re.match(r'blast',str($homology_mode))
             -strategy "${",".join(map(str, $blast_strategy))}" 
         #end if
-        -parallel '0' 
-        -repetition_cutoff 'relax,150,100' > 'output_tool.txt'
+        -rep 'relax,150,100'
         ]]></command>
     <inputs>
         <param format="fasta" multiple="true" name="specie_genome" type="data"
@@ -32,62 +35,67 @@
         <!--TEXT-->
         <param name="specie_name" type="text" label="Scientific specie name as: Genera_specie" />
         <param name="specie_tag" type="text" label="Species tag to identify through experiment" />
+        
+        <!--NUM-->
+
         <!--Binary-->
         <conditional name="activate_subset">
             <!--Binary-->
             <param name="subset_models_des" type="boolean" label="Subset default miRNA families"
-                truevalue="1" falsevalue="0" help="Make a selection of specific miRNA families to be search" />
+                truevalue="1" falsevalue="0" help="Make a selection of specific miRNA families to be search">
+            </param>
+            <when value="0">
+            </when>
             <when value="1">
                 <param format="txt" multiple="true" name="subset_models" type="data"
                     label="List of miRNA models to be searched"
                     help="Input sequence to be processed by miRNAture" optional="true"/>
             </when>
         </conditional>
-        <param name="bitscore_cut" type="float" value="1.0" min="0.0" max="1.0" label="Bitscore threshold" />
         <!--<param name="parallel" type="boolean" label="Run parallel"
         truevalue="1" falsevalue="0" help="Use parallel modules" />-->
             
         <!--Static list-->
-        <param name="stage" type="select" value="value1" label="Stages to run">
-            <option value="value1">complete</option>
-            <option value="value2">homology</option>
-            <option value="value3">validation</option>
-            <option value="value4">evaluation</option>
-            <option value="value5">summarise</option>
+        <param name="stage" type="select" label="Stages to run">
+            <option value="complete">complete</option>
+            <option value="homology">homology</option>
+            <option value="validation">validation</option>
+            <option value="evaluation">evaluation</option>
+            <option value="summarise">summarise</option>
         </param>
         <!--Check Boxes-->
-        <param name="homology_mode" type="select" display="checkboxes" multiple="true" label="Homology mode">
-            <option value="ex1">blast</option>
-            <option value="ex2">rfam</option>
-            <option value="ex3">mirbase</option>
-            <option value="ex4">hmm</option>
-            <option value="ex5">final</option>
+        <param name="homology_mode" type="select" multiple="true" label="Homology mode">
+            <option value="blast">blast</option>
+            <option value="rfam">rfam</option>
+            <option value="mirbase">mirbase</option>
+            <option value="hmm">hmm</option>
+            <option value="final">final</option>
         </param>
         <!--Integer/float list-->
-        <param name="blast_strategy" type="select" value="value8" label="Blast strategy">
-            <option value="value1">1</option>
-            <option value="value2">2</option>
-            <option value="value3">3</option>
-            <option value="value4">4</option>
-            <option value="value5">5</option>
-            <option value="value6">6</option>
-            <option value="value7">7</option>
-            <option value="value8">8</option>
-            <option value="value9">9</option>
-        </param>
-        <param name="outputs_select" type="select" optional="true" multiple="true" label="Which outputs should be generated">
-            <option value="short_summary" selected="true">short summary text</option>
-            <option value="gff">GFF file for miRNA predictions</option>
-            <option value="bed">BED file for miRNA predictions</option>
+        <param name="blast_strategy" type="select" value="8" label="Blast strategy">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
         </param>
     </inputs>
 
     <outputs>
-        <!--Maybe create a final html file pointing all the output files-->
-        <!--In that case look for the output files on the out folder-->
-        <collection type="list" name="report" format="yaml">
-            <discover_datasets pattern="(?P&lt;designation&gt;.*)" directory="output" visible="true" />
-        </collection>
+        <data format="txt" name="report0">
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="yaml" visible="true" />
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/miRNA_prediction/Final_Candidates" ext="gff3" visible="true" />
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt\.db" directory="output/miRNA_prediction/Final_Candidates" visible="true" />
+        </data>
+        <data format="txt" name="report2">
+            <filter>stage == "complete" </filter>
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/Final_miRNA_evaluation" ext="gff3" visible="true" />
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" directory="output/Final_miRNA_evaluation" ext="txt" visible="true" />
+        </data>
     </outputs>
     <help><![CDATA[
         Usage:
