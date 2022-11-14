@@ -1,5 +1,5 @@
-<tool id="mirnature" name="miRNAture" version="1.01+galaxy0" python_template_version="3.5" profile="21.05">
-    <description>Computational detection of microRNA candidates</description>
+<tool id="mirnature" name="miRNAture" version="1.1+galaxy0" python_template_version="3.5" profile="21.05">
+    <description>Computational detection of canonical microRNAs</description>
     <macros>
         <import>macros.xml</import>
     </macros>
@@ -13,93 +13,99 @@
         miRNAture 
         -stage '$stage' 
         #if '$subset_models_des' == 1:
-            -sublist '$subset_models'  
+        -sublist '$subset_models'  
         #end if
-        -nbitscore_cut '0.32'
+        -nbitscore_cut '$nbitscore'
         -dataF '$__tool_directory__/Dataset_mirnature_tutorial'
         -specie_genome '$specie_genome' 
         -specie_name '$specie_name'
         -specie_tag '$specie_tag' 
         -workdir 'output/'
         -mode "${",".join(map(str, $homology_mode))}"
-        -pe '0'
+        -parallel_linux '0'
         #if re.match(r'blast',str($homology_mode))
-            -strategy "${",".join(map(str, $blast_strategy))}" 
+        -strategy "${",".join(map(str, $blast_strategy))}" 
         #end if
         -rep 'relax,150,100'
         ]]></command>
+
     <inputs>
-        <param format="fasta" multiple="true" name="specie_genome" type="data"
+        <!--File-->
+        <param argument="-specie_genome" format="fasta" multiple="true" name="specie_genome" type="data"
             label="Input genome or sequence"
             help="Input sequence to be processed by miRNAture" />
+
         <!--TEXT-->
-        <param name="specie_name" type="text" label="Scientific specie name as: Genera_specie" />
-        <param name="specie_tag" type="text" label="Species tag to identify through experiment" />
-        
+        <param argument="-specie_name" name="specie_name" type="text" label="Scientific specie name as: Genera_specie" />
+        <param argument="-specie_tag" name="specie_tag" type="text" label="Species tag to identify through experiment" />
+
         <!--NUM-->
+        <param argument="-nbitscore_cut" name="nbitscore" type="float" label="nBitscore" 
+            value="0.32" min="0" max="1" help="Control bitscore threshold to filter Rfam candidates" /> 
 
         <!--Binary-->
         <conditional name="activate_subset">
             <!--Binary-->
-            <param name="subset_models_des" type="boolean" label="Subset default miRNA families"
+            <param argument="-sublist" name="subset_models_des" type="boolean" label="Subset default miRNA families"
                 truevalue="1" falsevalue="0" help="Make a selection of specific miRNA families to be search">
-            </param>
-            <when value="0">
-            </when>
-            <when value="1">
-                <param format="txt" multiple="true" name="subset_models" type="data"
-                    label="List of miRNA models to be searched"
-                    help="Input sequence to be processed by miRNAture" optional="true"/>
-            </when>
-        </conditional>
-        <!--<param name="parallel" type="boolean" label="Run parallel"
-        truevalue="1" falsevalue="0" help="Use parallel modules" />-->
-            
-        <!--Static list-->
-        <param name="stage" type="select" label="Stages to run">
-            <option value="complete">complete</option>
-            <option value="homology">homology</option>
-            <option value="validation">validation</option>
-            <option value="evaluation">evaluation</option>
-            <option value="summarise">summarise</option>
         </param>
-        <!--Check Boxes-->
-        <param name="homology_mode" type="select" multiple="true" label="Homology mode">
-            <option value="blast">blast</option>
-            <option value="rfam">rfam</option>
-            <option value="mirbase">mirbase</option>
-            <option value="hmm">hmm</option>
-            <option value="final">final</option>
-        </param>
-        <!--Integer/float list-->
-        <param name="blast_strategy" type="select" value="8" label="Blast strategy">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-        </param>
-    </inputs>
+        <when value="0">
+        </when>
+        <when value="1">
+            <param format="txt" multiple="true" name="subset_models" type="data"
+                label="List of miRNA models to be searched"
+                help="Input sequence to be processed by miRNAture" optional="true"/>
+        </when>
+    </conditional>
+    <!--<param name="parallel" type="boolean" label="Run parallel"
+    truevalue="1" falsevalue="0" help="Use parallel modules" />-->
 
-    <outputs>
-        <data format="txt" name="report0">
-            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="yaml" visible="true" />
-            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/miRNA_prediction/Final_Candidates" ext="gff3" visible="true" />
-            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt\.db" directory="output/miRNA_prediction/Final_Candidates" visible="true" />
-        </data>
-        <data format="txt" name="report2">
-            <filter>stage == "complete" </filter>
-            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/Final_miRNA_evaluation" ext="gff3" visible="true" />
-            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" directory="output/Final_miRNA_evaluation" ext="txt" visible="true" />
-        </data>
-    </outputs>
-    <help><![CDATA[
-        Usage:
-        ./miRNAture [-options]
-        ]]></help>
-    <expand macro="citations" />
+<!--Static list-->
+    <param argument="-stage" name="stage" type="select" label="Stages to run">
+        <option value="complete">complete</option>
+        <option value="homology">homology</option>
+        <option value="no_homology">no_homology</option>
+        <option value="validation">validation</option>
+        <option value="evaluation">evaluation</option>
+        <option value="summarise">summarise</option>
+    </param>
+    <!--Check Boxes-->
+    <param argument="-mode" name="homology_mode" type="select" multiple="true" label="Homology mode">
+        <option value="blast">blast</option>
+        <option value="rfam">rfam</option>
+        <option value="mirbase">mirbase</option>
+        <option value="hmm">hmm</option>
+        <option value="final">final</option>
+    </param>
+    <!--Integer/float list-->
+    <param argument="-strategy" name="blast_strategy" type="select" value="8" label="Blast strategy">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+    </param>
+</inputs>
+
+<outputs>
+    <data format="txt" name="report0">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="yaml" visible="true" />
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/miRNA_prediction/Final_Candidates" ext="gff3" visible="true" />
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt\.db" directory="output/miRNA_prediction/Final_Candidates" visible="true" />
+    </data>
+    <data format="txt" name="report2">
+        <filter>stage == "complete" </filter>
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/Final_miRNA_evaluation" ext="gff3" visible="true" />
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" directory="output/Final_miRNA_evaluation" ext="txt" visible="true" />
+    </data>
+</outputs>
+<help><![CDATA[
+    Usage:
+    ./miRNAture [-options]
+    ]]></help>
+<expand macro="citations" />
 </tool>
