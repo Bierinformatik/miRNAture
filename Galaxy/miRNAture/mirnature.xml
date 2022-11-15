@@ -9,7 +9,7 @@
         ##MIRNATURE_DATA_PATH=\$(dirname \$(which miRNAture))/../share/blockclust_data &&
 
         #import re
-        mkdir -p $__tool_directory__/output &&
+        mkdir -p output &&
         #if $blast_specific.blast_searches == 1:
         mkdir -p $__tool_directory__/queries_to_test &&
         cp '$queries_to_blast' $__tool_directory__/queries_to_test/query.fasta &&
@@ -27,7 +27,7 @@
         -specie_genome '$specie_genome' 
         -specie_name '$specie_name'
         -specie_tag '$specie_tag' 
-        -workdir '$__tool_directory__/output/'
+        -workdir 'output/'
         -m "${",".join(map(str, $homology_mode))}"
         -pe '1'
         #if $blast_specific.blast_searches == 1:
