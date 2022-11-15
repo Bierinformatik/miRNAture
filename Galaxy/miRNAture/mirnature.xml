@@ -9,22 +9,30 @@
         ##MIRNATURE_DATA_PATH=\$(dirname \$(which miRNAture))/../share/blockclust_data &&
 
         #import re
-        mkdir -p output &&
+        mkdir -p $__tool_directory__/output &&
+        #if $blast_specific.blast_searches == 1:
+        mkdir -p $__tool_directory__/queries_to_test &&
+        cp '$queries_to_blast' $__tool_directory__/queries_to_test/query.fasta &&
+        bash $__tool_directory__/generate_blast_folder.sh query.fasta > queries_description.txt  &&
+        mv queries_description.txt $__tool_directory__/queries_to_test/ &&
+        #end if
+
         miRNAture 
         -stage '$stage' 
-        #if '$subset_models_des' == 1:
-        -sublist '$subset_models'  
+        #if $activate_subset.subset_models_des == 1:
+            -sublist '$subset_models'  
         #end if
         -nbitscore_cut '$nbitscore'
         -dataF '$__tool_directory__/Dataset_mirnature_tutorial'
         -specie_genome '$specie_genome' 
         -specie_name '$specie_name'
         -specie_tag '$specie_tag' 
-        -workdir 'output/'
-        -mode "${",".join(map(str, $homology_mode))}"
-        -parallel_linux '0'
-        #if re.match(r'blast',str($homology_mode))
-        -strategy "${",".join(map(str, $blast_strategy))}" 
+        -workdir '$__tool_directory__/output/'
+        -m "${",".join(map(str, $homology_mode))}"
+        -pe '1'
+        #if $blast_specific.blast_searches == 1:
+        -strategy "${",".join(map(str, $blast_specific.blast_strategy))}" 
+        -blastq '$__tool_directory__/queries_to_test/' 
         #end if
         -rep 'relax,150,100'
         ]]></command>
@@ -77,18 +85,29 @@
         <option value="hmm">hmm</option>
         <option value="final">final</option>
     </param>
-    <!--Integer/float list-->
-    <param argument="-strategy" name="blast_strategy" type="select" value="8" label="Blast strategy">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-    </param>
+
+    <conditional name="blast_specific">
+        <param name="blast_searches" type="boolean" label="Use the blast mode to search annotated queries in your target genome?" truevalue="1" falsevalue="0" help="Activate this option if wanted to use blast mode with provided sequences">
+        </param>
+        <when value="0">
+        </when>
+        <when value="1">
+            <param argument="-strategy" name="blast_strategy" type="select" multiple="true" label="Select one or more blast strategy(ies)">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </param>
+            <param argument="-blstq" format="fasta" multiple="true" name="queries_to_blast" type="data"
+            label="Query sequences"
+            help="Query sequences to search in target genome" />
+        </when>
+    </conditional>
 </inputs>
 
 <outputs>
@@ -105,18 +124,18 @@
 </outputs>
 <tests>
     <test>
-        <param name="-stage" value="homology"/>
-        <param name="-sublist" value="fam.txt"/>
-        <param name="-nbitscore_cut" value="0.32"/>
-        <param name="-dataF" value="Dataset_mirnature_tutorial"/>
-        <param name="-specie_genome" value="test.fasta"/>
-        <param name="-specie_name" value="Homo_sapiens"/>
-        <param name="-specie_tag" value="Hosa"/>
-        <param name="-workdir" value="output/"/>
-        <param name="-mode" value="infernal,hmm,final"/>
-        <param name="-parallel_linux" value="1"/>
-        <param name="-rep" value="relax,150,100"/>
-        <param name="-workdir" value="output/"/>
+        <param name="stage" value="homology"/>
+        <param name="sublist" value="fam.txt"/>
+        <param name="nbitscore_cut" value="0.32"/>
+        <param name="dataF" value="Dataset_mirnature_tutorial"/>
+        <param name="specie_genome" value="test.fasta"/>
+        <param name="specie_name" value="Homo_sapiens"/>
+        <param name="specie_tag" value="Hosa"/>
+        <param name="workdir" value="output/"/>
+        <param name="mode" value="infernal,hmm,final"/>
+        <param name="parallel_linux" value="1"/>
+        <param name="rep" value="relax,150,100"/>
+        <param name="workdir" value="output/"/>
         <output name="report0" file="output/miRNA_prediction/Final_Candidates/all_RFAM_Hosa_final.ncRNAs_homology.txt.db.gff3"/>
     </test>
 </tests>
@@ -136,7 +155,7 @@ the same time, a summary file with the MFE, precursor length and number
 of loci of each annotated miRNA family.
 
 AUTHORS:
-    *Cristian A. Velandia Huerto* *Joerg Fallmann* *Peter F. Stadler*
+    *Cristian A. Velandia Huerto*, *Joerg Fallmann* and *Peter F. Stadler*
 
 USAGE:
     ./miRNAture [-options]
