@@ -17,13 +17,18 @@
         mv queries_description.txt $__tool_directory__/queries_to_test/ &&
         #end if
 
+        mkdir $__tool_directory__/uncompress &&
+        cp $dataset $__tool_directory__/uncompress/data.gz &&
+        tar -xf $__tool_directory__/uncompress/data.gz --directory $__tool_directory__/uncompress/ &&
+        mv $__tool_directory__/uncompress/Dataset_mirnature_Sept21_2022 $__tool_directory__/uncompress/Dataset &&
+
         miRNAture 
         -stage '$stage' 
         #if $activate_subset.subset_models_des == 1:
             -sublist '$subset_models'  
         #end if
         -nbitscore_cut '$nbitscore'
-        -dataF '$__tool_directory__/Dataset_mirnature_tutorial'
+        -dataF $__tool_directory__/uncompress/Dataset/
         -specie_genome '$specie_genome' 
         -specie_name '$specie_name'
         -specie_tag '$specie_tag' 
@@ -34,7 +39,8 @@
         -strategy "${",".join(map(str, $blast_specific.blast_strategy))}" 
         -blastq '$__tool_directory__/queries_to_test/' 
         #end if
-        -rep 'relax,150,100'
+        -rep 'relax,150,100' &&
+        rm -r $__tool_directory__/uncompress/ 
         ]]></command>
 
     <inputs>
@@ -65,8 +71,10 @@
                 help="Input sequence to be processed by miRNAture" optional="true"/>
         </when>
     </conditional>
-    <!--<param name="parallel" type="boolean" label="Run parallel"
-    truevalue="1" falsevalue="0" help="Use parallel modules" />-->
+
+    <param argument="-dataF" format="gz" multiple="true" name="dataset" type="data"
+            label="Input Pre-calculated data"
+            help="Please submit the pre-calculated data to run miRNAture (see https://doi.org/10.5281/zenodo.7180160)" />
 
 <!--Static list-->
     <param argument="-stage" name="stage" type="select" label="Stages to run">
