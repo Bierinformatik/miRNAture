@@ -17,10 +17,7 @@
         mv queries_description.txt $__tool_directory__/queries_to_test/ &&
         #end if
 
-        mkdir $__tool_directory__/uncompress &&
-        cp $dataset $__tool_directory__/uncompress/data.gz &&
-        tar -xf $__tool_directory__/uncompress/data.gz --directory $__tool_directory__/uncompress/ &&
-        mv $__tool_directory__/uncompress/Dataset_mirnature_Sept21_2022 $__tool_directory__/uncompress/Dataset &&
+        bash $__tool_directory__/create_dataset.sh '$dataset' '$__tool_directory__' &&
 
         miRNAture 
         -stage '$stage' 
@@ -40,7 +37,7 @@
         -blastq '$__tool_directory__/queries_to_test/' 
         #end if
         -rep 'relax,150,100' &&
-        rm -r $__tool_directory__/uncompress/ 
+        rm -rf $__tool_directory__/uncompress/ 
         ]]></command>
 
     <inputs>
