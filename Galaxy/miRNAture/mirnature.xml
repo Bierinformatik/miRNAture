@@ -7,14 +7,16 @@
     <command detect_errors="aggressive"><![CDATA[
         ##Last data path from: https://doi.org/10.5281/zenodo.7180160
         ##MIRNATURE_DATA_PATH=\$(dirname \$(which miRNAture))/../share/blockclust_data &&
+        #set $joined_str=",".join(map(str, $blast_specific.blast_strategy)) 
+        #set $complete_str=($joined_str + ",ALL") 
 
         #import re
         mkdir -p output &&
         #if $blast_specific.blast_searches == 1:
-        mkdir -p $__tool_directory__/queries_to_test &&
-        cp '$queries_to_blast' $__tool_directory__/queries_to_test/query.fasta &&
-        bash $__tool_directory__/generate_blast_folder.sh query.fasta > queries_description.txt  &&
-        mv queries_description.txt $__tool_directory__/queries_to_test/ &&
+            mkdir -p $__tool_directory__/queries_to_test &&
+            cp '$queries_to_blast' $__tool_directory__/queries_to_test/Unknown_specie.fa &&
+            bash $__tool_directory__/generate_blast_folder.sh Unknown_specie.fa > queries_description.txt  &&
+            mv queries_description.txt $__tool_directory__/queries_to_test/ &&
         #end if
 
         bash $__tool_directory__/create_dataset.sh '$dataset' '$__tool_directory__' &&
@@ -29,15 +31,15 @@
         -specie_genome '$specie_genome' 
         -specie_name '$specie_name'
         -specie_tag '$specie_tag' 
+        -pe '1'
         -workdir 'output/'
         -m "${",".join(map(str, $homology_mode))}"
-        -pe '1'
         #if $blast_specific.blast_searches == 1:
-        -strategy "${",".join(map(str, $blast_specific.blast_strategy))}" 
-        -blastq '$__tool_directory__/queries_to_test/' 
+            -strategy '$complete_str' 
+            -blastq '$__tool_directory__/queries_to_test/' 
         #end if
         -rep 'relax,150,100' &&
-        rm -rf $__tool_directory__/uncompress/ 
+        rm -rf $__tool_directory__/uncompress/
         ]]></command>
 
     <inputs>
