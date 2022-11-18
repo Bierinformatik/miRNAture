@@ -7,8 +7,6 @@
     <command detect_errors="aggressive"><![CDATA[
         ##Last data path from: https://doi.org/10.5281/zenodo.7180160
         ##MIRNATURE_DATA_PATH=\$(dirname \$(which miRNAture))/../share/blockclust_data &&
-        #set $joined_str=",".join(map(str, $blast_specific.blast_strategy)) 
-        #set $complete_str=($joined_str + ",ALL") 
 
         #import re
         mkdir -p output &&
@@ -35,6 +33,8 @@
         -workdir 'output/'
         -m "${",".join(map(str, $homology_mode))}"
         #if $blast_specific.blast_searches == 1:
+            #set $joined_str=",".join(map(str, $blast_specific.blast_strategy)) 
+            #set $complete_str=($joined_str + ",ALL") 
             -strategy '$complete_str' 
             -blastq '$__tool_directory__/queries_to_test/' 
         #end if
@@ -44,31 +44,32 @@
 
     <inputs>
         <!--File-->
-        <param argument="-specie_genome" format="fasta" multiple="true" name="specie_genome" type="data"
+        <param argument="-specie_genome" format="fasta" multiple="true" type="data"
             label="Input genome or sequence"
             help="Input sequence to be processed by miRNAture" />
 
         <!--TEXT-->
-        <param argument="-specie_name" name="specie_name" type="text" label="Scientific specie name as: Genera_specie" />
-        <param argument="-specie_tag" name="specie_tag" type="text" label="Species tag to identify through experiment" />
+        <param argument="-specie_name" type="text" label="Scientific specie name as: Genera_specie" />
+        <param argument="-specie_tag" type="text" label="Species tag to identify through experiment" />
 
         <!--NUM-->
         <param argument="-nbitscore_cut" name="nbitscore" type="float" label="nBitscore" 
-            value="0.32" min="0" max="1" help="Control bitscore threshold to filter Rfam candidates" /> 
+            value="1" min="0" max="1" help="Control bitscore threshold to filter Rfam candidates" /> 
 
         <!--Binary-->
         <conditional name="activate_subset">
             <!--Binary-->
-            <param argument="-sublist" name="subset_models_des" type="boolean" label="Subset default miRNA families"
-                truevalue="1" falsevalue="0" help="Make a selection of specific miRNA families to be search">
-        </param>
-        <when value="0">
-        </when>
-        <when value="1">
-            <param format="txt" multiple="true" name="subset_models" type="data"
-                label="List of miRNA models to be searched"
-                help="Input sequence to be processed by miRNAture" optional="true"/>
-        </when>
+            <param argument="-sublist" name="subset_models_des" type="select" label="Subset default miRNA families" help="Make a selection of specific miRNA families to be search">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </param>
+            <when value="0">
+            </when>
+            <when value="1">
+                <param format="txt" multiple="true" name="subset_models" type="data"
+                    label="List of miRNA models to be searched"
+                    help="Input sequence to be processed by miRNAture" optional="true"/>
+            </when>
     </conditional>
 
     <param argument="-dataF" format="gz" multiple="true" name="dataset" type="data"
@@ -76,7 +77,7 @@
             help="Please submit the pre-calculated data to run miRNAture (see https://doi.org/10.5281/zenodo.7180160)" />
 
 <!--Static list-->
-    <param argument="-stage" name="stage" type="select" label="Stages to run">
+    <param argument="-stage" type="select" label="Stages to run">
         <option value="complete">complete</option>
         <option value="homology">homology</option>
         <option value="no_homology">no_homology</option>
@@ -94,7 +95,9 @@
     </param>
 
     <conditional name="blast_specific">
-        <param name="blast_searches" type="boolean" label="Use the blast mode to search annotated queries in your target genome?" truevalue="1" falsevalue="0" help="Activate this option if wanted to use blast mode with provided sequences">
+        <param name="blast_searches" type="select" label="Use the blast mode to search annotated queries in your target genome?" help="Activate this option if wanted to use blast mode with provided sequences">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
         </param>
         <when value="0">
         </when>
@@ -119,31 +122,32 @@
 
 <outputs>
     <data format="txt" name="report0">
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="yaml" visible="true" />
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output/" ext="yaml" visible="true"/>
         <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/miRNA_prediction/Final_Candidates" ext="gff3" visible="true" />
         <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt\.db" directory="output/miRNA_prediction/Final_Candidates" visible="true" />
     </data>
-    <data format="txt" name="report2">
+    <data format="txt" name="report1">
         <filter>stage == "complete" </filter>
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output/" ext="yaml" visible="true" />
         <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/Final_miRNA_evaluation" ext="gff3" visible="true" />
         <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" directory="output/Final_miRNA_evaluation" ext="txt" visible="true" />
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.fasta" directory="output/Final_miRNA_evaluation/Fasta" ext="fasta" visible="true" />
     </data>
 </outputs>
 <tests>
     <test>
         <param name="stage" value="homology"/>
-        <param name="sublist" value="fam.txt"/>
-        <param name="nbitscore_cut" value="0.32"/>
-        <param name="dataF" value="Dataset_mirnature_tutorial"/>
-        <param name="specie_genome" value="test.fasta"/>
-        <param name="specie_name" value="Homo_sapiens"/>
-        <param name="specie_tag" value="Hosa"/>
-        <param name="workdir" value="output/"/>
+        <conditional name="activate_subset">
+            <param name="subset_models_des" value="true"/>
+            <param name="subset_models" value="test-data/fam.txt"/>
+        </conditional>
+        <param name="nbitscore" value="0.32"/>
+        <param name="dataF" value="test-data/Dataset_mirnature_tutorial"/>
+        <param name="specie_genome" value="test-data/test.fasta"/>
+        <param name="specie_name" value="Test_specie"/>
+        <param name="specie_tag" value="Test"/>
         <param name="mode" value="infernal,hmm,final"/>
-        <param name="parallel_linux" value="1"/>
-        <param name="rep" value="relax,150,100"/>
-        <param name="workdir" value="output/"/>
-        <output name="report0" file="output/miRNA_prediction/Final_Candidates/all_RFAM_Hosa_final.ncRNAs_homology.txt.db.gff3"/>
+        <output name="report0" file="test-data/output/miRNAture_configuration_Test.yaml"/>
     </test>
 </tests>
 
