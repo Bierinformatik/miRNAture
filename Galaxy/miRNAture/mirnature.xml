@@ -163,7 +163,6 @@
         <assert_contents>
             <has_text text="v.1.1 Sept 21th, 2022"/>
         </assert_contents>
-        <output name="report0" file="output/miRNA_prediction/Final_Candidates/all_RFAM_Test_final.ncRNAs_homology.txt.db.gff3"/>
     </test>
 </tests>
 
