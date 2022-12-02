@@ -1,4 +1,4 @@
-<tool id="mirnature" name="miRNAture" version="1.1+galaxy0" python_template_version="3.5" profile="21.05">
+<tool id="mirnature" name="miRNAture" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="21.05">
     <description>Computational detection of canonical microRNAs</description>
     <macros>
         <import>macros.xml</import>
@@ -21,14 +21,13 @@
         export LIBDIROUTPUT &&
         export LIBTEMP &&
         
-        cp '$specie_genome' \$LIBTEMP/genome.fasta  &&
+        ln -s '$speG' \$LIBTEMP/genome.fasta  &&
         #if $blast_specific.blast_searches == 1:
-            cp '$queries_to_blast' "\$LIBDIRBLAST"/Unknown_specie.fa &&
-            bash $__tool_directory__/generate_blast_folder.sh Unknown_specie.fa > queries_description.txt  &&
-            mv queries_description.txt "\$LIBDIRBLAST" &&
+            ln -s '$queries_to_blast' "\$LIBDIRBLAST"/Unknown_species.fa &&
+        bash '$__tool_directory__/generate_blast_folder.sh' Unknown_species.fa > "\$LIBDIRBLAST"/queries_description.txt  &&
         #end if
 
-        bash $__tool_directory__/create_dataset.sh '$dataset' "\$LIBDIR" &&
+        bash '$__tool_directory__/create_dataset.sh' '$dataset' "\$LIBDIR" &&
 
         miRNAture 
         -stage '$stage' 
@@ -37,39 +36,38 @@
         #end if
         -nbitscore_cut '$nbitscore'
         -dataF \$LIBDIR/Dataset/
-        -specie_genome \$LIBTEMP/genome.fasta 
-        -specie_name '$specie_name'
-        -specie_tag '$specie_tag' 
-        -pe '$parallel_linux_select'
-        -workdir \$LIBDIROUTPUT
+        -speG \$LIBTEMP/genome.fasta 
+        -speN '$speN'
+        -speT '$speT' 
+        -pe '1'
+        -workdir 'output/'
         -m "${",".join(map(str, $homology_mode)) + ",final"}"
         #if $blast_specific.blast_searches == 1:
             #set $joined_str=",".join(map(str, $blast_specific.blast_strategy)) 
             #set $complete_str=($joined_str + ",ALL") 
             -strategy '$complete_str' 
-            -blastq 'queries_to_test/' 
+            -blastq \$LIBDIRBLAST 
         #end if
-        -rep '$repeat_filter' > '$std_output' &&
-        rm -rf \$LIBDIR
+        -rep '$repeat_filter' > '$std_output'
         ]]></command>
 
     <inputs>
         <!--File-->
-        <param argument="-specie_genome" format="fasta" multiple="true" type="data"
+        <param argument="-speG" format="fasta" multiple="true" type="data"
             label="Input genome or sequence"
             help="Input sequence to be processed by miRNAture" />
-        <!--Hidden-->
-        <param argument="-pe" name="parallel_linux_select" type="integer" value="1" label="Parallel running" help="Test Parallel Linux" >
-            <validator type="in_range" message="Please set this option to 1." min="1" max="1"/>
-        </param>
 
         <!--TEXT-->
-        <param argument="-specie_name" type="text" label="Scientific specie name as: Genera_specie" />
-        <param argument="-specie_tag" type="text" label="Species tag to identify through experiment" />
+        <param argument="-speN" type="text" label="Scientific species name written separated by '_', such as: Homo_sapiens" >
+            <validator type="regex" message="Only letters and underscores are allowed">^[\(\w\)]+$</validator>
+        </param>
+        <param argument="-speT" type="text" label="Species tag to identify through experiment (i.e short 4 letters tag)" >
+            <validator type="regex" message="Please write only letters">^[a-zA-Z]+$</validator>
+        </param>
 
         <!--NUM-->
         <param argument="-nbitscore_cut" name="nbitscore" type="float" label="nBitscore" 
-            value="1" min="0" max="1" help="Control bitscore threshold to filter Rfam candidates" /> 
+            value="1" min="0" max="1" help="Control of normalized bitscore (nbitscore) threshold to filter Rfam candidates" /> 
 
         <param argument="-rep" name="repeat_filter" type="select" label="Repeats filter" help="Repetition cutoff" >
                 <option value="relax,150,100">relax</option>
@@ -97,7 +95,7 @@
             help="Please submit the pre-calculated data to run miRNAture (see https://doi.org/10.5281/zenodo.7180160)" />
 
 <!--Static list-->
-    <param argument="-stage" type="select" label="Stages to run">
+    <param argument="-stage" type="select" label="Select one miRNAture stage">
         <option value="complete">complete</option>
         <option value="homology">homology</option>
         <option value="no_homology">no_homology</option>
@@ -121,7 +119,7 @@
         <when value="0">
         </when>
         <when value="1">
-            <param argument="-strategy" name="blast_strategy" type="select" multiple="true" label="Select one or more blast strategy(ies)">
+            <param argument="-strategy" name="blast_strategy" type="select" multiple="true" label="Select one or more pre-calculated set of blastn parameters, accordingly to the miRNAture publication.">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -140,22 +138,40 @@
 </inputs>
 
 <outputs>
-    <data name="std_output" auto_format="true" label="Standard output miRNAture" /> 
-    <data format="txt" name="report0" label="Homology output miRNAture">
-        <filter>stage == "homology" </filter>
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="\$LIBDIROUTPUT" ext="yaml" visible="true"/>
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="\$LIBDIROUTPUT/miRNA_prediction/Final_Candidates" ext="gff3" visible="true" />
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt\.db" directory="\$LIBDIROUTPUT/miRNA_prediction/Final_Candidates" visible="true" />
-    </data>
-    <data format="txt" name="report1" label="Complete output miRNAture">
-        <filter>stage == "complete" </filter>
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output/" ext="yaml" visible="true"/>
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output/Final_miRNA_evaluation" ext="gff3" visible="true" />
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" directory="output/Final_miRNA_evaluation" ext="txt" visible="true" />
-        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.fasta" directory="output/Final_miRNA_evaluation/Fasta" ext="fasta" visible="true" />
-    </data>
+    <data name="std_output" format="txt" label="Standard output miRNAture" /> 
+    <collection name="gff3_files_h" type="list" label="${tool.name} on ${on_string}: GFF3 files">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="gff3" visible="true" />
+        <filter> stage == "homology" </filter>
+    </collection>
+    <collection name="tab_files_h" type="list" label="${tool.name} on ${on_string}: Tabular files">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt\.db" directory="output" ext="db" visible="true" />
+        <filter> stage == "homology" </filter>
+    </collection>
+    <collection name="yaml_files_h" type="list" label="${tool.name} on ${on_string}: YAML files">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="yaml" visible="true"/>
+        <filter> stage == "homology" </filter>
+    </collection>
+
+    <collection name="gff3_files_c" type="list" label="${tool.name} on ${on_string}: GFF3 files">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.gff3" directory="output" ext="gff3" visible="true" />
+        <filter> stage == "complete" </filter>
+    </collection>
+    <collection name="fasta_files_c" type="list" label="${tool.name} on ${on_string}: Fasta files">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.fasta" directory="output" ext="fasta" visible="true" />
+        <filter> stage == "complete" </filter>
+    </collection>
+    <collection name="statistics_files_c" type="list" label="${tool.name} on ${on_string}: Statistics">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.txt" directory="output" ext="txt" visible="true" />
+        <filter> stage == "complete" </filter>
+    </collection>
+    <collection name="yaml_files_c" type="list" label="${tool.name} on ${on_string}: YAML files">
+        <discover_datasets pattern="(?P&lt;designation&gt;.+)\.yaml" directory="output" ext="yaml" visible="true"/>
+        <filter> stage == "complete" </filter>
+    </collection>
 </outputs>
+
 <tests>
+    <!-- HMM Rfam searches -->
     <test expect_exit_code="0">
         <param name="stage" value="homology"/>
         <conditional name="activate_subset">
@@ -164,32 +180,108 @@
         </conditional>
         <param name="nbitscore" value="1.0"/>
         <param name="dataset" value="Dataset_mirnature_tutorial.tar.gz"/>
-        <param name="specie_genome" value="test.fasta"/>
-        <param name="specie_name" value="Test_specie"/>
-        <param name="specie_tag" value="Test"/>
+        <param name="speG" value="genome.fasta"/>
+        <param name="speN" value="Unknown_species"/>
+        <param name="speT" value="Unsp"/>
         <param name="homology_mode" value="hmm"/>
-        <param name="parallel_linux_select" value="1"/>
         <param name="repeat_filter" value="relax"/>
-        <output name="std_output" file="test.txt" ftype="txt"/>
+        <output name="std_output" file="test_hmm.txt" ftype="txt"/>
+        <output_collection name="gff3_files_h" count="1"/>
+        <output_collection name="yaml_files_h" count="1"/>
+    </test>
+    <!-- Infernal Rfam searches -->
+    <test expect_exit_code="0">
+        <param name="stage" value="homology"/>
+        <conditional name="activate_subset">
+            <param name="subset_models_des" value="1"/>
+            <param name="subset_models" value="fam.txt"/>
+        </conditional>
+        <param name="nbitscore" value="1.0"/>
+        <param name="dataset" value="Dataset_mirnature_tutorial.tar.gz"/>
+        <param name="speG" value="genome.fasta"/>
+        <param name="speN" value="Unknown_species"/>
+        <param name="speT" value="Unsp"/>
+        <param name="homology_mode" value="rfam"/>
+        <param name="repeat_filter" value="relax"/>
+        <output name="std_output" file="test_rfam.txt" ftype="txt"/>
+        <output_collection name="gff3_files_h" count="1"/>
+        <output_collection name="yaml_files_h" count="1"/>
+    </test>
+    <!-- Infernal miRBase searches -->
+    <test expect_exit_code="0">
+        <param name="stage" value="homology"/>
+        <conditional name="activate_subset">
+            <param name="subset_models_des" value="1"/>
+            <param name="subset_models" value="fam.txt"/>
+        </conditional>
+        <param name="nbitscore" value="1.0"/>
+        <param name="dataset" value="Dataset_mirnature_tutorial.tar.gz"/>
+        <param name="speG" value="genome.fasta"/>
+        <param name="speN" value="Unknown_species"/>
+        <param name="speT" value="Unsp"/>
+        <param name="homology_mode" value="mirbase"/>
+        <param name="repeat_filter" value="relax"/>
+        <output name="std_output" file="test_mirbase.txt" ftype="txt"/>
+        <output_collection name="gff3_files_h" count="1"/>
+        <output_collection name="yaml_files_h" count="1"/>
+    </test>
+    <!-- Infernal miRBase searches -->
+    <test expect_exit_code="0">
+        <param name="stage" value="homology"/>
+        <conditional name="activate_subset">
+            <param name="subset_models_des" value="1"/>
+            <param name="subset_models" value="fam.txt"/>
+        </conditional>
+        <param name="nbitscore" value="1.0"/>
+        <param name="dataset" value="Dataset_mirnature_tutorial.tar.gz"/>
+        <param name="speG" value="genome.fasta"/>
+        <param name="speN" value="Unknown_species"/>
+        <param name="speT" value="Unsp"/>
+        <param name="homology_mode" value="blast"/>
+        <conditional name="blast_specific">
+            <param name="blast_searches" value="1"/>
+            <param name="strategy" value="8,9"/>
+            <param name="blstq" value="test.fasta"/>
+        </conditional>
+        <param name="repeat_filter" value="relax"/>
+        <output name="std_output" file="test_blast.txt" ftype="txt"/>
+        <output_collection name="gff3_files_h" count="1"/>
+        <output_collection name="yaml_files_h" count="1"/>
+    </test>
+    <!-- Combined all homology searches -->
+    <test expect_exit_code="0">
+        <param name="stage" value="homology"/>
+        <conditional name="activate_subset">
+            <param name="subset_models_des" value="1"/>
+            <param name="subset_models" value="fam.txt"/>
+        </conditional>
+        <param name="nbitscore" value="1.0"/>
+        <param name="dataset" value="Dataset_mirnature_tutorial.tar.gz"/>
+        <param name="speG" value="genome.fasta"/>
+        <param name="speN" value="Unknown_species"/>
+        <param name="speT" value="Unsp"/>
+        <param name="homology_mode" value="blast,hmm,rfam,mirbase"/>
+        <conditional name="blast_specific">
+            <param name="blast_searches" value="1"/>
+            <param name="strategy" value="8,9"/>
+            <param name="blstq" value="test.fasta"/>
+        </conditional>
+        <param name="repeat_filter" value="relax"/>
+        <output name="std_output" file="test_all_homology.txt" ftype="txt"/>
+        <output_collection name="gff3_files_h" count="1"/>
+        <output_collection name="yaml_files_h" count="1"/>
     </test>
 </tests>
 
 <help><![CDATA[
     
-**miRNAture** detects *bona fide* miRNA candidates through sequence homology
-searches and validation steps using structural alignments with
-pre-defined or/and modified miRNA-specific covariance models. The
-miRNAture pipeline is composed of three modules: (1) Homology search
-operating on miRNA precursors, (2) prediction of the positioning of
-mature miRNAs within the precursor mature annotation, and (3) an
-Evaluation scheme designed to identify false positive miRNA annotations.
-This multi-stage approach generates annotation files in BED/GFF3 from
-precursors and detected mature regions and corresponding FASTA files. At
-the same time, a summary file with the MFE, precursor length and number
-of loci of each annotated miRNA family.
+**miRNAture** detects *bona fide* miRNA candidates through sequence homology searches and validation steps using structural alignments with pre-defined or/and modified miRNA-specific covariance models. The miRNAture pipeline is composed of three modules:
 
-AUTHORS:
-    *Cristian A. Velandia Huerto*, *Joerg Fallmann* and *Peter F. Stadler*
+    #. Homology search operating on miRNA precursors
+    #. Prediction of the positioning of mature miRNAs within the precursor mature annotation
+    #. Evaluation scheme designed to identify false positive miRNA annotations.
+
+This multi-stage approach generates annotation files in BED/GFF3 from precursors and detected mature regions and corresponding FASTA files. At the same time, a summary file with the MFE, precursor length and number of loci of each annotated miRNA family.
 
 USAGE:
     ./miRNAture [-options]
@@ -241,14 +333,13 @@ OPTIONS:
                 'homology', 'no_homology', 'validation', 'evaluation',
                 'summarise' or 'complete'.
 
-    -speG/-specie_genome <PATH>
+    -speG/-species_genome <PATH>
                 Path of target sequences to be analyzed in FASTA format.
 
-    -speN/-specie_name <Genera_specie>
-                Specie or sequence source's scientific name. The format must
-                be: *Genera_specie*, separated by '_'.
+    -speN/-species_name <Genera_specie>
+                Species or sequence source's scientific name. The format should be written without space as: *Genera_species*, separated by '_'.
 
-    -speT/-specie_tag <TAG_NAME>
+    -speT/-species_tag <TAG_NAME>
                 Experiment tag. Will help to identify the generated files
                 along miRNA output files.
 
@@ -264,5 +355,6 @@ BUGS, CAVEATS, COMPLAINS or DONATIONS
     Write directly to cristian at bioinf.uni-leipzig.de
 
     ]]></help>
+<expand macro="creators" />
 <expand macro="citations" />
 </tool>
