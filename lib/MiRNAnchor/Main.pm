@@ -68,12 +68,12 @@ with 'MiRNAnchor::Tools';
 sub recognize_families_homology {
 	my $shift = shift;
 	my $db_models_relation = shift;
-	my $specie = $shift->tag_spe_query;
+	my $species = $shift->tag_spe_query;
 	my $targetfolder = $shift->output_folder->stringify;
-	my $table_db_target = "$targetfolder/miRNA_prediction/Final_Candidates/all_RFAM_${specie}_final.ncRNAs_homology.txt.db";
+	my $table_db_target = "$targetfolder/miRNA_prediction/Final_Candidates/all_RFAM_${species}_final.ncRNAs_homology.txt.db";
 	my $target_fasta = $shift->fasta_sequences->stringify;
 	modify_table($table_db_target, $db_models_relation);
-	modify_fasta($target_fasta, $specie, $db_models_relation);
+	modify_fasta($target_fasta, $species, $db_models_relation);
 	return;
 }
 
@@ -196,12 +196,12 @@ sub move_fasta {
 }
 
 sub modify_fasta {
-	my ($path, $specie, $db) = @_;
+	my ($path, $species, $db) = @_;
 	#Move original fasta to the Temp/ folder
-	my $fasta_query = check_folder_files_index($path, ".*\_".$specie."\.*\.fasta");
+	my $fasta_query = check_folder_files_index($path, ".*\_".$species."\.*\.fasta");
 	move_fasta($path, $fasta_query);
 	#Index again on the new folder
-	my $fasta_moved_files = check_folder_files_index("$path/Temp", ".*\_".$specie."\.*\.fasta");
+	my $fasta_moved_files = check_folder_files_index("$path/Temp", ".*\_".$species."\.*\.fasta");
 	foreach my $file (@$fasta_moved_files){
 		my $model = (split /\./, $file)[1]; #all_RFAM_Hosa.F-let-7-1.fasta
 		my $new_name = $model;
@@ -209,7 +209,7 @@ sub modify_fasta {
 			$new_name = $$db{$model};
 		}
 		#Create new file with new model concatenated in the fasta folder
-		open my $OUT, ">> $path/all_RFAM_$specie.$new_name.fasta" or die;
+		open my $OUT, ">> $path/all_RFAM_$species.$new_name.fasta" or die;
 		open my $IN, "< $path/Temp/$file" or die;
 		while (<$IN>){
 			chomp;

@@ -19,13 +19,13 @@ my ($NAMES, $LEN, $OUT, $SPECIAL,$IN);
 with 'MiRNAture::Evaluate';
 
 sub load_database_query {
-	my ($folder, $pattern, $specie) = @_;
+	my ($folder, $pattern, $species) = @_;
 	my %database_names;
 	my $IN;
 	my @all_database_files = check_folder_files($folder, $pattern); #Files generated with define_final_CMs on all strategies
 	foreach my $filesdb (@all_database_files){
 		my $str = $filesdb;
-		$str =~ s/(${specie}\_)([0-9]+)(\.miRNA\.tab\.db\.location\.database)/$2/g;
+		$str =~ s/(${species}\_)([0-9]+)(\.miRNA\.tab\.db\.location\.database)/$2/g;
 		my $complete = "${folder}${filesdb}";
         if(!-e $complete || -z $complete){
            print_error("The database file $complete did not exists"); 
@@ -56,26 +56,26 @@ sub discover_query_sequences {
 }
 
 sub resolve_mergings {
-	my ($specie, $dir, $MODE, $str) = @_;
+	my ($species, $dir, $MODE, $str) = @_;
 	my $file;
 	my $tto = 0;
 	my $database_grouped_queries;
 	if ($str =~ /^hmm$/){
-		$file = "${dir}/all_RFAM_$specie.truetable.clean"; #Adjusted HMM coordinates
+		$file = "${dir}/all_RFAM_$species.truetable.clean"; #Adjusted HMM coordinates
 	} elsif ($str =~ /^rfam$|^mirbase$|^user$/){
-		$file = "${dir}/all_RFAM_$specie.truetable"; #INFERNAL direct coordinates
+		$file = "${dir}/all_RFAM_$species.truetable"; #INFERNAL direct coordinates
 	} elsif ($str =~ /^ALL$|^COMPLETE$/) {
 		my $database_folder = "${dir}/../../";
 		my $pattern_file_db = "miRNA\\.tab\\.db\\.location\\.database"; #All database files
 		# Load all database files to get query references
-		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $specie);
-		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Adjusted Blast ALL str coordinates
+		$database_grouped_queries = load_database_query($database_folder, $pattern_file_db, $species);
+		$file = "${dir}/all_RFAM_${species}_${str}.truetable"; #Adjusted Blast ALL str coordinates
     } elsif ($str =~ /^final$/) {
-		$file = "${dir}/all_RFAM_${specie}_${str}.truetable"; #Final file concatenated
+		$file = "${dir}/all_RFAM_${species}_${str}.truetable"; #Final file concatenated
 	} elsif ($str =~ /^Merging$/){
-		$file = "${dir}/all_RFAM_${specie}_Final.all";
+		$file = "${dir}/all_RFAM_${species}_Final.all";
 	} elsif ($str =~ /^\d+$/) {
-		$file = "${dir}/all_RFAM_${specie}_${str}.truetable.clean"; #Adjusted Blast specific str coordinates
+		$file = "${dir}/all_RFAM_${species}_${str}.truetable.clean"; #Adjusted Blast specific str coordinates
 	} else {
 		print_error("$str is not recognized");
 	}
@@ -110,7 +110,7 @@ sub resolve_mergings {
 			push @{$rows{"$database[0] $database[1]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0] ];
 		} elsif ($MODE == 6){
 			#scaffold101126-size1290_0 -_1       cin7,cin9_2       1_3       107_4     1006_5    1105_6    46.6_7    2.2e-09_8 no_9      RF00026_10 104_11     3_12
-			push @{$rows{"$database[0] $database[1]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0,14,15] ];  #At the end, add specie [14], and original name query [15]. 
+			push @{$rows{"$database[0] $database[1]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0,14,15] ];  #At the end, add species [14], and original name query [15]. 
 		} elsif ($MODE == 3){
 			if ($database[9] eq "+"){ #Not considering sense
 				push @{$rows{"$database[0] $database[9]"}} , [ @database[5,6,7,8,14,15,10,2,-1],$tto,@database[2,9,0] ];
@@ -499,7 +499,7 @@ sub push_to_new {
 }
 
 sub generate_final_ncRNAs {
-	my ($blast_file, $hmm_file, $infernal_file, $other_file, $user_file, $out_folder, $specie) = @_;
+	my ($blast_file, $hmm_file, $infernal_file, $other_file, $user_file, $out_folder, $species) = @_;
 	my (@all_files, @all_filesT);
 	push @all_filesT, $blast_file; # 0
 	push @all_filesT, $hmm_file; # 1
@@ -527,8 +527,8 @@ sub generate_final_ncRNAs {
 			push @all_files, $all_filesT[$i];
 		}
 	}
-	concatenate_true_cand($specie, $out_folder, \@all_files, "final"); #Concantenate all true
-	resolve_mergings($specie, $out_folder, "5", "final");
+	concatenate_true_cand($species, $out_folder, \@all_files, "final"); #Concantenate all true
+	resolve_mergings($species, $out_folder, "5", "final");
 	return;
 }
 

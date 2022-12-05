@@ -134,25 +134,5 @@ sub subset_search_models {
 	return (\@new_cm, \@new_hmm);
 }
 
-##sub read_genomes_paths { #File
-##	my $shift = shift;
-##	open (my $genomes_paths, "<", $shift->data_folder->stringify."/genomes.txt") or die "The file Data/genomes.txt> does not exists\n"; 
-##	my $targetGenomes;
-##	my %genomes;
-##	while (<$genomes_paths>){
-##		chomp;
-##		next if ($_ =~ /^#|^$/); 
-##		my @splitline = split /\=/, $_;
-##		$splitline[1] =~ s/"//g;
-##		$genomes{$splitline[0]} = $splitline[1];
-##	}
-##	foreach my $keys (sort keys %genomes){
-##		$targetGenomes .= "$keys ";
-##	}
-##	$targetGenomes =~ s/(.*)(\s+)/$1/g;
-##	$shift->genomes($targetGenomes);
-##	return %genomes;
-##}
-
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -38,13 +38,13 @@ has 'output_folder' => (
 	required => 1,
 );
 
-has 'specie_name' => (
+has 'species_name' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
 );
 
-has 'subject_specie' => (
+has 'subject_species' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
@@ -56,7 +56,7 @@ has 'genome_subject' => (
 	required => 1,
 );
 
-has 'specie_genome_new_database' => (
+has 'species_genome_new_database' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
@@ -119,10 +119,10 @@ sub generate_final_output {
 		print_result("Were not detected blast, hmm, mirbase, rfam or user candidates. Not possible to merge anything");
 		exit(0);
 	} else {
-		generate_final_ncRNAs($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify, $shift->output_folder."/Final_Candidates", $shift->subject_specie);		
-		format_final_table($shift->output_folder."/Final_Candidates", $shift->subject_specie, $shift->families_names_CM, $shift->names_CM, $shift->specie_genome_new_database);
-        #my $final_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_final.truetable.joined.table";
-        my $temporal_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_final.ncRNAs_homology.txt.temp";
+		generate_final_ncRNAs($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify, $shift->output_folder."/Final_Candidates", $shift->subject_species);		
+		format_final_table($shift->output_folder."/Final_Candidates", $shift->subject_species, $shift->families_names_CM, $shift->names_CM, $shift->species_genome_new_database);
+        #my $final_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_species."_final.truetable.joined.table";
+        my $temporal_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_species."_final.ncRNAs_homology.txt.temp";
         my $mode = (split /\,/, $shift->repetition_rules)[0]; 
         my $repeat_threshold = (split /\,/, $shift->repetition_rules)[1];
         my $number_best = (split /\,/, $shift->repetition_rules)[2];
@@ -139,7 +139,7 @@ sub create_final_report {
 
 sub get_fasta_sequences {
 	my $shift = shift;
-	getSequencesFasta($shift->subject_specie, $shift->genome_subject, "NA", $shift->output_folder->stringify."/Final_Candidates/Fasta/", "5", $shift->length_CM, $shift->names_CM, $shift->final_out_table->stringify, $shift->specie_name); #Header mode == 5 Final table
+	getSequencesFasta($shift->subject_species, $shift->genome_subject, "NA", $shift->output_folder->stringify."/Final_Candidates/Fasta/", "5", $shift->length_CM, $shift->names_CM, $shift->final_out_table->stringify, $shift->species_name); #Header mode == 5 Final table
 	return;
 }
 
@@ -147,13 +147,13 @@ sub get_small_genomes {
     # Generate genome anchors from predicted miRNAs to be validated with MIRfix.
     # This will extend reported coordinates +-300 nt.
 	my $shift = shift;
-    getSequencesFastaSubGenome($shift->specie_name, $shift->genome_subject, $shift->output_folder->stringify."/Final_Candidates/Fasta/Genomes", $shift->final_out_table);
+    getSequencesFastaSubGenome($shift->species_name, $shift->genome_subject, $shift->output_folder->stringify."/Final_Candidates/Fasta/Genomes", $shift->final_out_table);
 	return;
 }
 
 sub generate_gff_homology {
     my $shift = shift;
-    my $target_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_specie."_final.ncRNAs_homology.txt.db"; #Complete_target file
+    my $target_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_species."_final.ncRNAs_homology.txt.db"; #Complete_target file
     open my $OUT, "> ${target_file}.gff3" or die;
     open my $IN, "< $target_file";
     print $OUT "##gff-version 3\n";

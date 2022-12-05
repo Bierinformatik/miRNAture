@@ -9,19 +9,13 @@ with 'MiRNAture::ToolBox';
 with 'MiRNAture::Evaluate';
 with 'MiRNAture::Cleaner';
 
-##has 'cm_model' => (
-##	is => 'ro',
-##	isa => 'Str',
-##	required => 1,
-##);
-
 has 'genome_subject' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
 );
 
-has 'subject_specie' => (
+has 'subject_species' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
@@ -70,8 +64,8 @@ has 'cmsearch_program_path' => (
 sub create_folders_other {
 	my $shift = shift;
 	create_folders($shift->output_folder->stringify, "");
-	create_folders($shift->output_folder->stringify, $shift->subject_specie);
-	create_folders($shift->output_folder->stringify."/".$shift->subject_specie, "Final");
+	create_folders($shift->output_folder->stringify, $shift->subject_species);
+	create_folders($shift->output_folder->stringify."/".$shift->subject_species, "Final");
 	return;
 }
 
@@ -81,20 +75,20 @@ sub search_homology_other {
 	my $minBitscore = shift;
 	my $maxthreshold = shift;
 	searchOthershomology($shift, $zscore, $minBitscore, $maxthreshold);
-	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie, $shift->subject_specie."\.tab");
+	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_species, $shift->subject_species."\.tab");
 	for (my $i = 0; $i <= $#result_files; $i++) {
 		my $cm_model = $result_files[$i];
 		$cm_model =~ s/(MIPF[0-9]+|.*)(\_.*)(\.tab)/$1/g;
 		my $molecule = "NA";
-		classify_2rd_align_results($shift->subject_specie, $cm_model, $shift->output_folder."/".$shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/".$cm_model."\_".$shift->subject_specie."\.tab", "mirbase", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore, $maxthreshold);
+		classify_2rd_align_results($shift->subject_species, $cm_model, $shift->output_folder."/".$shift->subject_species, $shift->output_folder."/".$shift->subject_species."/".$cm_model."\_".$shift->subject_species."\.tab", "mirbase", $molecule, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $minBitscore, $maxthreshold);
 	}
 	return;
 }	
 
 sub clean_empty {
 	my $shift = shift;
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie); #Blast/Specie
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie."/Final"); #Blast/Specie/Infernal
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species); #Blast/species
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species."/Final"); #Blast/species/Infernal
 	return;
 }
 

@@ -18,7 +18,7 @@ has 'genome_subject' => (
 	required => 1,
 );
 
-has 'subject_specie' => (
+has 'subject_species' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
@@ -102,29 +102,22 @@ sub create_folders_hmm {
 
 sub search_homology_HMM {
 	my ($shift, $zvalue, $minBitscore, $maxthreshold) = @_;
-	searchHomologyHMM($shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold, $shift->list_models);
-	##searchHomologyHMM($shift->hmm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold);
-	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie, "\.tab\.true\.table");
+	searchHomologyHMM($shift->genome_subject, $shift->subject_species, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold, $shift->list_models);
+	my @result_files = check_folder_files($shift->output_folder->stringify."/".$shift->subject_species, "\.tab\.true\.table");
 	for (my $i = 0; $i <= $#result_files; $i++) {
 		my $hmm = $result_files[$i];
 		$hmm =~ s/([A-Za-z]+\.)(.*)(\.tab\.true\.table)/$2/g;
-		getSequencesFasta($shift->subject_specie, $shift->genome_subject, $hmm, $shift->output_folder->stringify."/".$shift->subject_specie, "2", $shift->length_CM, $shift->names_CM); #Header mode == 2 HMM
-		searchStructureHMM($hmm, $shift->genome_subject, $shift->subject_specie, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold, $shift->list_models);
+		getSequencesFasta($shift->subject_species, $shift->genome_subject, $hmm, $shift->output_folder->stringify."/".$shift->subject_species, "2", $shift->length_CM, $shift->names_CM); #Header mode == 2 HMM
+		searchStructureHMM($hmm, $shift->genome_subject, $shift->subject_species, $shift->output_folder->stringify, $shift->path_hmm_models, $shift->path_covariance, $shift->bitscores_CM, $shift->length_CM, $shift->names_CM, $shift->families_names_CM, $shift->nhmmer_program_path->stringify, $shift->cmsearch_program_path->stringify, $zvalue, $minBitscore, $maxthreshold, $shift->list_models);
 	}
-	#create_folders($shift->output_folder."/".$shift->subject_specie."/Infernal","Final");#Create folder specific to specie
-	#my @result_files_str = check_folder_files($shift->output_folder->stringify."/".$shift->subject_specie."/Infernal", "\.tab");
-	#for (my $i = 0; $i <= $#result_files_str -1 ; $i++) {
-	#	my $molecule = get_family_name($hmm, $families_names);
-	#	classify_2rd_align_results($shift->subject_specie, $result_files_str[$i], $shift->output_folder->stringify."/".$specie."/Infernal", "$infernal_out_path/$specie.$hmm.tab" ,"hmm", $molecule, $bitscores, $len_r, $names_r, $minBitscore, $maxthreshold); #Obtain true candidates
-	#}
 	return;
 }	
 
 sub clean_empty {
 	my $shift = shift;
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie); #Blast/Specie
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie."/Infernal"); #Blast/Specie/Infernal
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie."/Infernal/Final"); #Blast/Specie/Infernal/Final
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species); #Blast/Species
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species."/Infernal"); #Blast/Species/Infernal
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species."/Infernal/Final"); #Blast/Species/Infernal/Final
 	return;
 }
 

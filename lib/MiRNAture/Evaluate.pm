@@ -2,7 +2,7 @@ package MiRNAture::Evaluate;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(load_all_databases concatenate_true_cand cleancmsearch get_family_name format_final_table analyse_involved_species get_specie_name analyse_strategies get_str_name perform_detection_repeated_loci);
+@EXPORT = qw(load_all_databases concatenate_true_cand cleancmsearch get_family_name format_final_table analyse_involved_species get_species_name analyse_strategies get_str_name perform_detection_repeated_loci);
 
 use Moose::Role; #Set of common tools that miRNAture uses
 use Data::Dumper;
@@ -183,23 +183,23 @@ sub load_all_databases {
 }
 
 sub concatenate_true_cand {
-	my ($specie, $dir, $files_true, $str) = @_;
+	my ($species, $dir, $files_true, $str) = @_;
 	my $output_file;
 	if ($str !~ /^hmm$|^rfam$|^final$|^mirbase$|^user$/){ #Str is not rfam or hmm, only blast
 		foreach my $input_file (@$files_true){
-			system "cat $dir/$input_file >> $dir/all_RFAM_${specie}_${str}.truetable.temp";
+			system "cat $dir/$input_file >> $dir/all_RFAM_${species}_${str}.truetable.temp";
 		}
-		$output_file = "$dir/all_RFAM_${specie}_${str}.truetable.temp";
+		$output_file = "$dir/all_RFAM_${species}_${str}.truetable.temp";
 	} elsif ($str =~ /^final$/){
 		foreach my $input_file (@$files_true){
-			system "cat $input_file >> $dir/all_RFAM_${specie}_${str}.truetable.temp";
+			system "cat $input_file >> $dir/all_RFAM_${species}_${str}.truetable.temp";
 		}
-		$output_file = "$dir/all_RFAM_${specie}_${str}.truetable.temp";
+		$output_file = "$dir/all_RFAM_${species}_${str}.truetable.temp";
 	} else {  # Here HMM, INFERNAL   
 		foreach my $input_file (@$files_true){
-			system "cat $dir/$input_file >> $dir/all_RFAM_$specie.truetable.temp";
+			system "cat $dir/$input_file >> $dir/all_RFAM_$species.truetable.temp";
 		}
-		$output_file = "$dir/all_RFAM_$specie.truetable.temp";
+		$output_file = "$dir/all_RFAM_$species.truetable.temp";
 	}
 	my $output_file_final = $output_file;
 	$output_file_final =~ s/(.*)(\.temp)/$1/g;
@@ -339,12 +339,12 @@ sub index_new_old_contig_names {
 }
 
 sub format_final_table {
-	my ($input_folder, $specie, $families_names, $names_r_inverse, $database_names_contigs) = @_;
-	my $file_in = "$input_folder/all_RFAM_${specie}_final.truetable.joined.table"; 
-	my $file_out = "$input_folder/all_RFAM_${specie}_final.ncRNAs_homology.txt.temp";
+	my ($input_folder, $species, $families_names, $names_r_inverse, $database_names_contigs) = @_;
+	my $file_in = "$input_folder/all_RFAM_${species}_final.truetable.joined.table"; 
+	my $file_out = "$input_folder/all_RFAM_${species}_final.ncRNAs_homology.txt.temp";
 	my $index_names = index_new_old_contig_names($database_names_contigs); # tagnameNumb => contigName
 	if (-z $file_in){
-		print_result("No candidates were found in the $specie specie\n");
+		print_result("No candidates were found in the $species species\n");
 		exit(0);
 	}
 	open my $INF, "< $file_in" or die "The file $file_in not exists\n";  #all_RFAM_Dive_Final.truetable.joined.table
@@ -461,32 +461,32 @@ sub analyse_involved_species {
 		my @all = split /\,/, $species;
 		my @temp;
 		foreach my $cand (@all){
-			my $spe = get_specie_name($cand, $str);
+			my $spe = get_species_name($cand, $str);
 			push @temp, $spe;
 		}	
 		my @unique = do { my %seen; grep { !$seen{$_}++ } @temp };
 		$set_species = join ",", @unique;
 	} else {
-		$set_species = get_specie_name($species, $str);	
+		$set_species = get_species_name($species, $str);	
 	}
 	return $set_species;
 }
 
-sub get_specie_name {
+sub get_species_name {
 	my ($spe, $str) = @_;
-	my $specie_out;
+	my $species_out;
 	if ($spe =~ /^\w+/ && $str =~ /^0$/){
-		$specie_out = "CM";
+		$species_out = "CM";
 	} elsif ($spe =~ /^\w{2,4}\d+/ && $str =~ /\d+/ && $str !~ /^0$/){
-		$specie_out = $spe;
-		$specie_out =~ s/^(\w{2,4})(\d+|\_.*)/$1/g;
-		$specie_out = uc($specie_out);
+		$species_out = $spe;
+		$species_out =~ s/^(\w{2,4})(\d+|\_.*)/$1/g;
+		$species_out = uc($species_out);
 	} elsif ($spe =~ /^\w+/ && $str !~ /^0$/) {
-		$specie_out = "HMM";
+		$species_out = "HMM";
 	} else {
 		die "This combination of parameters are not allowed\n";
 	}
-	return $specie_out;
+	return $species_out;
 }
 
 sub analyse_strategies {

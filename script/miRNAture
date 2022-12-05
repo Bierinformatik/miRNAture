@@ -100,9 +100,9 @@ if ($data_path !~ /^\/\.+\//){
 
 my $config_file = Mir::ConfigurationFile->new (
 	stage => $stagesRun,
-	specie_name => $name_species,
-	specie_tag => $species_tag,
-	specie_genome => $species_genome_path,
+	species_name => $name_species,
+	species_tag => $species_tag,
+	species_genome => $species_genome_path,
 	output_folder => $work_folder,
 	data_path => $data_path,
 	current_folder => $current_path,

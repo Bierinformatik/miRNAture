@@ -23,10 +23,10 @@ sub generate_summary_file {
 	my $config_file = shift;
 	my $variables = shift;
 	my $evaluation_folder = shift;
-	my $validatedStr = $evaluation_folder."/high_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $validatedNoStr = $evaluation_folder."/medium_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $discarded = $evaluation_folder."/NO_confidence_".$variables->[3]->{Specie_data}{Tag}."_final.table";
-	my $out_summary_file = $evaluation_folder."/miRNAture_summary_".$shift->all_parameters->[3]->{Specie_data}->{Tag}.".txt";
+	my $validatedStr = $evaluation_folder."/high_confidence_".$variables->[3]->{Species_data}{Tag}."_final.table";
+	my $validatedNoStr = $evaluation_folder."/medium_confidence_".$variables->[3]->{Species_data}{Tag}."_final.table";
+	my $discarded = $evaluation_folder."/NO_confidence_".$variables->[3]->{Species_data}{Tag}."_final.table";
+	my $out_summary_file = $evaluation_folder."/miRNAture_summary_".$shift->all_parameters->[3]->{Species_data}->{Tag}.".txt";
 	calculate_summary_file($validatedStr, $validatedNoStr, $discarded, $out_summary_file);
 	get_final_output($variables, $evaluation_folder);
 	return;
@@ -190,7 +190,7 @@ sub get_final_output {
 			;
 		}
 	}
-	my $tag = $shift->[3]->{Specie_data}{Tag};
+	my $tag = $shift->[3]->{Species_data}{Tag};
 	my $gffAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/GFF3/miRNA_annotation_".$tag."_accepted_conf.gff3";
 	my $bedAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/BED/miRNA_annotation_".$tag."_accepted_conf.bed";
 	copy($gffAccepted, $working_path);

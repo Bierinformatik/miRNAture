@@ -65,7 +65,7 @@ has 'tag_spe_query' => (
 	required => 1,
 );
 
-has 'genome_specie' => (
+has 'genome_species' => (
 	is => 'ro',
 	isa => 'Path::Class::File',
 	coerce => 1,
@@ -169,8 +169,8 @@ sub process_all_candidates {
     my $name_cm_db = shift;
 	my ($db_codes, $acceptedDB, $discardedDB) = load_all_results($shift); 
 	my $finalValidationPath = $shift->output_folder;
-    my $specie_tag = $shift->tag_spe_query;
-    my $genome_path_complete = $variables->[3]->{Specie_data}{Old_Genome};
+    my $species_tag = $shift->tag_spe_query;
+    my $genome_path_complete = $variables->[3]->{Species_data}{Old_Genome};
     my ($Zvalue, $genome_size_bp) = calculate_Z_value($genome_path_complete, "Genome");
     my $minBitscore = calculate_minimum_bitscore($genome_size_bp);
 	# Output files
@@ -212,7 +212,7 @@ sub process_all_candidates {
             #
             ##### Extract final fasta and evaluate if truncated with global
             my $line = $$acceptedDB{$code};
-            my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $specie_tag);
+            my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $species_tag);
             #(split /\s+|\t/, $line)[-2]; # Homology Family
             #(split /\s+|\t/, $line)[3];  # Structural Family
             # Here evaluate, if exists, with homolgy family. If not, By the structural one.
@@ -221,7 +221,7 @@ sub process_all_candidates {
             my @families_CMs = ();
             push @families_CMs, $fam_sequenceH;
             push @families_CMs, $fam_sequenceS;
-            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $specie_tag, $code, \@families_CMs); 
+            my $truncated_scores_global = perform_global_evaluation_covariance($fasta_sequence, $name_cm_db, $finalValidationPath, $species_tag, $code, \@families_CMs); 
             my ($truncated_value, $bitscore_global_value);
             #Truncated value
             if (exists $$truncated_scores_global{$code}{0}{Truncated}){
@@ -301,7 +301,7 @@ sub process_all_candidates {
 }
 
 sub perform_global_evaluation_covariance {
-    my ($file, $pathsCM, $outFolder, $specieT, $code, $family) = @_;
+    my ($file, $pathsCM, $outFolder, $speciesT, $code, $family) = @_;
     my $outfile;
 	if (!-e $file || -z $file){
 		print_error("Sequence file to global evaluation not created\n");
@@ -309,15 +309,15 @@ sub perform_global_evaluation_covariance {
     # $family[0]: Str,  $family[1] = Homology CM
     if (exists $$pathsCM{"$$family[0]"}){ #Test with Structural CM.
         my $cm = $$pathsCM{$$family[0]};
-        $outfile = cmsearch_global($$family[0], $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
+        $outfile = cmsearch_global($$family[0], $cm, $file, $speciesT, $outFolder, "cmsearch", $code); #, $zscore); 
     } elsif (exists $$pathsCM{"$$family[1]"}){ # Test with homology CM.
         my $cm = $$pathsCM{$$family[1]};
-        $outfile = cmsearch_global($$family[1], $cm, $file, $specieT, $outFolder, "cmsearch", $code); #, $zscore); 
+        $outfile = cmsearch_global($$family[1], $cm, $file, $speciesT, $outFolder, "cmsearch", $code); #, $zscore); 
     } else {
         print_error("CM is $family not available for global validation\n");
     }
     # Here concatenate and classify the results if they are complete or not
-    #my $outfile = concatenate_tab_files($outFolder, $specieT);
+    #my $outfile = concatenate_tab_files($outFolder, $speciesT);
     # Delete individual files
     #delete_individual_files($outFile, "\\_global\.tab");
     #delete_individual_files($outFile, "\\_global\.out");
@@ -327,8 +327,8 @@ sub perform_global_evaluation_covariance {
 }
 
 sub concatenate_tab_files {
-    my ($outFolder, $specie) = @_;
-    my $concatenatedFile = "$outFolder/${specie}_concatenated_evaluation.tab";
+    my ($outFolder, $species) = @_;
+    my $concatenatedFile = "$outFolder/${species}_concatenated_evaluation.tab";
     open my $OUT, "> $concatenatedFile" or die;
     my @filesToConcatenate = check_folder_files($outFolder, "\\_global\.tab");
     foreach my $out (@filesToConcatenate){
@@ -360,8 +360,8 @@ sub cmsearch_global {
 }
 
 sub generate_temporal_fasta_family {
-    my ($dir, $sequences, $family, $specie, $code) = @_;
-    my $out_name = "$dir/${family}_${specie}_${code}_temporal_evaluate.fa";
+    my ($dir, $sequences, $family, $species, $code) = @_;
+    my $out_name = "$dir/${family}_${species}_${code}_temporal_evaluate.fa";
     open my $OUT, "> " or die;
     foreach my $head (sort keys %{$sequences}){
         print $OUT "$head\n";
@@ -420,7 +420,7 @@ sub concatenate_cms_paths_old {
 }
 
 sub get_fasta_to_global {
-    my ($fasta, $codeStart, $finalValidationPath, $specieTag) = @_;
+    my ($fasta, $codeStart, $finalValidationPath, $speciesTag) = @_;
     open my $IN, "< $fasta" or die;
     my $head;
     my $code;
@@ -441,7 +441,7 @@ sub get_fasta_to_global {
         }
     }
     close $IN;
-    my $outfile = "$finalValidationPath/${codeStart}_${specieTag}_temporal_file.fa";
+    my $outfile = "$finalValidationPath/${codeStart}_${speciesTag}_temporal_file.fa";
     open my $TEMP, "> $outfile" or die;
     foreach my $head (sort keys %sequences){
         print $TEMP "$head\n$sequences{$head}\n";
@@ -892,14 +892,14 @@ sub organise_mess {
 	create_folders($working_path, "GFF3");
 	create_folders($working_path, "BED");
 	create_folders($working_path, "Additional_Support");
-    my $short_specie = $shift->tag_spe_query;
+    my $short_species = $shift->tag_spe_query;
 	opendir DH, $working_path;
 	while (my $file = readdir DH) {
-		if ($file =~ /\.txt$/ && $file =~ /\_$short_specie/){
+		if ($file =~ /\.txt$/ && $file =~ /\_$short_species/){
 			move("$working_path/$file", "$working_path/Additional_Support");
-		} elsif ($file =~ /\.gff3/ && $file =~ /\_$short_specie/){
+		} elsif ($file =~ /\.gff3/ && $file =~ /\_$short_species/){
 			move("$working_path/$file", "$working_path/GFF3");
-		} elsif ($file =~ /\.bed/ && $file =~ /\_$short_specie/){
+		} elsif ($file =~ /\.bed/ && $file =~ /\_$short_species/){
 			move("$working_path/$file", "$working_path/BED");
 		} else {
 			;

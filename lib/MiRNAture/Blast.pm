@@ -34,7 +34,7 @@ has 'genome_subject' => (
 	required => 1,
 );
 
-has 'subject_specie' => (
+has 'subject_species' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,

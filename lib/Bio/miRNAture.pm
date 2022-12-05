@@ -85,15 +85,15 @@ This flag is blast mode specific. It corresponds to blast strategies that would 
 
 Selects the stage to be run on miRNAture. The options are: 'homology', 'no_homology', 'validation', 'evaluation', 'summarise' or 'complete'.
 
-=item -speG/-specie_genome <PATH>
+=item -speG/-species_genome <PATH>
 
 Path of target sequences to be analyzed in FASTA format.
 
-=item -speN/-specie_name <Genera_specie>
+=item -speN/-species_name <Genera_species>
 
-Specie or sequence source's scientific name. The format must be: I<Genera_specie>, separated by '_'.
+Species or sequence source's scientific name. The format must be: I<Genera_species>, separated by '_'.
 
-=item -speT/-specie_tag <TAG_NAME>
+=item -speT/-species_tag <TAG_NAME>
 
 Experiment tag. Will help to identify the generated files along miRNA output files.
 

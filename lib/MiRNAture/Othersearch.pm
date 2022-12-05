@@ -11,10 +11,7 @@ sub searchOthershomology {
 	my $minBitscore = shift;
 	my $maxthreshold = shift;
 	my $models = $shift->path_covariance;
-	##foreach my $pathCM (@$models){
-	cmsearch_mirbase_parallel($shift->genome_subject, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $models, 1, $shift->cmsearch_program_path->stringify, $zscore);
-	##cmsearch($shift->cm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $pathCM, 1, $shift->cmsearch_program_path->stringify, $zscore);
-	##}
+	cmsearch_mirbase_parallel($shift->genome_subject, $shift->subject_species, $shift->output_folder."/".$shift->subject_species, $models, 1, $shift->cmsearch_program_path->stringify, $zscore);
 	return;
 }
 

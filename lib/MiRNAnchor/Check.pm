@@ -429,7 +429,7 @@ sub check_validity_mature_coordinates {
 	my $des2 = 0;
 	while (<$IN>){
 		chomp;
-		if ($_ =~ /^H/){ #The file contains a specie candidate
+		if ($_ =~ /^H/){ #The file contains a species candidate
 			if ($_ =~ m/\s-1\s|\s0\s/){ # Removed \sNULL\s, here I allow to annotate only one sequence
 				$des2 = 0;
 				print_result("Seems that $id does not fit with the alignment");
