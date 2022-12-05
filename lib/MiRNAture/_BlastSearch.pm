@@ -410,11 +410,8 @@ sub writeBlastn {
 
 sub runBlastn_parallel {
 	my ($blast_path, $parameters, $genome, $strategy, $ncrna, $species, $out_path_blast, $dir_now, $parallel, $query_path_specific) = @_;	
-	if ($parallel == 1){
-		print_process("Going into parallel running!");
-		# Ciona_savignyi.cisa.new.fasta -> Cirp_3.miRNA.cisa.tab
-		system("parallel --will-cite --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${species}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
-	}
+    # Ciona_savignyi.cisa.new.fasta -> Cirp_3.miRNA.cisa.tab
+    system("parallel --will-cite --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${species}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
 	return; 
 }
 

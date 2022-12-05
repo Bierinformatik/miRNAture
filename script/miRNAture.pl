@@ -33,7 +33,7 @@ my $species = ""; #target species genomes
 my $strategy = ""; #Blast strategy
 my $blastQueriesFolder = ""; # Path blast queries
 my $work_folder = ""; #output folder
-my $name_specie = ""; #Scientific name of species
+my $name_species = ""; #Scientific name of species
 my $data_folder = "";
 my $parallel_run = "";
 my $parallel_linux = "";
@@ -51,7 +51,7 @@ GetOptions (
     'hmmpath|hmmp=s{1,3}' => \@path_hmm, # including HMMs from multiple sources 
     'mode|m=s' => \$mode,
     'species|spe=s' => \$species,
-    'species_name|n_spe=s' => \$name_specie,
+    'species_name|n_spe=s' => \$name_species,
     'workdir|w=s' => \$work_folder,
     'repetition_cutoff|rep=s' => \$rep_cutoff,
     'nbitscore_cutoff|nb_cut=f' => \$maxthresholdBit, #CAVH
@@ -81,7 +81,7 @@ my ($start_hmm, $start_other, $start_infernal, $start_blast, $start_user);
 my $name = $nameC;
 $name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 my $tag = ((strftime "%H%M%S%d%m%Y", localtime) + (int(rand(10)))); #Today date + random number 0..10.
-print_process("Processing: $name models on $name_specie genome");
+print_process("Processing: $name models on $name_species genome");
 
 my $input_line = join " ", @original_ARGV; 
 
@@ -169,7 +169,7 @@ if ($configuration_file->mode eq "blast"){
             output_folder => "$work_folder/Blast",
             query_folder => $blastQueriesFolder,
             genome_subject => $configuration_mirnature->[3]->{Species_data}->{Genome},
-            subject_specie => $species,
+            subject_species => $species,
             data_folder => $data_folder,
             current_directory => $current_dir,
             path_covariance => \@$temp_cm,
@@ -202,7 +202,7 @@ if ($configuration_file->mode eq "blast"){
     my $hmm_experiment = MiRNAture::HMM->new(
         parallel_linux => $parallel_linux,
         genome_subject => $$genomes{$species},
-        subject_specie => $species,
+        subject_species => $species,
         output_folder => $outHMM,
         path_covariance => \@$temp_cm,
         path_hmm_models => \@$temp_hmm,
@@ -223,7 +223,7 @@ if ($configuration_file->mode eq "blast"){
     $start_infernal = time;
     my $cm_experiment = MiRNAture::CM->new(
         genome_subject => $$genomes{$species},
-        subject_specie => $species,
+        subject_species => $species,
         output_folder => $outInfernal,
         path_covariance => \@$temp_cm,
         bitscores_CM => $bitscores,
@@ -241,7 +241,7 @@ if ($configuration_file->mode eq "blast"){
     $start_other = time;
     my $other_experiment = MiRNAture::Others->new(
         genome_subject => $$genomes{$species},
-        subject_specie => $species,
+        subject_species => $species,
         output_folder => $outOther,
         path_covariance => \@$temp_cm, 
         bitscores_CM => $bitscores, 
@@ -259,7 +259,7 @@ if ($configuration_file->mode eq "blast"){
     $start_user = time;
     my $other_experiment = MiRNAture::Others->new(
         genome_subject => $$genomes{$species},
-        subject_specie => $species,
+        subject_species => $species,
         output_folder => $outUser,
         path_covariance => \@$temp_cm, 
         bitscores_CM => $bitscores, 
@@ -313,12 +313,12 @@ if ($configuration_file->mode eq "final"){
         other_results => $mirbase_output,
         user_results => $user_output,
         output_folder => $work_folder,	
-        subject_specie => $species,
+        subject_species => $species,
         genome_subject => $configuration_mirnature->[3]->{Species_data}{"Old_Genome"}, #$genomes{$species}, # Here the original one
         names_CM => $names_r_inverse,
         length_CM => $len_r,
         families_names_CM => $families_names,
-        species_name => $name_specie,
+        species_name => $name_species,
         species_genome_new_database => $configuration_mirnature->[3]->{Species_data}{Database_names_genome},
         repetition_rules => $rep_cutoff,
     );
