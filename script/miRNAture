@@ -91,7 +91,7 @@ if ($work_folder !~ /^\/\.+\//){
 if ($species_genome_path !~ /^\/\.+\//){
 	$species_genome_path = abs_path($species_genome_path);
 }
-if ($mirfix_path !~ /^\/\.+\//){
+if ($mirfix_path && $mirfix_path !~ /^\/\.+\//){
 	$mirfix_path = abs_path($mirfix_path);
 }
 if ($data_path !~ /^\/\.+\//){
