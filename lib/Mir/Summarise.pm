@@ -7,7 +7,6 @@ use Data::Dumper;
 use Term::ANSIColor;
 use File::Copy;
 use lib "lib/MiRNAture";
-#use lib 'src/Statistics-R-0.34/lib';
 use Statistics::R;
 
 with 'MiRNAture::ToolBox';

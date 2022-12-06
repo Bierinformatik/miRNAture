@@ -273,7 +273,6 @@ sub setup_all_to_run_mirfix_group_subset {
 		print_process("$name-$code input files already copied");
 	} else {
 		print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
-		#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
 	}
 	##Parameters constructor
 	my $param_mirfix = MiRNAnchor::ExternalPrograms->new(
@@ -427,8 +426,6 @@ sub load_correspondence_models_rfam {
 		$db{$all[0]} = $all[-1]; #Rfam->miRBase
 		$db{$all[-1]} = $all[-1]; #miRBase->miRBase
 		#TODO: include multiple families to test for the same homology model
-		#push @{$db{$all[0]}}, $all[-1]; #Rfam->miRBase
-		#push @{$db{$all[-1]}}, $all[-1]; #miRBase->miRBase
 	}
 	close $IN;
 	if (length $user_path !~ /^NO$/){
@@ -476,11 +473,6 @@ sub evaluated_family {
 	}
 	return 0;
 }
-#sub read_data_share {
-#	my $data_location = dist_dir('Bio-miRNAture');
-#	print "$data_location\n";
-#	return $data_location;
-#}
 
 sub end_close {
 	print_end("\n-¿Olvida usted algo?-\n ¡Ojalá!.\n\n  El emigrante. Luis Felipe Lornelí. (2005)\n");

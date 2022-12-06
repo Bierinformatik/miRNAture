@@ -35,19 +35,16 @@ sub test_input_files {
 	my $final_accepted_nostr = $shift->all_parameters->[3]->{"Default_folders"}->{"Output_folder"}."/miRNA_validation/Additional_Support/accepted_".$shift->all_parameters->[3]->{Species_data}->{Tag}."_noalign.txt";
 	my $final_discarded = $shift->all_parameters->[3]->{"Default_folders"}->{"Output_folder"}."/miRNA_validation/Additional_Support/discarded_".$shift->all_parameters->[3]->{Species_data}->{Tag}.".miRNAs.txt";
 	if (-e $final_accepted_str){
-		#$variables->[4]->{"User_results"}{"Validated_miRNAs_with_structure"} = $final_accepted_str;
 		$variables->[4]->{"User_results"}{"High_confidence_miRNAs"} = $final_accepted_str;
 	} else {
 		print_error("The accepted miRNA, with structure (HIGH), file was not created");
 	}
 	if (-e $final_accepted_nostr){
-		#$variables->[4]->{"User_results"}{"Validated_miRNAs_without_structure"} = $final_accepted_nostr;
 		$variables->[4]->{"User_results"}{"Medium_confidence_miRNAs"} = $final_accepted_nostr;
 	} else {
 		print_error("The accepted miRNA, without structure (MEDIUM), file was not created");
 	}
 	if (-e $final_discarded){
-		#$variables->[4]->{"User_results"}{"Discarded_miRNAs"} = $final_discarded;
 		$variables->[4]->{"User_results"}{"NO_confidence_miRNAs"} = $final_discarded;
 	} else {
 		print_error("The discarded (NO) structure file was not created");

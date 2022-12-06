@@ -5,7 +5,6 @@ use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Bio::SeqIO;
 use Data::Dumper;
-#use File::Share ':all';
 
 use lib "lib/MiRNAture";
 
@@ -190,8 +189,6 @@ has 'nbitscore_cut' => (
 	is => 'ro',
 	isa => 'Num',
 	required => 1
-	#lazy => 1
-	#default => 0.32 # By default this nBit= 0.32, cutoff bitscore
 );
 
 
@@ -293,7 +290,6 @@ sub models_list_hash {
 	return \%reference;
 }
 
-
 #Concatenate models in case both rfam and mirbase modes are indicated
 sub concatenate_models {
 	my $self =  shift;
@@ -330,7 +326,6 @@ sub concatenate_models {
 sub generate_copy_genome {
 	my $shift = shift;
 	if (!-e $shift->output_folder){
-        ##print_error("Output folder did not exist. Please create it to run miRNAture.");
         print_process("Output folder not detected. Creating...");
         create_folders($shift->output_folder, "");
 	}
@@ -343,12 +338,10 @@ sub generate_copy_genome {
 	my $new_genome_len = $new_genome_file.".len"; #Len Chr
 	if (-e $new_genome_file && !-z $new_genome_file){ #Test if exists or process
 		print_process("miRNAture detected a previous genome reference for the ".$shift->species_name." genome");
-		#generate_length_file_genome($new_genome_file, $shift->species_tag, $data_folder."/".$shift->species_name,$shift->species_genome->basename.".new.fa");
 	} else {
 		print_process("Generating a carbon-copy of your ".$shift->species_tag." genome");
 		create_map_genome($shift->species_genome, $shift->species_tag, $data_folder."/".$shift->species_name, $shift->species_genome->basename);
 		generate_length_file_genome($new_genome_file, $shift->species_tag, $data_folder."/".$shift->species_name, $shift->species_genome->basename.".new.fa");
-		#copy_files($shift->species_genome, $new_folder);
 	}
 	$shift->species_genome_new($new_genome_file);	
 	$shift->species_genome_new_database($new_dababase_names);
@@ -412,12 +405,6 @@ sub test_name {
 	}    
 }
 
-#sub read_data_share {
-#	my $data_location = dist_dir('Bio-miRNAture');
-#	#print "$data_location\n";
-#	return $data_location;
-#}
-
 sub create_config_file {
 	my $shift = shift;
 	my $yamlNew = YAML::Tiny->new();
@@ -441,7 +428,6 @@ sub write_header {
 	$yaml_file->[0]->{"miRNAture"}{"Author"} = 'Cristian A. Velandia-Huerto, Joerg Fallmann, Peter F. Stadler';
 	$yaml_file->[0]->{"miRNAture"}{"Version"} = 'v.1.1';
 	$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Sept 21 2022';
-	#$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Mon Mar 16 19:02:25 CET 2020';
 	$yaml_file->[1]->{"Data_user"}{"User"} = `whoami | tr -d '\n'`;
 	$yaml_file->[1]->{"Data_user"}{"Hostname"} = `hostname | tr -d '\n'`;
 	$yaml_file->[1]->{"Data_user"}{"Running_date"} = `date | tr -d '\n'`;
@@ -477,9 +463,6 @@ sub obtain_paths_programs {
 	my $mirfix = collect_data("MIRfix.py");
     my $mirnatureHomology = collect_data("miRNAture.pl");
     my $mirnanchor = collect_data("miRNAnchor.pl");
-    ##TEMPORAL TODO
-    #my $mirnatureHomology = "~/Proyects/miRNAture_v1/script/miRNAture.pl";
-    #my $mirnanchor = "~/Proyects/miRNAture_v1/script/miRNAnchor.pl";
     return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix, $mirnatureHomology, $mirnanchor);
 }
 
@@ -505,7 +488,6 @@ sub write_config_file {
 	$yaml->[3]->{Species_data}{"Database_names_genome"} = $shift->species_genome_new_database->stringify;
 	$yaml->[3]->{Default_folders}{"Current_dir"} = $shift->current_folder->stringify;
 	$yaml->[3]->{Default_folders}{"Output_folder"} = $shift->output_folder->stringify;
-	#$yaml->[3]->{Default_folders}{"Temp_folder"} = $shift->output_folder->stringify."/Temp";
 	
 	$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = "$data_path/Data/Validation_mature_data";
 	$yaml->[3]->{Default_folders}{"Data_folder"} = "$data_path/Data";
@@ -589,8 +571,7 @@ sub evaluate_variables_file {
 	if ($valid_content == 1) {
 		return $temp_file;
 	}
-	# Information not in selected file. Evaluate
-	# previous one.
+	# Information not in selected file. Evaluate previous one.
 	my $previous_file = $temp_file;
 	$previous_file =~ s/(miRNAture_configuration_.*)(\-)(\d+)(.yaml)/$1/g;
 	# Previous file

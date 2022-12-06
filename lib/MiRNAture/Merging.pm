@@ -98,8 +98,6 @@ sub resolve_mergings {
 			push @{$rows{"$database[0] $database[2]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
 		} elsif ($MODE == 1){
 			push @{$rows{"$database[0] $database[2]"}}, [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ];
-			#push @{ $rows{"$database[0] $database[1]"} } , [ @database[3,4,5,6,7,8,9,10,11,12,2,1,0] ];
-			#push @{ $rows{"$database[0] $database[2]"} } , [ @database[3,4,5,6,7,8,9,10,11,12,1,2,0] ]; #Considering strand
 
 		} elsif ($MODE == 4){ #Blast ALL
 			# JH126831_0	1_1	-_2	1_3	74_4	75661_5	75722_6	15.5_7	0.0021_8	no_9	mir-10_10	74_11	1_12
@@ -277,7 +275,6 @@ sub test_length {
 				my $fam12 = get_uniq($$i[9]);
 				print $OUT "$$i[12]\t$$i[11]\t$fam2\t$$i[0]\t$$i[1]\t$$i[2]\t$$i[3]\t$$i[4]\t$$i[5]\t$fam9\t$fam10\t$fam11\t$fam12\n";
 				@temporal = ();
-				#last; #END ALL
 			}
 		} else { #Here print those ones with insufficient coverate respect to CM length
 			foreach my $i (${$array}[0]){
@@ -407,7 +404,6 @@ sub filter_candidate {
 }
 
 sub fusion_all {
-	#my (@cand1, @cand2, $mode) = @_;
 	my @cand1 = $_[0];
 	my @cand2 = $_[1];
 	my $mode = $_[2];
@@ -474,7 +470,6 @@ sub push_best {
 	} else {
 		error();
 	}
-	#return $best;
 	push_to_new($best, $test1, $test2);
 	return;
 }
@@ -482,7 +477,6 @@ sub push_best {
 sub push_to_new {
 	# Here I fill the global @new with the fusion
 	my ($cand, $text1, $text2) = @_;
-	#my @temp;
 	if ($cand == 0){
 		push @new, $text1;
 	} elsif ($cand == 1){

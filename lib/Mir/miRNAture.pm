@@ -56,10 +56,8 @@ sub generate_file_mirnature {
         $outfile = test_name($outfile);
     }
     open (my $OUT, ">", "$outfile.sh");
-    ##open (my $GENOME_OUT, ">>", $variable->[3]->{"Default_folders"}->{"Data_folder"}."/genomes.txt");
 	my $header = "# miRNAture\n# ".$variable->[0]->{"miRNAture"}->{"Author"}."\n# ".$variable->[0]->{"miRNAture"}->{"Date"}."\n# ".$variable->[0]->{"miRNAture"}->{"Version"};
 	my $headerUser = "# Session data:\n# Hostname: ".$variable->[1]->{"Data_user"}->{"Hostname"}."\n# Date:".$variable->[1]->{"Data_user"}->{"Running_date"}."\n# User:".$variable->[1]->{"Data_user"}->{"User"}."\n# Program: miRNAture";
-    ##print $GENOME_OUT $variable->[3]->{"Species_data"}->{"Tag"}."="."\"".$variable->[3]->{"Species_data"}->{"Genome"}."\"\n";
 	print $OUT "#!/bin/bash\n\n####\n$header\n####\n$headerUser\n####\n";
 	my $parameters = build_parameters_mirnature($variable);
 	my $mode = $variable->[3]->{"Homology_options"}->{"Mode"};
@@ -90,7 +88,6 @@ sub generate_file_mirnature {
 	$variable->[4]->{"User_results"}{"miRNAture_program"} = $outfile.".sh";
 	$variable->write($config_file);
 	close $OUT;
-    ##close $GENOME_OUT;
 	return;
 }
 

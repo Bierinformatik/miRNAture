@@ -113,14 +113,9 @@ sub get_basic_files {
 	my ($scoresCMmodels, $namesCM, $LENGTH_OTHER);
 	my $data_folder = "$working_folder";
 	my $basic_folder = "$data_folder/Basic_files";
-	#create_folders($working_folder, "Data");
 	create_folders($data_folder, "Basic_files");
 	if (is_folder_empty($basic_folder)){
 		print_error("Seems that you do not have the scores files: all_rfam_scores.txt and all_mirbase_scores.txt to run miRNAture.")
-		#TODO: Consider point the location to download those files
-		#print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
-		#copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
-		#copy_files("$working_folder/Default_Data/genomes.txt", $basic_folder);
 	} else { #Test if files are in the right format to be processed
 		if (-s "$basic_folder/all_rfam_scores.txt"){
 			test_basic_file("$basic_folder/all_rfam_scores.txt", "scores");
@@ -128,23 +123,7 @@ sub get_basic_files {
 		if (-s "$basic_folder/all_mirbase_scores.txt"){
 			test_basic_file("$basic_folder/all_mirbase_scores.txt", "scores");
 		} 
-		#else {
-		#	copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
-		#	test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
-		#}
-        ##if (-s "$basic_folder/genomes.txt"){
-        ##	test_basic_file("$basic_folder/genomes.txt", "genomes");
-        ##} else {
-        ##	;
-			#This file is generated automatically, so it must be on the folder. If not, is an error of miRNAture.
-			#print_process("The file: $data_folder/genomes.txt is missing, miRNAture will create it.");
-			#copy_files("Default_Data/genomes.txt", $basic_folder);
-			#test_basic_file("$basic_folder/genomes.txt", "genomes");
-        ##}
 	}
-	#if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
-	#	copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
-	#} 
 	return;
 }
 
@@ -218,34 +197,6 @@ sub read_config_file {
 	return $final;
 }
 
-##sub read_genomes_paths { #File
-##	my $name = shift;
-##	$name =~ s/(.*\/|\/.*\/)(.*)$/$2/g;
-##	open my $genomes_paths, "< Data/Basic_files/genomes.txt" or die "The file <Data/Basic_files/genomes.txt> does not exists\n"; 
-##	my $targetGenomes;
-##	my %genomes;
-##	while (<$genomes_paths>){
-##		chomp;
-##		next if ($_ =~ /^#|^$/); 
-##		my @splitline = split /\=/, $_;
-##		$splitline[1] =~ s/"//g;
-##		$genomes{$splitline[0]} = $splitline[1];
-##	}
-##	foreach my $keys (sort keys %genomes){
-##		$targetGenomes .= "$keys ";
-##	}
-##	$targetGenomes =~ s/(.*)(\s+)$/2\.$1/g; #add identification
-##	store_conf_file($targetGenomes, $name);
-##	return %genomes;
-##}
-
-#sub read_genomes_paths {
-#    my ($tag, $path) = @_;
-#    my %genomes; 
-#    $genomes{$tag} = $path;
-#    return \%genomes;
-#}
-
 =head1 create_folders 
     Title: create_folders 
     Usage: create_folders(base_folder, new_folder);
@@ -316,14 +267,6 @@ sub check_folder_files {
     }
     return @files;
 }
-
-#sub check_folder_files {
-#	my ($dir, $prefix) = @_;
-#	opendir(DIR, $dir);
-#	my @files = grep(/$prefix$/, readdir(DIR));
-#	closedir(DIR);
-#	return @files;
-#}
 
 =head1 calculate_Z_value
     Title: calculate_Z_value
@@ -402,7 +345,6 @@ sub getSequencesFasta {
 	} else {
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
 	}
-	#my $dbFasta = Bio::SeqIO->new(-file => $genome, '-format' => 'Fasta');
 	my $molecule_name;
 	my ($IN, $OUTFILE, $DBFILE);
 	if ($mode == 1 || $mode == 2){
@@ -448,11 +390,7 @@ sub getSequencesFasta {
 		my ($ids, $idsDouble);
 		if ($mode == 1 || $mode == 5){
 			my $strand = (split /\s+|\t/, $_)[1];
-			#if ($strand =~ /\,/){
-			#    $idsDouble = generate_key_double(); 
-			#} else {
 			$ids = generate_key();
-			#}
 		} elsif ($mode == 2 || $mode == 3 || $mode == 4 || $mode == 6){
 			$ids = "Temporal$count"; #generate_key(); #ConsiderChange
 		}
@@ -525,7 +463,6 @@ sub getSequencesFasta {
 		} elsif ($mode == 6){ # Blocks
 			#dre1	scaffold2992-size13932	+	1013	1127	46	161	164
 			# 20	JH126831.1	-	1045134	1045213
-			#$tmp[1] = modify_chr($tmp[1], $spe);
 
 			my $chr_length = $dbCHR->length("$tmp[1]");
 			if (!$chr_length){
@@ -606,7 +543,6 @@ sub getSequencesFasta {
 		}
 		foreach my $ids (sort keys %{$final_seq{$acc} }){
 			my $idsm = $ids;
-			#$idsm =~ s/\#/ /g;
 			print $OUTFILE ">$idsm\n";
 			my $all = $final_seq{$acc}{$ids}; #Here is a problem
 			foreach my $sq (@$all){
@@ -666,14 +602,8 @@ sub getSequencesFastaSubGenome {
 		my $output_nucleotide2 = Bio::Seq->new(
 			-seq        => $gen_seq,
 			-id         => $gene_name,
-			#-display_id => $gene_name,
 			-alphabet   => 'dna'
 		);
-        # In case was detected in forward strand, just report as a genome in 5'->3'
-        # because MIRfix will search in both strands
-        #if ($frame eq "-") {
-        #	$output_nucleotide2 = $output_nucleotide2->revcom();
-        #}
 		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
 	}
 	close $IN;
@@ -727,7 +657,6 @@ sub getSequencesFasta_final {
 		my $output_nucleotide2 = Bio::Seq->new(
 			-seq        => $gen_seq,
 			-id         => $gene_name,
-			#-display_id => $gene_name,
 			-alphabet   => 'dna'
 		);
 		if ($frame eq "-") {
@@ -985,7 +914,6 @@ sub getSpeciesName {
 	} elsif ($abb eq "saco"){
 		$species_name = "Saccoglossus kowalewski";
 	} else {
-		#print "$abb doesn´t recognized!\n";
 		$species_name = "Species unrecognized";
 	}
 	return $species_name;
@@ -1014,7 +942,6 @@ sub classify_2rd_align_results {
 	my ($spe, $cm, $folder_in, $file, $mode, $molecule, $cm_scores, $len_scores, $names_cms, $minBitscore, $maxthreshold) = @_;
 	my $filein;
 	if ($cm ne "NA"){
-		#$filein = "$folder_in/$spe.$cm.tab";
 		if ($mode eq "rfam" || $mode eq "mirbase" || $mode eq "user"){
 			$filein = $file; 
 		} elsif ($mode eq "hmm"){
@@ -1028,7 +955,6 @@ sub classify_2rd_align_results {
 	if (-e $filein && !-z $filein){
 		if ($molecule =~ /^miRNA/){ #Based on evidence, miRNAs are evaluated with 32% of Bitscore.
 			cleancmsearch($filein, $maxthreshold, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
-			#cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); #filein, threshold bitscore, mode GA score
 		} elsif ($molecule =~ /^NA$/){ #other CMs without bitscore
 			cleancmsearch($filein, $maxthreshold, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
 		} else { # Other RNA families

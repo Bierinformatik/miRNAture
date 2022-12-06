@@ -6,12 +6,6 @@ use Data::Dumper;
 
 with 'MiRNAture::HMMsearch';
 
-#has 'hmm_model' => (
-#	is => 'ro',
-#	isa => 'Str',
-#	required => 1,
-#);
-
 has 'genome_subject' => (
 	is => 'ro',
 	isa => 'Str',
@@ -46,14 +40,12 @@ has 'parallel_linux' => (
 
 has 'path_hmm_models' => (
 	is => 'ro',
-	#isa => 'Path::Class::Dir',
 	isa => 'ArrayRef[Str]',
 	required => 1,
 );
 
 has 'path_covariance' => (
 	is => 'ro',
-	#isa => 'Path::Class::Dir',
 	isa => 'ArrayRef[Str]',
 	required => 1,
 );

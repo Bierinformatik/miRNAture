@@ -211,12 +211,7 @@ sub concatenate_true_cand {
 	while (<$GENERATED>){
 		chomp;
 		# JH126831.1.-.75502.75785.41	-	mir-10	RF00104	cm	1	74	159	220	+	no	1	0.26	0.2	15.5	0.0021	!	-	74
-		#if ($str =~ /^ALL$|^final$/){
 		print $OUT "$_\n";
-		#} else { #Here Blast, Infernal and HMM modes
-		#	my @split = split /\s+|\t/, $_;
-		#	my @other = split /\./, $split[0];
-		#	print $OUT "$_\n";
 	}
 	close $OUT;
 	return;
@@ -292,7 +287,6 @@ sub cleancmsearch {
 		}
 		my $ln = join "\t", @valuesT;
 		if ($evalue > 0.01){ #miRNAture
-			#if ($evalue > 100){
 			print $OUT2 "$ln\t$max\n";
 		} else {
 			# $defined_nGA is the proportion of nBit that discriminate btw true|false:  <26-11-21, cavelandiah> #
@@ -300,7 +294,6 @@ sub cleancmsearch {
 				print $OUT2 "$ln\t$max\n";
 			} else {
 				my $max70 = sprintf("%.1f", ($max * 0.7)); #miRNAture
-				#my $max70 = sprintf("%.1f", ($max * 0)); # Default 
 				if ($diffh < $max70){ #<<<<<<< Length
 					print $OUT2 "$ln\t$max\n";
 				} else {
@@ -320,7 +313,6 @@ sub get_family_name {
 		$name = $$families_names{$acc};
 	} else {
 		#TODO: Future references to search other ncRNAs
-		#$name = "NA";
 		print_error("Your $acc has not description field of the ncRNA family!");
 	}
 	return $name;
@@ -362,7 +354,6 @@ sub format_final_table {
 		}
 		my $involved_species = analyse_involved_species($split[2], $split[-1]);
 		my $current_strategies = analyse_strategies($split[-1]);
-		#$split[0] =~ s/(.*)(\.\d+)/$1/g;
 		if (exists $$index_names{$split[0]}){
 			$split[0] = $$index_names{$split[0]};
 		} else {
@@ -522,7 +513,6 @@ sub get_str_name {
 
 sub format_acc_name {
 	my $name = shift;
-	#print $name."\n";
 	#model: RF\d.cm
 	if ($name =~ m/^RF[0-9]/) {
 		if ($name !~ m/RF[0-9]+\.cm/){

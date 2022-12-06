@@ -9,12 +9,6 @@ with 'MiRNAture::ToolBox';
 with 'MiRNAture::Evaluate';
 with 'MiRNAture::Cleaner';
 
-##has 'cm_model' => (
-##	is => 'ro',
-##	isa => 'Str',
-##	required => 1,
-##);
-
 has 'genome_subject' => (
 	is => 'ro',
 	isa => 'Str',
@@ -66,13 +60,6 @@ has 'cmsearch_program_path' => (
 	required => 1,
 	coerce => 1,
 );
-
-##has 'list_models' => (
-##	is => 'ro',
-##	isa => 'Path::Class::Dir',
-##	coerce => 1,
-##	required => 1,
-##);
 
 sub create_folders_cm {
 	my $shift = shift;

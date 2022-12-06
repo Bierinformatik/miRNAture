@@ -57,7 +57,6 @@ sub create_folders_blast {
 }
 
 sub index_query_genome {
-	#my $shift = shift;
 	my ($genome, $makeblastpath) = @_;
 	#Only create in case it doesn't exists
 	if (!-e $genome.".nhr"){

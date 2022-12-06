@@ -23,7 +23,6 @@ sub resolveBlastMergings {
 	#Check if empty
 	my $input = $input_path_db_file;
 	if (-z $input || !-e $input){
-		#print "The file $input is empty\n";
 		return;
 	}
 	#Read File line by line
@@ -80,7 +79,6 @@ sub analyse_sorted {
 	FLAG1:
 	my $sense0 = $$all_sorted[0][7];
 	my $sense1 = $$all_sorted[1][7];
-	#my $interq_diff = abs($all[1][2] - $all[0][3]);
 	$S1 = $temporal[0][0];
 	$E1 = $temporal[0][1];
 	$S2 = $temporal[1][0];
@@ -125,11 +123,9 @@ sub test_coverage {
 }
 
 sub fusion_all {
-	#my (@cand1, @cand2, $mode) = @_;
 	my @cand1 = $_[0];
 	my @cand2 = $_[1];
 	my $mode = $_[2];
-	#my @new;
 	my $new_line;
 	if ($mode == 1){ #Merge with greater values and names with comma
 		for (my $a=0; $a <= 7; $a++){ # Walking througt the array
@@ -256,7 +252,6 @@ sub to_print {
 	my $out = $_[1];
 	my $test_cov = test_coverage($$complete[0], $$complete[1], $$complete[4]);		
 	if ($out == 1){ #Print as candidate
-		#my $fam2 = &get_uniq($$complete[10]);
 		if ($test_cov == 1){ #Pass coverage test, print.
 			print $F_OUT "$$complete[5]\t$$complete[6]\t$$complete[7]\t$$complete[0]\t$$complete[1]\t$$complete[2]\t$$complete[3]\t$$complete[4]\n";
 		} else { #Do not print!, do not have the coverage!
@@ -281,7 +276,6 @@ sub test_length {
 				print $F_OUT "$$i[5]\t$$i[6]\t$$i[7]\t$$i[0]\t$$i[1]\t$$i[2]\t$$i[3]\t$$i[4]\n";
 			}
 			@temporal = ();
-			#END ALL
 		}
 	} else {
 		if ($numb == 1){ # Mode
@@ -321,7 +315,6 @@ sub push_best {
 
 sub push_to_new {
 	my ($cand, $text1, $text2) = @_;
-	#my @temp;
 	if ($cand == 0){
 		push @new, $text1;
 	} elsif ($cand == 1){

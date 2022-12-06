@@ -126,7 +126,6 @@ sub analyse_sorted {
 }
 
 sub fusion_all {
-	#my (@cand1, @cand2, $mode) = @_;
 	my @cand1 = $_[0];
 	my @cand2 = $_[1];
 	my $mode = $_[2];

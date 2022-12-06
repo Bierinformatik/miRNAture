@@ -121,7 +121,6 @@ sub generate_final_output {
 	} else {
 		generate_final_ncRNAs($shift->blast_results->stringify, $shift->hmm_results->stringify, $shift->infernal_results->stringify, $shift->other_results->stringify, $shift->user_results->stringify, $shift->output_folder."/Final_Candidates", $shift->subject_species);		
 		format_final_table($shift->output_folder."/Final_Candidates", $shift->subject_species, $shift->families_names_CM, $shift->names_CM, $shift->species_genome_new_database);
-        #my $final_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_species."_final.truetable.joined.table";
         my $temporal_file = $shift->output_folder->stringify."/Final_Candidates/all_RFAM_".$shift->subject_species."_final.ncRNAs_homology.txt.temp";
         my $mode = (split /\,/, $shift->repetition_rules)[0]; 
         my $repeat_threshold = (split /\,/, $shift->repetition_rules)[1];

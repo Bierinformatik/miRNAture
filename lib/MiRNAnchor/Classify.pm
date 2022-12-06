@@ -213,8 +213,6 @@ sub process_all_candidates {
             ##### Extract final fasta and evaluate if truncated with global
             my $line = $$acceptedDB{$code};
             my $fasta_sequence = get_fasta_to_global($fastaFinal, $code, $finalValidationPath, $species_tag);
-            #(split /\s+|\t/, $line)[-2]; # Homology Family
-            #(split /\s+|\t/, $line)[3];  # Structural Family
             # Here evaluate, if exists, with homolgy family. If not, By the structural one.
             my $fam_sequenceH = (split /\s+|\t/, $line)[-2]; # Homology
             my $fam_sequenceS = (split /\s+|\t/, $line)[3]; # Structural
@@ -316,12 +314,6 @@ sub perform_global_evaluation_covariance {
     } else {
         print_error("CM is $family not available for global validation\n");
     }
-    # Here concatenate and classify the results if they are complete or not
-    #my $outfile = concatenate_tab_files($outFolder, $speciesT);
-    # Delete individual files
-    #delete_individual_files($outFile, "\\_global\.tab");
-    #delete_individual_files($outFile, "\\_global\.out");
-    # Build hash with resulting data
     my $truncated_global = get_result_truncated_global($outfile);
     return $truncated_global;
 }
@@ -349,7 +341,6 @@ sub cmsearch_global {
 	$sequence =~ s/"//g;
 	if (-e "${cm}" && !-z "${cm}"){
         # Here detect truncated sequences
-        # Z-score?
         my $param = "-g --cpu 5 --toponly --nohmmonly --tblout $outFolder/${nameCMFinal}_${speTag}_${code}_global.tab -o $outFolder/${nameCMFinal}_${speTag}_${code}_global.out $cm $sequence";
 		system "$cmsearch_path $param 1> /dev/null";
 	} else {
@@ -822,12 +813,6 @@ sub generate_output_files {
 	#Generate Accepted (High + Medium) output
 	generate_gff($shift->gff_ACCEPTED_file, \%positiveAccepted, \%info);
 	generate_bed($shift->bed_ACCEPTED_file, \%positiveAccepted, \%info);
-	#Genererate High Output
-	#generate_gff($shift->gff_high_file, \%positiveHigh, \%info);
-	#generate_bed($shift->bed_high_file, \%positiveHigh, \%info);
-	#Genererate Medium Output
-	#generate_gff($shift->gff_med_file, \%positiveMed, \%info);
-	#generate_bed($shift->bed_med_file, \%positiveMed, \%info);
 	#Genererate Low Output
 	generate_gff($shift->gff_NO_file, \%negativeLow, \%info);
 	generate_bed($shift->bed_NO_file, \%negativeLow, \%info);

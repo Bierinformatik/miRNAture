@@ -200,7 +200,6 @@ sub update_coordinates_to_genome { #Only for HMMs and Blast strategies
 
 sub check_format_input_header {
 	my $header_array = shift;
-	#my @header_array =  split /\./, $header;
 	my $len = scalar @$header_array;
 	if ($$header_array[1] =~ /^[0-9]/ && $len >= 5){ #Discriminate "NW_003107091.1.+.410955.411080.xtr101.21.89.108" and accept "chr1.-.3351215.3351292.cin280.1.53.53"
 		splice @$header_array, 1, 1;

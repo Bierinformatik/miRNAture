@@ -36,9 +36,6 @@ sub detect_blast_queries {
 				$count += 1; #$sum; #Avoid duplicated mapped headers
 			}
 		} 
-		#else {
-		#	print_warning("Sequence tag for query sequence: $fastaF is not available.");
-		#}
 	}
 	if (-s "$queriesFolder/queries_description.txt"){
 		open my $METADATA, "< $queriesFolder/queries_description.txt" or die "Metadata file is corrupted\n";

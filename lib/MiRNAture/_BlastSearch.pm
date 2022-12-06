@@ -426,14 +426,12 @@ sub runBlastn {
 		$id = `sbatch --job-name=$nameTTO --nodes=1 --ntasks=1 --cpus-per-task=5 --time=96:00:00 --mem=2G --output=$dir_now/.blastTemp/LOGs/out_${species}_$strategy.$ncrna.$query_tag.out --error=$dir_now/.blastTemp/LOGs/error_${species}_$strategy.$ncrna.$query_tag.out $dir_now/.blastTemp/${species}_$strategy.$ncrna.$query_tag.sh`;
 		$id =~ /^Submitted batch job (\d+)/; 
 		$id = $1;
-		#print "$id\n";
 	} else {
 		system("$dir_now/.blastTemp/${species}_$strategy.$ncrna.$query_tag.sh &");
 		$id = `ps aux | grep ${species}_$strategy.$ncrna.$query_tag.sh | grep bash`;
 		$id = (split /\s+/,(split /\n/, $id)[0])[1];
 		$id =~ s/(\d+)(\s*)/$1/g;
 	}
-	####
 	return $id;
 }
 
@@ -446,7 +444,6 @@ sub wait_processes {
 	if ($parallel == 1){
 		foreach my $reference (@$processes){
 			chomp $reference;
-			#print_process("Waiting for the process: $reference"); 
 			EVAL:
 			my $state_qsub = `squeue -o "%8i %20j %4t %10u" | grep "^$reference"`; #Capture state
 			if ($state_qsub && length $state_qsub > 0){
@@ -460,7 +457,6 @@ sub wait_processes {
 		return;
 	} else {
 		foreach my $reference (@$processes){
-			#print_process("Waiting for the process: $reference"); 
 			EVAL2:
 			my $exists = kill 0, $reference;
 			if ( $exists ){
@@ -492,7 +488,6 @@ sub wait_slurm_process {
 
 sub cleanBlastnOut {
 	my ($genome, $strategy, $query_seq, $query_tag, $ncrna, $species, $out_path_blast, $lenQueryDB) = @_;	
-	#makeIndex($query_tag, $ncrna);
 	open my $INFILE, "< $out_path_blast/${species}_$strategy.$ncrna.$query_tag.tab" or die "Not possible to open the blastn input file: $out_path_blast/${species}_$strategy.$ncrna.$query_tag.tab\n";
 	open my $OUTT, "> $out_path_blast/${species}_$strategy.$ncrna.$query_tag.tab.db" or die;
 	while (<$INFILE>){
@@ -611,7 +606,6 @@ sub runcmSearch_parallel {
 
 
 sub runcmSearch {
-	#infernalTemp/${genome_tag}_$str.$molecule_query.$query_name_spe.sh";
 	my ($strategy, $ncrna, $species, $dir_now, $parallel) = @_;	
 	my $name = "${ncrna}_${species}";
 	my $nameTTO = "$species-$ncrna";
