@@ -4,7 +4,6 @@ use Moose;
 use MooseX::Types::Path::Class;
 use MiRNAture::ToolBox;
 use File::Path;
-#use File::Copy;
 use Data::Dumper;
 
 has 'tag' => (
@@ -98,7 +97,6 @@ sub subset_search_models {
 		for (my $j = 0; $j <= $numC -1; $j++) {
 			my $test_file = "$$path_cm[$j]/$_.cm";
 			if (-e $test_file && !-l "$new_cm/$_.cm"){
-				#copy($test_file, $new_cm);
 				symlink($test_file, "$new_cm/$_.cm") || print_error("Cannot create CM reference");
 			}
 		}
@@ -106,7 +104,6 @@ sub subset_search_models {
 		for (my $j = 0; $j <= $numH -1; $j++) {
 			my $test_file = "$$path_hmm[$j]/$_.hmm";
 			if (-e $test_file && !-l "$new_hmm/$_.hmm"){
-				#copy($test_file, $new_hmm);
 				symlink($test_file, "$new_hmm/$_.hmm") || print_error("Cannot create CM reference");
 			}
 		}
@@ -116,12 +113,10 @@ sub subset_search_models {
 			next if $_ =~ /^MIPF/;
 			my $test_file = "$$path_user[$j]/HMMs/$_.hmm";
 			if (-e $test_file && !-l "$new_hmm/$_.hmm"){
-				#copy($test_file, $new_hmm);
 				symlink($test_file, "$new_hmm/$_.hmm") || print_error("Cannot create CM reference");
 			}
 			my $test_file2 = "$$path_user[$j]/CMs/$_.cm";
 			if (-e $test_file2 && !-l "$new_cm/$_.cm"){
-				#copy($test_file2, $new_cm);
 				symlink($test_file2, "$new_cm/$_.cm") || print_error("Cannot create CM reference");
 			}
 		}
@@ -133,26 +128,6 @@ sub subset_search_models {
 	push @new_hmm, $new_hmm;
 	return (\@new_cm, \@new_hmm);
 }
-
-##sub read_genomes_paths { #File
-##	my $shift = shift;
-##	open (my $genomes_paths, "<", $shift->data_folder->stringify."/genomes.txt") or die "The file Data/genomes.txt> does not exists\n"; 
-##	my $targetGenomes;
-##	my %genomes;
-##	while (<$genomes_paths>){
-##		chomp;
-##		next if ($_ =~ /^#|^$/); 
-##		my @splitline = split /\=/, $_;
-##		$splitline[1] =~ s/"//g;
-##		$genomes{$splitline[0]} = $splitline[1];
-##	}
-##	foreach my $keys (sort keys %genomes){
-##		$targetGenomes .= "$keys ";
-##	}
-##	$targetGenomes =~ s/(.*)(\s+)/$1/g;
-##	$shift->genomes($targetGenomes);
-##	return %genomes;
-##}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

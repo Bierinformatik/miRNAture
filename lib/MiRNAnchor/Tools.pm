@@ -163,8 +163,8 @@ sub change_name {
 =cut 
 
 sub create_genome_list_mirfix {
-	my ($working_path, $destination, $name_tag, $genome_path_list, $specie_pattern) = @_; 
-	my @candidates = grep(m/$specie_pattern/, @$genome_path_list); 
+	my ($working_path, $destination, $name_tag, $genome_path_list, $species_pattern) = @_; 
+	my @candidates = grep(m/$species_pattern/, @$genome_path_list); 
 	my $outT = "$working_path/$destination/${name_tag}_genomes_list.txt";
 	open my $OUT6, ">> $outT" or die;
 	foreach my $ln (@candidates){
@@ -254,9 +254,6 @@ sub setup_all_to_run_mirfix_group {
 
 sub write_mirfix_specific_family_individual {
 	my ($dir_now, $name, $param, $MIRFIX_path, $code, $outAddress, $tagSpe) = @_;
-    ##create_folder($dir_now); # Create base working dir
-    ##create_folder("$dir_now/$outAddress"); #Create folder specific to specie
-    ##create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to specie
 	my $OUTTEMPC;
 	if (-e "$outAddress/${name}_${code}.sh"){
 		open $OUTTEMPC, "> $outAddress/${name}_${code}_${tagSpe}.sh";
@@ -276,7 +273,6 @@ sub setup_all_to_run_mirfix_group_subset {
 		print_process("$name-$code input files already copied");
 	} else {
 		print_error("The required input files to validate the miRNAs are missing, check input files from Rfam");
-		#ExternalPrograms::copyStartFiles("$location/BaseFiles", $name);
 	}
 	##Parameters constructor
 	my $param_mirfix = MiRNAnchor::ExternalPrograms->new(
@@ -307,8 +303,8 @@ sub setup_all_to_run_mirfix_group_subset {
 sub write_mirfix_specific_family_individual_subset {
 	my ($dir_now, $name, $param, $MIRFIX_path, $code, $outAddress, $tagSpe, $subset) = @_;
 	create_folder($dir_now); # Create base working dir
-	create_folder("$dir_now/$outAddress"); #Create folder specific to specie
-	create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to specie
+	create_folder("$dir_now/$outAddress"); #Create folder specific to species
+	create_folder("$dir_now/$outAddress/LOGs"); #Create folder specific to species
 	my $OUTTEMPC;
 	if (-e "$outAddress/${name}_${code}_${tagSpe}_$subset.sh"){
 		open $OUTTEMPC, "> $outAddress/${name}_${code}_${tagSpe}_$subset.sh";
@@ -328,7 +324,6 @@ sub run_mirfix_individual {
 	my $short = substr($name,-5);
 	$short = "${short_spe}${short}";
 	system "sbatch --job-name=${short} --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$outAddress/LOGs/out_${name}_${code}_${tagSpe}.out --error=$outAddress/LOGs/error_${name}_${code}_${tagSpe}.out $outAddress/${name}_${code}_${tagSpe}.sh &";	
-	#system "qsub -S /bin/sh -cwd -l h_vmem=4G -pe smp 5 -m bes -V -q normal.q -o $dir_now/$outAddress/LOGs/out_${name}_${code}.out -e $dir_now/$outAddress/LOGs/error_${name}_${code}.out $dir_now/$outAddress/${name}_${code}.sh &";
 	sleep(2); #I detected some delay on the sge system while I summited the job and it started to be recognized as job on job table
 	return;
 }
@@ -336,16 +331,15 @@ sub run_mirfix_individual {
 sub run_mirfix_individual_subset {
 	my ($name, $dir_now, $code, $outAddress, $tagSpe, $subset) = @_;	
 	system "sbatch --job-name=${subset}_${code}_${tagSpe}_$subset --nodes=1 --ntasks=1 --cpus-per-task=20 --time=24:00:00 --mem=2G --output=$outAddress/LOGs/out_${subset}_${code}_${tagSpe}_$subset.out --error=$outAddress/LOGs/error_${subset}_${code}_${tagSpe}_$subset.out $outAddress/${subset}_${code}_${tagSpe}_$subset.sh &";	
-	#system "qsub -S /bin/sh -cwd -l h_vmem=4G -pe smp 5 -m bes -V -q normal.q -o $dir_now/$outAddress/LOGs/out_${name}_${code}.out -e $dir_now/$outAddress/LOGs/error_${name}_${code}.out $dir_now/$outAddress/${name}_${code}.sh &";
 	sleep(2); #I detected some delay on the sge system while I summited the job and it started to be recognized as job on job table
 	return;
 }
 
 sub wait_slurm_process {
 	my $reference = shift;	
-	my $specie = shift;
+	my $species = shift;
 	$reference = substr($reference,-5);
-	my $short_spe = substr($specie, 0, 3);
+	my $short_spe = substr($species, 0, 3);
 	$reference = "${short_spe}${reference}";
 	print "Waiting for the process on $reference\n";
 	if (length $reference > 8){
@@ -432,8 +426,6 @@ sub load_correspondence_models_rfam {
 		$db{$all[0]} = $all[-1]; #Rfam->miRBase
 		$db{$all[-1]} = $all[-1]; #miRBase->miRBase
 		#TODO: include multiple families to test for the same homology model
-		#push @{$db{$all[0]}}, $all[-1]; #Rfam->miRBase
-		#push @{$db{$all[-1]}}, $all[-1]; #miRBase->miRBase
 	}
 	close $IN;
 	if (length $user_path !~ /^NO$/){
@@ -481,11 +473,6 @@ sub evaluated_family {
 	}
 	return 0;
 }
-#sub read_data_share {
-#	my $data_location = dist_dir('Bio-miRNAture');
-#	print "$data_location\n";
-#	return $data_location;
-#}
 
 sub end_close {
 	print_end("\n-¿Olvida usted algo?-\n ¡Ojalá!.\n\n  El emigrante. Luis Felipe Lornelí. (2005)\n");

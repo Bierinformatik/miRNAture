@@ -29,11 +29,11 @@ my $nameC = ""; #cmlist file
 my @path_cm = ""; #cm_path
 my @path_hmm = ""; #hmm_path
 my $mode = ""; #run mode
-my $specie = ""; #target specie genomes
+my $species = ""; #target species genomes
 my $strategy = ""; #Blast strategy
 my $blastQueriesFolder = ""; # Path blast queries
 my $work_folder = ""; #output folder
-my $name_specie = ""; #Scientific name of specie
+my $name_species = ""; #Scientific name of species
 my $data_folder = "";
 my $parallel_run = "";
 my $parallel_linux = "";
@@ -50,8 +50,8 @@ GetOptions (
     'cmpath|cmp=s{1,3}' => \@path_cm, # including CMs from multiple sources
     'hmmpath|hmmp=s{1,3}' => \@path_hmm, # including HMMs from multiple sources 
     'mode|m=s' => \$mode,
-    'specie|spe=s' => \$specie,
-    'specie_name|n_spe=s' => \$name_specie,
+    'species|spe=s' => \$species,
+    'species_name|n_spe=s' => \$name_species,
     'workdir|w=s' => \$work_folder,
     'repetition_cutoff|rep=s' => \$rep_cutoff,
     'nbitscore_cutoff|nb_cut=f' => \$maxthresholdBit, #CAVH
@@ -69,8 +69,8 @@ GetOptions (
 my $startComplete = time();
 #### Flags Evaluation
 my $new_model_path = $cm_model_others[-1];
-$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $specie, $parallel_run, $parallel_linux, $rep_cutoff, $new_model_path);
-my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$specie.yaml");
+$rep_cutoff = evaluate_input_flags($nameC, $mode, $work_folder, $species, $parallel_run, $parallel_linux, $rep_cutoff, $new_model_path);
+my $configuration_mirnature = read_config_file("$work_folder/../miRNAture_configuration_$species.yaml");
 my $current_dir = $configuration_mirnature->[3]->{Default_folders}->{Output_folder}."/TemporalFiles"; #getcwd;
 ## Working Paths
 get_basic_files($configuration_mirnature->[3]->{Default_folders}->{Data_folder});
@@ -81,7 +81,7 @@ my ($start_hmm, $start_other, $start_infernal, $start_blast, $start_user);
 my $name = $nameC;
 $name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
 my $tag = ((strftime "%H%M%S%d%m%Y", localtime) + (int(rand(10)))); #Today date + random number 0..10.
-print_process("Processing: $name models on $name_specie genome");
+print_process("Processing: $name models on $name_species genome");
 
 my $input_line = join " ", @original_ARGV; 
 
@@ -93,15 +93,13 @@ my $configuration_file = MiRNAture::ConfigFile->new(
 );
 $configuration_file->include_running_mode($mode);
 my ($temp_cm, $temp_hmm) = $configuration_file->subset_search_models(\@path_cm, \@path_hmm, \@cm_model_others);
-#my $path_selected_cm = $configuration_mirnature->[3]->{"Default_folders"}->{"Data_folder"}."/Selected_CM_models";
-#my $path_selected_hmm = $configuration_mirnature->[3]->{"Default_folders"}->{"Data_folder"}."/Selected_HMM_models";
 
-my $tag_spe = $configuration_mirnature->[3]->{"Specie_data"}->{"Tag"};
-my $genome_path = $configuration_mirnature->[3]->{"Specie_data"}->{"Genome"};
+my $tag_spe = $configuration_mirnature->[3]->{"Species_data"}->{"Tag"};
+my $genome_path = $configuration_mirnature->[3]->{"Species_data"}->{"Genome"};
 my $genomes = $configuration_file->read_genomes_paths($tag_spe, $genome_path);
 
 my $log_file = MiRNAture::LogFile->new(
-    log_file_input => "$work_folder/LOGs/miRNAture_homology_log_${specie}_${mode}_$tag.log",
+    log_file_input => "$work_folder/LOGs/miRNAture_homology_log_${species}_${mode}_$tag.log",
     command_line => $input_line,		
 );
 $log_file->create_log_folder($work_folder);
@@ -133,9 +131,6 @@ if (length $user_data_path > 0){ #If path defined check that exists scores file
 }
 
 if ($mode =~ m/mirbase/){ #Load specific scores for mirbase.
-    #if (length $user_data_path > 0){ #If path defined check that exists scores file
-    #    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Additional", $basicFiles, $user_data_path);
-    #} else { #Only with miRNAture models
 	    ($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("mirbase", $basicFiles, $user_data_path); 
     #}
 } elsif ($mode =~ m/rfam/) { #Here get all the scores from RFAM database
@@ -150,14 +145,11 @@ if ($mode =~ m/mirbase/){ #Load specific scores for mirbase.
 	}
 }
 
-## Start all
-##open my $LIST, "< $nameC" or die;
-
 #Check that genome tag has genome path
-if (!exists $$genomes{$specie}){
+if (!exists $$genomes{$species}){
     print_error("Your sequence tag is not correct respect to genomes file");
 }
-my $genome_path_complete = $$genomes{$specie};
+my $genome_path_complete = $$genomes{$species};
 my ($Zvalue, $genome_size_bp) = calculate_Z_value($genome_path_complete, "Genome");
 my $minBitscore = calculate_minimum_bitscore($genome_size_bp);
 
@@ -167,7 +159,7 @@ if ($configuration_file->mode eq "blast"){
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_blast = time;
     my $speciesTag = detect_blast_queries($blastQueriesFolder);
-    index_query_genome($$genomes{$specie}, $configuration_mirnature->[2]->{Program_locations}->{makeblastdb});
+    index_query_genome($$genomes{$species}, $configuration_mirnature->[2]->{Program_locations}->{makeblastdb});
     create_folders("$work_folder", "Blast");
     for (my $i = 0; $i<=$#strategy; $i++){
         print_process("Running on strategy $strategy[$i]");
@@ -176,11 +168,10 @@ if ($configuration_file->mode eq "blast"){
             blast_str => $strategy[$i],
             output_folder => "$work_folder/Blast",
             query_folder => $blastQueriesFolder,
-            genome_subject => $configuration_mirnature->[3]->{Specie_data}->{Genome},
-            subject_specie => $specie,
+            genome_subject => $configuration_mirnature->[3]->{Species_data}->{Genome},
+            subject_species => $species,
             data_folder => $data_folder,
             current_directory => $current_dir,
-            #path_covariance => \@path_cm,
             path_covariance => \@$temp_cm,
             bitscores_CM => $bitscores,
             length_CM => $len_r,
@@ -194,7 +185,6 @@ if ($configuration_file->mode eq "blast"){
         );	
         if ($blast_experiment->blast_str =~ /^\d+$/){
             my ($molecules, $query_species, $families, $files_relation) = $blast_experiment->searchHomologySequenceBlast_parallel($speciesTag); #Run all blastn jobs, returns array by Str
-            ## $blast_experiment->wait_processes($id_process_running, $parallel_run); #Wait until complete all processes from Str
             $blast_experiment->searchHomologyBlast($molecules, $query_species, $families, $files_relation, $Zvalue, $minBitscore,$maxthresholdBit);	
         } elsif ($blast_experiment->blast_str =~ /^ALL$/){
             $blast_experiment->join_all_blast_str;
@@ -209,17 +199,11 @@ if ($configuration_file->mode eq "blast"){
     print_process("Running ".$configuration_file->mode." searches mode");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_hmm = time;
-    ##while (<$LIST>){ #In this case, list is the CM names
-    ##chomp;
-    ##print_process("Running on $specie\t$_");
     my $hmm_experiment = MiRNAture::HMM->new(
-        ##hmm_model => $_,	
         parallel_linux => $parallel_linux,
-        genome_subject => $$genomes{$specie},
-        subject_specie => $specie,
+        genome_subject => $$genomes{$species},
+        subject_species => $species,
         output_folder => $outHMM,
-        #path_hmm_models => \@path_hmm,
-        #path_covariance => \@path_cm,
         path_covariance => \@$temp_cm,
         path_hmm_models => \@$temp_hmm,
         bitscores_CM => $bitscores,
@@ -233,20 +217,13 @@ if ($configuration_file->mode eq "blast"){
     $hmm_experiment->create_folders_hmm($work_folder);
     $hmm_experiment->search_homology_HMM($Zvalue, $minBitscore, $maxthresholdBit);						
     $hmm_experiment->clean_empty;
-    ##}
-    #my $diff = $start - time;
-    #LogFile::write_line_log("# Running homology search time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "rfam"){
     print_process("Running ".$configuration_file->mode." searches mode");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_infernal = time;
-    ##while (<$LIST>){ #In this case, list is the CM names
-    ##    chomp;
-    ##    next if $_ !~ /^RF/; # Must start with RF[0-9]+
     my $cm_experiment = MiRNAture::CM->new(
-        ##cm_model => $_,
-        genome_subject => $$genomes{$specie},
-        subject_specie => $specie,
+        genome_subject => $$genomes{$species},
+        subject_species => $species,
         output_folder => $outInfernal,
         path_covariance => \@$temp_cm,
         bitscores_CM => $bitscores,
@@ -254,25 +231,17 @@ if ($configuration_file->mode eq "blast"){
         names_CM => $names_r,
         families_names_CM => $families_names,
         cmsearch_program_path => $configuration_mirnature->[2]->{Program_locations}->{cmsearch},
-        #list_models => $configuration_file->list_file->stringify, 
     );
     $cm_experiment->create_folders_cm;
     $cm_experiment->search_homology_CM($Zvalue,$minBitscore,$maxthresholdBit);
     $cm_experiment->clean_empty;
-    ##}		
-    #my $diff = $start - time;
-    #LogFile::write_line_log("# Running homology search time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "mirbase"){
     print_process("Running Mode: ".$configuration_file->mode." searches");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_other = time;
-    ##while (<$LIST>){ #In this case, list is the CM names
-    ##    chomp;
-    ##    next if $_ =~ /^RF/;
     my $other_experiment = MiRNAture::Others->new(
-        ## cm_model => $_,
-        genome_subject => $$genomes{$specie},
-        subject_specie => $specie,
+        genome_subject => $$genomes{$species},
+        subject_species => $species,
         output_folder => $outOther,
         path_covariance => \@$temp_cm, 
         bitscores_CM => $bitscores, 
@@ -284,20 +253,13 @@ if ($configuration_file->mode eq "blast"){
     $other_experiment->create_folders_other;
     $other_experiment->search_homology_other($Zvalue,$minBitscore,$maxthresholdBit);
     $other_experiment->clean_empty;
-    ##}
-    #my $diff = $start - time;
-    #write_line_log("# Running search time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "user"){
     print_process("Running Mode: ".$configuration_file->mode." searches");	
     write_line_log($log_file, "# Running Mode: ".$configuration_file->mode." at ".localtime."\n");
     $start_user = time;
-    ##while (<$LIST>){ #In this case, list is the CM names
-    ##    chomp;
-    ##    next if $_ =~ /^RF[0-9]+/; # Exclude rfam models
     my $other_experiment = MiRNAture::Others->new(
-        ## cm_model => $_,
-        genome_subject => $$genomes{$specie},
-        subject_specie => $specie,
+        genome_subject => $$genomes{$species},
+        subject_species => $species,
         output_folder => $outUser,
         path_covariance => \@$temp_cm, 
         bitscores_CM => $bitscores, 
@@ -309,12 +271,6 @@ if ($configuration_file->mode eq "blast"){
     $other_experiment->create_folders_other;
     $other_experiment->search_homology_other($Zvalue,$minBitscore,$maxthresholdBit);
     $other_experiment->clean_empty;
-    ##}
-    #my $diff = $start - time;
-    #write_line_log("# Running search time: ".$diff." s\n");
-#} else {
-#print_error("Your sequence tag is not correct respect to genomes file");
-#}
 } elsif ($configuration_file->mode eq "final"){
     ;
 } else {
@@ -324,46 +280,32 @@ if ($configuration_file->mode eq "blast"){
 print_process("Merging candidates on ".$configuration_file->mode);	
 ## Merging candidates by Strategy
 if ($configuration_file->mode eq "hmm"){
-    #print_process("\t".$configuration_file->mode);	
-    define_final_CMs("$outHMM/$specie/Infernal/Final", $specie, $configuration_file->mode, $len_r);
+    define_final_CMs("$outHMM/$species/Infernal/Final", $species, $configuration_file->mode, $len_r);
     my $diff = time - $start_hmm;
     write_line_log($log_file, "# Total running time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "rfam"){
-    #print_process("\t".$configuration_file->mode);	
-    define_final_CMs("$outInfernal/$specie/Final", $specie, $configuration_file->mode, $len_r);
+    define_final_CMs("$outInfernal/$species/Final", $species, $configuration_file->mode, $len_r);
     my $diff = time - $start_infernal;
     write_line_log($log_file, "# Total running time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "mirbase"){
-    #print_process("\t".$configuration_file->mode);	
-    define_final_CMs("$outOther/$specie/Final", $specie, $configuration_file->mode, $len_r);
+    define_final_CMs("$outOther/$species/Final", $species, $configuration_file->mode, $len_r);
     my $diff = time - $start_other;
     write_line_log($log_file, "# Total running time: ".$diff." s\n");
 } elsif ($configuration_file->mode eq "user"){
-    #print_process("\t".$configuration_file->mode);	
-    define_final_CMs("$outUser/$specie/Final", $specie, $configuration_file->mode, $len_r);
+    define_final_CMs("$outUser/$species/Final", $species, $configuration_file->mode, $len_r);
     my $diff = time - $start_user;
     write_line_log($log_file, "# Total running time: ".$diff." s\n");
 }
 
 # Final Merge
 if ($configuration_file->mode eq "final"){
-    print_process("Refining final candidates on ".$specie);	
+    print_process("Refining final candidates on ".$species);	
     ####Preliminar Results ###
-    $blast_output = "$outBlast/$specie/Infernal/Final/all_RFAM_${specie}_ALL.truetable.joined.table"; #Blast
-    $hmm_output = "$outHMM/$specie/Infernal/Final/all_RFAM_${specie}.truetable.clean.joined.table"; #HMMs
-    $infernal_output = "$outInfernal/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Direct Infernal
-    $mirbase_output = "$outOther/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Other direct CMs
-    $user_output = "$outUser/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Other direct CMs
-    #$infernalDefault = "$outInfernalDefault/$specie/Final/all_RFAM_${specie}.truetable.joined.table"; #Direct Infernal
-    ###
-    #if ($other_output){
-        # Refill hashes with both score files
-    #if (length $user_data_path > 0){ #If path defined check that exists scores file
-    #	($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("Joined", $basicFiles, $user_data_path); 
-    #} else {
-    #	($bitscores, $len_r, $names_r, $names_r_inverse, $families_names) = load_all_databases("JoinedN", $basicFiles, $user_data_path); 
-    #}
-    #}
+    $blast_output = "$outBlast/$species/Infernal/Final/all_RFAM_${species}_ALL.truetable.joined.table"; #Blast
+    $hmm_output = "$outHMM/$species/Infernal/Final/all_RFAM_${species}.truetable.clean.joined.table"; #HMMs
+    $infernal_output = "$outInfernal/$species/Final/all_RFAM_${species}.truetable.joined.table"; #Direct Infernal
+    $mirbase_output = "$outOther/$species/Final/all_RFAM_${species}.truetable.joined.table"; #Other direct CMs
+    $user_output = "$outUser/$species/Final/all_RFAM_${species}.truetable.joined.table"; #Other direct CMs
     my $final_candidates = MiRNAture::FinalCandidates->new(
         blast_results => $blast_output,
         hmm_results => $hmm_output,
@@ -371,13 +313,13 @@ if ($configuration_file->mode eq "final"){
         other_results => $mirbase_output,
         user_results => $user_output,
         output_folder => $work_folder,	
-        subject_specie => $specie,
-        genome_subject => $configuration_mirnature->[3]->{Specie_data}{"Old_Genome"}, #$genomes{$specie}, # Here the original one
+        subject_species => $species,
+        genome_subject => $configuration_mirnature->[3]->{Species_data}{"Old_Genome"}, #$genomes{$species}, # Here the original one
         names_CM => $names_r_inverse,
         length_CM => $len_r,
         families_names_CM => $families_names,
-        specie_name => $name_specie,
-        specie_genome_new_database => $configuration_mirnature->[3]->{Specie_data}{Database_names_genome},
+        species_name => $name_species,
+        species_genome_new_database => $configuration_mirnature->[3]->{Species_data}{Database_names_genome},
         repetition_rules => $rep_cutoff,
     );
     $final_candidates->create_folders_final;
@@ -429,9 +371,9 @@ list of CM to evaluate over target genome
 
 running mode: BLAST, HMM, INFERNAL, ALL, Final
 
-=item -specie
+=item -species
 
-target specie, write tag referenced on genomes file
+target species, write tag referenced on genomes file
 
 =item -workdir 
 

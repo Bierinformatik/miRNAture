@@ -22,10 +22,10 @@ my $MIRFIX_path = ""; #Path of the exe file of MIRfix
 my $working_path = ""; #Out folder
 my $RFAM_mirbase_source = ""; #Path with all pre-calculated data from RFAM-miRBase
 my $parallel_running = ""; #Decide if run with SLURM or not
-my $origin_genome = ""; #Path of the genome from the subject specie
+my $origin_genome = ""; #Path of the genome from the subject species
 my $original_genome = ""; #Path of the original genome to perform blast mapping
 my $final_miRNA_table = ""; #miRNA table database generate by miRNAture
-my $tag_specie = "";
+my $tag_species = "";
 my $user_data = "";
 my $help = 0; 
 my $man = 0;
@@ -43,7 +43,7 @@ GetOptions (
     'genome|g=s' => \$origin_genome,
     'original_genome|og=s' => \$original_genome,
     'table_database|db=s' => \$final_miRNA_table,
-    'tag_specie|tag=s' => \$tag_specie,
+    'tag_species|tag=s' => \$tag_species,
     'user_models|usrM=s' => \$user_data,
     'help|h' => \$help,
     man => \$man,
@@ -58,10 +58,10 @@ my $start_config = MiRNAnchor::Main->new (
     parallel_running_confirmation => $parallel_running,
     subject_genome_path => $origin_genome,
     subject_original_genome_path => $original_genome,
-    tag_spe_query => $tag_specie
+    tag_spe_query => $tag_species
 );
 
-my $configFile = read_config_file("$working_path/miRNAture_configuration_${tag_specie}.yaml"); #Read old config file
+my $configFile = read_config_file("$working_path/miRNAture_configuration_${tag_species}.yaml"); #Read old config file
 my $db_models_relation = load_correspondence_models_rfam("$RFAM_mirbase_source/../", $user_data); #Load databases correspondence to do validation.
 $start_config->check_existence_folder_output;
 my $genome_location = $start_config->get_genome_validation_list;
@@ -81,7 +81,7 @@ my @all_results;
 # Iterate Rfam Model
 foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only to the targeted ones
     ### Evaluate if the family was previously evaluated, in cases of broken runs.
-    my $evaluated = evaluated_family($rfam_defined_models, $working_path."/miRNA_validation/".$tag_specie);
+    my $evaluated = evaluated_family($rfam_defined_models, $working_path."/miRNA_validation/".$tag_species);
     if ($evaluated == 1){ # Family has been evaluated
         print_result("The family $rfam_defined_models has been previously evaluated");
         next;
@@ -106,13 +106,13 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
             my @groups = (0, 1); #Until now only 2 sets by corrected family.
             foreach my $num (@groups){
                 my $subset = "${rfam_defined_models}_${num}"; #Set Name
-                create_environment_detailed_subset($start_config->output_folder, $rfam_defined_models, $code_header, $address, $subset, $tag_specie);
-                copy_rfam_files_group_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $subset, $tag_specie);
-                create_genome_file_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $subset, $tag_specie);
-                process_query_fasta_group_subset($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $subset, $tag_specie); #Include subject fasta sequences
-                $specific_query_path = $start_config->output_folder."/$address/$tag_specie/$rfam_defined_models/$subset/$code_header";
+                create_environment_detailed_subset($start_config->output_folder, $rfam_defined_models, $code_header, $address, $subset, $tag_species);
+                copy_rfam_files_group_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $subset, $tag_species);
+                create_genome_file_subset($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $subset, $tag_species);
+                process_query_fasta_group_subset($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $subset, $tag_species); #Include subject fasta sequences
+                $specific_query_path = $start_config->output_folder."/$address/$tag_species/$rfam_defined_models/$subset/$code_header";
                 include_subject_genome($specific_query_path, "BaseFiles", $subset, $genome_location, $start_config->subject_genome_path);
-                clean_redundancy_file_subset($start_config->output_folder, $rfam_defined_models, $code_header, $address, $subset, $tag_specie);
+                clean_redundancy_file_subset($start_config->output_folder, $rfam_defined_models, $code_header, $address, $subset, $tag_species);
                 setup_all_to_run_mirfix_group_subset($specific_query_path, $subset, $start_config->mirfix_path, $current_dir, $start_config->parallel_running_confirmation, 
 							$code_header, $outTempAddress, $start_config->tag_spe_query, $subset); #1: block copy again the mirfix input files 
                 if ($start_config->parallel_running_confirmation == 1){ #Support of SLURM
@@ -120,13 +120,13 @@ foreach my $rfam_defined_models (sort keys %{ $RFAM_families }){ #restrict only 
                 } # Else is included on setup_all_to_run_mirfix_group
             }
         } else {
-            create_environment_detailed($start_config->output_folder, $rfam_defined_models, $code_header, $address, $tag_specie);
-            copy_rfam_files_group($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $tag_specie);
-            create_genome_file($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $tag_specie);
-            process_query_fasta_group($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $tag_specie); #Include subject fasta sequences
-            $specific_query_path = $start_config->output_folder."/$address/$tag_specie/$rfam_defined_models/$code_header";
+            create_environment_detailed($start_config->output_folder, $rfam_defined_models, $code_header, $address, $tag_species);
+            copy_rfam_files_group($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $tag_species);
+            create_genome_file($start_config->output_folder, $rfam_defined_models, $rfam_precalculated_specific, $code_header, $address, $genome_location, $tag_species);
+            process_query_fasta_group($rfam_defined_models, $start_config->output_folder, $code_header, $header_fasta, $candidates, $address, $tag_species); #Include subject fasta sequences
+            $specific_query_path = $start_config->output_folder."/$address/$tag_species/$rfam_defined_models/$code_header";
             include_subject_genome($specific_query_path, "BaseFiles",$rfam_defined_models, $genome_location, $start_config->subject_genome_path);
-            clean_redundancy_file($start_config->output_folder, $rfam_defined_models, $code_header, $address, $tag_specie);
+            clean_redundancy_file($start_config->output_folder, $rfam_defined_models, $code_header, $address, $tag_species);
             setup_all_to_run_mirfix_group($specific_query_path, $rfam_defined_models, $start_config->mirfix_path, $current_dir, $start_config->parallel_running_confirmation, $code_header, $outTempAddress, $start_config->tag_spe_query); #1: block copy again the mirfix input files 
             if ($start_config->parallel_running_confirmation == 1){ #Support of SLURM
                 run_mirfix_individual($rfam_defined_models, $current_dir, $code_header, $outTempAddress, $start_config->tag_spe_query);
@@ -212,23 +212,23 @@ my $classification = MiRNAnchor::Classify->new(
     database_mirnas => $final_miRNA_table,
     output_folder => $working_path."/".$address."/".$start_config->tag_spe_query,
     current_dir => $current_dir,
-    accepted_mirnas => $working_path."/".$address."/all_accepted_".$tag_specie."_miRNAs.txt", # Concatenated pre-accepted
-    discarted_mirnas => $working_path."/".$address."/all_discarded_".$tag_specie."_miRNAs.txt", # Concatenated pre-discarded
-    mature_description => $working_path."/".$address."/all_mature_".$tag_specie."_miRNAs_description.txt", # Concatenated mature info
+    accepted_mirnas => $working_path."/".$address."/all_accepted_".$tag_species."_miRNAs.txt", # Concatenated pre-accepted
+    discarted_mirnas => $working_path."/".$address."/all_discarded_".$tag_species."_miRNAs.txt", # Concatenated pre-discarded
+    mature_description => $working_path."/".$address."/all_mature_".$tag_species."_miRNAs_description.txt", # Concatenated mature info
     precalculated_path => $RFAM_mirbase_source,
-    genome_specie => $original_genome,
-    tag_spe_query => $tag_specie,
-    accepted_file => $working_path."/".$address."/accepted_".$tag_specie.".miRNAs.txt", #Out accepted file
-    accepted_noStr_file => $working_path."/".$address."/accepted_".$tag_specie."_noalign.txt", #Out accepted file with cand that destroyed alignment
-    discarded_file => $working_path."/".$address."/discarded_".$tag_specie.".miRNAs.txt", #Out discarded file
-    gff_high_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_high_conf.gff3",
-    bed_high_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_high_conf.bed",
-    gff_med_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_medium_conf.gff3",
-    bed_med_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_medium_conf.bed",
-    gff_NO_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_NO_conf.gff3",
-    bed_NO_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_NO_conf.bed",
-    gff_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.gff3",
-    bed_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_specie."_accepted_conf.bed",
+    genome_species => $original_genome,
+    tag_spe_query => $tag_species,
+    accepted_file => $working_path."/".$address."/accepted_".$tag_species.".miRNAs.txt", #Out accepted file
+    accepted_noStr_file => $working_path."/".$address."/accepted_".$tag_species."_noalign.txt", #Out accepted file with cand that destroyed alignment
+    discarded_file => $working_path."/".$address."/discarded_".$tag_species.".miRNAs.txt", #Out discarded file
+    gff_high_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_high_conf.gff3",
+    bed_high_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_high_conf.bed",
+    gff_med_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_medium_conf.gff3",
+    bed_med_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_medium_conf.bed",
+    gff_NO_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_NO_conf.gff3",
+    bed_NO_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_NO_conf.bed",
+    gff_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_accepted_conf.gff3",
+    bed_ACCEPTED_file => $working_path."/".$address."/miRNA_annotation_".$tag_species."_accepted_conf.bed",
 );
 ### Build database CMs names
 ## CM RFAM:

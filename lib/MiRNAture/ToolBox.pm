@@ -2,7 +2,7 @@ package MiRNAture::ToolBox;
 
 use Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpecieName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_error2 print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final infer_name_database_cm);
+@EXPORT = qw(evaluate_input_flags get_basic_files test_basic_file openF create_folders is_folder_empty copy_files check_folder_files getSequencesFasta extendBlastnCoordinates get_header_name generate_key check_if_exists getSpeciesName make_blast_database existenceProgram classify_2rd_align_results infer_data_from_cm infer_list_from_cm cmsearch print_error print_error2 print_result print_process read_config_file calculate_Z_value calculate_minimum_bitscore getSequencesFasta_final infer_name_database_cm);
 
 use Moose::Role; 
 use File::Copy; 
@@ -32,7 +32,7 @@ with 'MiRNAture::Evaluate'; #Load tool subroutines
 
 sub evaluate_input_flags {
 	#cmlist file, mode run, out folder, parallel mode.
-	my ($nameC, $mode, $work_folder, $subject_specie, $parallel, $parallel_linux, $repetition_threshold, $new_models) = @_;
+	my ($nameC, $mode, $work_folder, $subject_species, $parallel, $parallel_linux, $repetition_threshold, $new_models) = @_;
 	# Evaluate the existence of list of CM models
 	my $name = $nameC;
 	$name =~ s/(.*\/Data\/|\.\/Data\/|\/.*\/|\.\/)(.*)/$2/g;
@@ -71,10 +71,10 @@ sub evaluate_input_flags {
 	} else {
 		create_folders($work_folder, "");
 	}
-	if (length $subject_specie > 0){
+	if (length $subject_species > 0){
 		;
 	} else {
-		print_error("The subject specie wasn't defined, please be specific with the tag name of your subject genome");
+		print_error("The subject species wasn't defined, please be specific with the tag name of your subject genome");
 	}
 	if ($repetition_threshold =~ /default/){
 		my @all = split /,/, $repetition_threshold; 
@@ -113,14 +113,9 @@ sub get_basic_files {
 	my ($scoresCMmodels, $namesCM, $LENGTH_OTHER);
 	my $data_folder = "$working_folder";
 	my $basic_folder = "$data_folder/Basic_files";
-	#create_folders($working_folder, "Data");
 	create_folders($data_folder, "Basic_files");
 	if (is_folder_empty($basic_folder)){
 		print_error("Seems that you do not have the scores files: all_rfam_scores.txt and all_mirbase_scores.txt to run miRNAture.")
-		#TODO: Consider point the location to download those files
-		#print_process("Seems that you do not have the basic file to start running miRNAture, let me copy it for you on:\n $data_folder");
-		#copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
-		#copy_files("$working_folder/Default_Data/genomes.txt", $basic_folder);
 	} else { #Test if files are in the right format to be processed
 		if (-s "$basic_folder/all_rfam_scores.txt"){
 			test_basic_file("$basic_folder/all_rfam_scores.txt", "scores");
@@ -128,23 +123,7 @@ sub get_basic_files {
 		if (-s "$basic_folder/all_mirbase_scores.txt"){
 			test_basic_file("$basic_folder/all_mirbase_scores.txt", "scores");
 		} 
-		#else {
-		#	copy_files("$working_folder/Default_Data/all_RFAM_scores.txt", $basic_folder);
-		#	test_basic_file("$basic_folder/all_RFAM_scores.txt", "scores");
-		#}
-        ##if (-s "$basic_folder/genomes.txt"){
-        ##	test_basic_file("$basic_folder/genomes.txt", "genomes");
-        ##} else {
-        ##	;
-			#This file is generated automatically, so it must be on the folder. If not, is an error of miRNAture.
-			#print_process("The file: $data_folder/genomes.txt is missing, miRNAture will create it.");
-			#copy_files("Default_Data/genomes.txt", $basic_folder);
-			#test_basic_file("$basic_folder/genomes.txt", "genomes");
-        ##}
 	}
-	#if (-s "$data_folder/miRNA_RFAM14-1_ACC.lista"){
-	#	copy_files("$working_folder/Default_Data/miRNA_RFAM14-1_ACC.lista", $data_folder);
-	#} 
 	return;
 }
 
@@ -218,34 +197,6 @@ sub read_config_file {
 	return $final;
 }
 
-##sub read_genomes_paths { #File
-##	my $name = shift;
-##	$name =~ s/(.*\/|\/.*\/)(.*)$/$2/g;
-##	open my $genomes_paths, "< Data/Basic_files/genomes.txt" or die "The file <Data/Basic_files/genomes.txt> does not exists\n"; 
-##	my $targetGenomes;
-##	my %genomes;
-##	while (<$genomes_paths>){
-##		chomp;
-##		next if ($_ =~ /^#|^$/); 
-##		my @splitline = split /\=/, $_;
-##		$splitline[1] =~ s/"//g;
-##		$genomes{$splitline[0]} = $splitline[1];
-##	}
-##	foreach my $keys (sort keys %genomes){
-##		$targetGenomes .= "$keys ";
-##	}
-##	$targetGenomes =~ s/(.*)(\s+)$/2\.$1/g; #add identification
-##	store_conf_file($targetGenomes, $name);
-##	return %genomes;
-##}
-
-#sub read_genomes_paths {
-#    my ($tag, $path) = @_;
-#    my %genomes; 
-#    $genomes{$tag} = $path;
-#    return \%genomes;
-#}
-
 =head1 create_folders 
     Title: create_folders 
     Usage: create_folders(base_folder, new_folder);
@@ -317,14 +268,6 @@ sub check_folder_files {
     return @files;
 }
 
-#sub check_folder_files {
-#	my ($dir, $prefix) = @_;
-#	opendir(DIR, $dir);
-#	my @files = grep(/$prefix$/, readdir(DIR));
-#	closedir(DIR);
-#	return @files;
-#}
-
 =head1 calculate_Z_value
     Title: calculate_Z_value
     Usage: calculate_Z_value(genome);
@@ -392,7 +335,7 @@ sub log2 {
 =cut 
 
 sub getSequencesFasta {
-	my ($specie_name, $genome, $hmm_query, $out_fasta, $mode, $len_r, $names_r, $file_in, $complete_name) = @_; #mode: 1-> fasta as miRBase, 2-> as HMM, 3-> blast, 4-> final Coord ## $file_in is optional, only with TTO 5!, 6-> blocks
+	my ($species_name, $genome, $hmm_query, $out_fasta, $mode, $len_r, $names_r, $file_in, $complete_name) = @_; #mode: 1-> fasta as miRBase, 2-> as HMM, 3-> blast, 4-> final Coord ## $file_in is optional, only with TTO 5!, 6-> blocks
 	### First, index the genome
 	my $extension_blastn_candidates = 10;
 	my $dbCHR;
@@ -402,12 +345,11 @@ sub getSequencesFasta {
 	} else {
 		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
 	}
-	#my $dbFasta = Bio::SeqIO->new(-file => $genome, '-format' => 'Fasta');
 	my $molecule_name;
 	my ($IN, $OUTFILE, $DBFILE);
 	if ($mode == 1 || $mode == 2){
-		open $DBFILE, ">> $out_fasta/${specie_name}.db" or die; #Names DB
-		open $IN, "< $out_fasta/${specie_name}.${hmm_query}.tab.true.table" or die "I need the tabular output from nhmmer\n"; #True table nhmmer 
+		open $DBFILE, ">> $out_fasta/${species_name}.db" or die; #Names DB
+		open $IN, "< $out_fasta/${species_name}.${hmm_query}.tab.true.table" or die "I need the tabular output from nhmmer\n"; #True table nhmmer 
 	} elsif ($mode == 3){
 		open $DBFILE, ">> $out_fasta.db" or die; #Names DB
 		open $IN, "< $out_fasta" or die "I need the location file, output from blastn\n"; #Dive_9.snRNA.anca.tab.db.location
@@ -415,8 +357,8 @@ sub getSequencesFasta {
 		my @tmp_m = split /\./, $molecule_name;
 		$molecule_name = $tmp_m[1];
 	} elsif ($mode == 4){
-		open $DBFILE, ">> $out_fasta/all_RFAM_${specie_name}.truetable.joined.table.db" or die; #Names DB
-		open $IN, "< $out_fasta/all_RFAM_${specie_name}.truetable.joined.table" or die "I need the tabular output\n"; #Final Tab
+		open $DBFILE, ">> $out_fasta/all_RFAM_${species_name}.truetable.joined.table.db" or die; #Names DB
+		open $IN, "< $out_fasta/all_RFAM_${species_name}.truetable.joined.table" or die "I need the tabular output\n"; #Final Tab
 	} elsif ($mode == 5){
 		open $DBFILE, ">> ${file_in}.db" or die;
 		open ($IN, "<", $file_in) or die; 
@@ -427,13 +369,13 @@ sub getSequencesFasta {
 		my @tmp_m = split /\./, $molecule_name;
 		$molecule_name = $tmp_m[1];
 	}
-	my $spe = lc($specie_name);
-	my $specie_name_complete;
+	my $spe = lc($species_name);
+	my $species_name_complete;
 	if (!$complete_name){
-		$specie_name_complete = getSpecieName($spe);
+		$species_name_complete = getSpeciesName($spe);
 	} else {
-		$specie_name_complete = $complete_name;
-		$specie_name_complete =~ s/\_/ /g;
+		$species_name_complete = $complete_name;
+		$species_name_complete =~ s/\_/ /g;
 	}
 	my (%tosearch,%db,%final_seq, %database);
 	my ($header, $sta, $end, $lon, $seq);
@@ -448,11 +390,7 @@ sub getSequencesFasta {
 		my ($ids, $idsDouble);
 		if ($mode == 1 || $mode == 5){
 			my $strand = (split /\s+|\t/, $_)[1];
-			#if ($strand =~ /\,/){
-			#    $idsDouble = generate_key_double(); 
-			#} else {
 			$ids = generate_key();
-			#}
 		} elsif ($mode == 2 || $mode == 3 || $mode == 4 || $mode == 6){
 			$ids = "Temporal$count"; #generate_key(); #ConsiderChange
 		}
@@ -489,7 +427,7 @@ sub getSequencesFasta {
 			##
 			$tmp[8] = $exStart;
 			$tmp[9] = $exEnd;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, $other_name, $spe, $specie_name_complete, $len_r);
+			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, $other_name, $spe, $species_name_complete, $len_r);
 		} elsif ($mode == 3){
 			#dre1	scaffold2992-size13932	+	1013	1127	46	161	164
 			my $chr_length = $dbCHR->length("$tmp[1]");
@@ -506,7 +444,7 @@ sub getSequencesFasta {
 			$frame = $tmp[2]; #Strand
 			$tmp[3] = $exStart;
 			$tmp[4] = $exEnd;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $specie_name_complete, $len_r);
+			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
 		} elsif ($mode == 4 || $mode == 5){ #Final Tables
             if ($mode == 5){
                 my $extension_homology = 15; # Extension to the homology candidates
@@ -521,11 +459,10 @@ sub getSequencesFasta {
 			$frame = $tmp[1]; #Strand
 			my $other_name = $$names_r{$tmp[10]};
 			push @tmp, $other_name;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $specie_name_complete, $len_r);
+			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
 		} elsif ($mode == 6){ # Blocks
 			#dre1	scaffold2992-size13932	+	1013	1127	46	161	164
 			# 20	JH126831.1	-	1045134	1045213
-			#$tmp[1] = modify_chr($tmp[1], $spe);
 
 			my $chr_length = $dbCHR->length("$tmp[1]");
 			if (!$chr_length){
@@ -539,7 +476,7 @@ sub getSequencesFasta {
 			$frame = $tmp[2]; #Strand
 			$tmp[3] = $exStart;
 			$tmp[4] = $exEnd;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $specie_name_complete, $len_r);
+			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
 		}
 		my $output_nucleotide = Bio::Seq->new(
 			-seq        => $gen_seq,
@@ -598,15 +535,14 @@ sub getSequencesFasta {
 	}
 	foreach my $acc (sort keys %final_seq){
 		if ($mode == 1 || $mode == 2){
-			open $OUTFILE, ">> $out_fasta/${specie_name}.${acc}.tab.true.table.fasta" or die;
+			open $OUTFILE, ">> $out_fasta/${species_name}.${acc}.tab.true.table.fasta" or die;
 		} elsif ($mode == 3 || $mode == 6){
 			open $OUTFILE, ">> $out_fasta.fasta" or die;
 		} elsif ($mode == 4 || $mode == 5){
-			open $OUTFILE, ">> $out_fasta/all_RFAM_${specie_name}.${acc}.fasta" or die;
+			open $OUTFILE, ">> $out_fasta/all_RFAM_${species_name}.${acc}.fasta" or die;
 		}
 		foreach my $ids (sort keys %{$final_seq{$acc} }){
 			my $idsm = $ids;
-			#$idsm =~ s/\#/ /g;
 			print $OUTFILE ">$idsm\n";
 			my $all = $final_seq{$acc}{$ids}; #Here is a problem
 			foreach my $sq (@$all){
@@ -634,7 +570,7 @@ sub getSequencesFasta {
 ##############
 
 sub getSequencesFastaSubGenome {
-	my ($specie_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
+	my ($species_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
 	my %final_seq;
 	### First, index the genome
 	my $dbCHR;
@@ -662,22 +598,16 @@ sub getSequencesFastaSubGenome {
 			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
         }
 		my $frame = $tmp[2]; #Strand
-		my $gene_name = "$tmp[0] $specie_name $tmp[11] $tmp[1]#$tmp[6]#$tmp[7]"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
+		my $gene_name = "$tmp[0] $species_name $tmp[11] $tmp[1]#$tmp[6]#$tmp[7]"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
 		my $output_nucleotide2 = Bio::Seq->new(
 			-seq        => $gen_seq,
 			-id         => $gene_name,
-			#-display_id => $gene_name,
 			-alphabet   => 'dna'
 		);
-        # In case was detected in forward strand, just report as a genome in 5'->3'
-        # because MIRfix will search in both strands
-        #if ($frame eq "-") {
-        #	$output_nucleotide2 = $output_nucleotide2->revcom();
-        #}
 		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
 	}
 	close $IN;
-	my $outfileF = "$out_fasta/${specie_name}_subgenome.fasta";
+	my $outfileF = "$out_fasta/${species_name}_subgenome.fasta";
 	open my $OUTFILE, ">> $outfileF";
 	foreach my $ids (sort keys %final_seq){
 		my $idsm = $ids;
@@ -699,7 +629,7 @@ sub getSequencesFastaSubGenome {
 #############
 
 sub getSequencesFasta_final {
-	my ($specie_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
+	my ($species_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
 	my %final_seq;
 	### First, index the genome
 	my $dbCHR;
@@ -723,11 +653,10 @@ sub getSequencesFasta_final {
 			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
         }
 		my $frame = $tmp[2]; #Strand
-		my $gene_name = "$tmp[0] $specie_name $tmp[11] stem-loop"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
+		my $gene_name = "$tmp[0] $species_name $tmp[11] stem-loop"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
 		my $output_nucleotide2 = Bio::Seq->new(
 			-seq        => $gen_seq,
 			-id         => $gene_name,
-			#-display_id => $gene_name,
 			-alphabet   => 'dna'
 		);
 		if ($frame eq "-") {
@@ -736,7 +665,7 @@ sub getSequencesFasta_final {
 		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
 	}
 	close $IN;
-	my $outfileF = "$out_fasta/${specie_name}_miRNAs_$mode.fasta";
+	my $outfileF = "$out_fasta/${species_name}_miRNAs_$mode.fasta";
 	open my $OUTFILE, "> $outfileF";
 	foreach my $ids (sort keys %final_seq){
 		my $idsm = $ids;
@@ -845,10 +774,10 @@ sub extendBlastnCoordinates {
 }
 
 sub get_header_name {
-	my ($info, $mode, $id, $count, $other_name, $spe, $specie_nm_all, $len) = @_;
+	my ($info, $mode, $id, $count, $other_name, $spe, $species_nm_all, $len) = @_;
 	my $name;
 	if ($mode == 1){ #Header as miRBase
-		$name = "$spe-$other_name-${count}#A$id#$specie_nm_all#$$info[3]#ncRNA"; #New ID is 'A'
+		$name = "$spe-$other_name-${count}#A$id#$species_nm_all#$$info[3]#ncRNA"; #New ID is 'A'
 	} elsif ($mode == 2){ #Header as HMM requirements
 		#dvexscf69170.-.49.191.RF00001.3.117.119
 		if ($$info[8] <= $$info[9]){
@@ -864,7 +793,7 @@ sub get_header_name {
 	} elsif ($mode == 5){
 		#JH126831	-	mir-942	1	86	7	67	29.2	3.7e-05	no	mir-942	86	0 RF00997
 		#ENSLACT00000020000.1	+	RF01014	1	74	50	123	99.5	1.4e-28	no	mir-1306	74 10,9	Blast	ANCA,DARE,XELA,XETR	anca148572,dare191,xela36937,xetr1950	miRNA RF01014
-		$name = "$spe-$$info[-1]-${count} H$id $specie_nm_all $$info[10] stem-loop"; 
+		$name = "$spe-$$info[-1]-${count} H$id $species_nm_all $$info[10] stem-loop"; 
 	} elsif ($mode == 6){
 		# 20    JH126831.1  -   1045134 1045213
 		$name = "$$info[1].$$info[2].$$info[3].$$info[4].$$info[0]";
@@ -931,64 +860,63 @@ sub check_if_exists {
 	}
 }
 
-sub getSpecieName {
+sub getSpeciesName {
 	my $abb = shift;
-	my $specie_name;
+	my $species_name;
 	if ($abb eq "bole"){
-		$specie_name = "Botrylloides leachii";
+		$species_name = "Botrylloides leachii";
 	} elsif ($abb eq "bosc"){
-		$specie_name = "Botryllus schlosseri";
+		$species_name = "Botryllus schlosseri";
 	} elsif ($abb eq "brbe"){
-		$specie_name = "Branchiostoma belcheri";
+		$species_name = "Branchiostoma belcheri";
 	} elsif ($abb eq "brfl"){
-		$specie_name = "Branchiostoma floridae";
+		$species_name = "Branchiostoma floridae";
 	} elsif ($abb eq "ciin"){
-		$specie_name = "Ciona intestinalis";
+		$species_name = "Ciona intestinalis";
 	} elsif ($abb eq "ciro"){
-		$specie_name = "Ciona robusta";
+		$species_name = "Ciona robusta";
 	} elsif ($abb eq "cisa"){
-		$specie_name = "Ciona savignyi";
+		$species_name = "Ciona savignyi";
 	} elsif ($abb eq "clob"){
-		$specie_name = "Clavelina oblonga";
+		$species_name = "Clavelina oblonga";
 	} elsif ($abb eq "dare"){
-		$specie_name = "Danio rerio";
+		$species_name = "Danio rerio";
 	} elsif ($abb eq "dive"){
-		$specie_name = "Didemnum vexillum";
+		$species_name = "Didemnum vexillum";
 	} elsif ($abb eq "haau"){
-		$specie_name = "Halocynthia aurantium";
+		$species_name = "Halocynthia aurantium";
 	} elsif ($abb eq "haro"){
-		$specie_name = "Halocynthia roretzi";
+		$species_name = "Halocynthia roretzi";
 	} elsif ($abb eq "lach"){
-		$specie_name = "Latimeria chalumnae";
+		$species_name = "Latimeria chalumnae";
 	} elsif ($abb eq "mata"){
-		$specie_name = "Molgula oculata";
+		$species_name = "Molgula oculata";
 	} elsif ($abb eq "mlis"){
-		$specie_name = "Molgula occidentalis";
+		$species_name = "Molgula occidentalis";
 	} elsif ($abb eq "mlta"){
-		$specie_name = "Molgula occulta";
+		$species_name = "Molgula occulta";
 	} elsif ($abb eq "oidi"){
-		$specie_name = "Oikopleura dioica";
+		$species_name = "Oikopleura dioica";
 	} elsif ($abb eq "pema"){
-		$specie_name = "Petromyzon marinus";
+		$species_name = "Petromyzon marinus";
 	} elsif ($abb eq "pami"){
-		$specie_name = "Patiria miniata";
+		$species_name = "Patiria miniata";
 	} elsif ($abb eq "pevi"){
-		$specie_name = "Perophora viridis";
+		$species_name = "Perophora viridis";
 	} elsif ($abb eq "phfu"){
-		$specie_name = "Phallusia fumigata";
+		$species_name = "Phallusia fumigata";
 	} elsif ($abb eq "phma"){
-		$specie_name = "Phallusia mammillata";
+		$species_name = "Phallusia mammillata";
 	} elsif ($abb eq "sath"){
-		$specie_name = "Salpa thompsoni";
+		$species_name = "Salpa thompsoni";
 	} elsif ($abb eq "stpu"){
-		$specie_name = "Strongylocentrotus purpuratus";
+		$species_name = "Strongylocentrotus purpuratus";
 	} elsif ($abb eq "saco"){
-		$specie_name = "Saccoglossus kowalewski";
+		$species_name = "Saccoglossus kowalewski";
 	} else {
-		#print "$abb doesn´t recognized!\n";
-		$specie_name = "Specie unrecognized";
+		$species_name = "Species unrecognized";
 	}
-	return $specie_name;
+	return $species_name;
 }
 
 sub make_blast_database {
@@ -1014,7 +942,6 @@ sub classify_2rd_align_results {
 	my ($spe, $cm, $folder_in, $file, $mode, $molecule, $cm_scores, $len_scores, $names_cms, $minBitscore, $maxthreshold) = @_;
 	my $filein;
 	if ($cm ne "NA"){
-		#$filein = "$folder_in/$spe.$cm.tab";
 		if ($mode eq "rfam" || $mode eq "mirbase" || $mode eq "user"){
 			$filein = $file; 
 		} elsif ($mode eq "hmm"){
@@ -1028,7 +955,6 @@ sub classify_2rd_align_results {
 	if (-e $filein && !-z $filein){
 		if ($molecule =~ /^miRNA/){ #Based on evidence, miRNAs are evaluated with 32% of Bitscore.
 			cleancmsearch($filein, $maxthreshold, 1, $cm_scores, $len_scores, $names_cms ,$minBitscore); #filein, threshold bitscore, mode GA score miRNAture
-			#cleancmsearch($filein, 1, 1, $cm_scores, $len_scores, $names_cms, $minBitscore); #filein, threshold bitscore, mode GA score
 		} elsif ($molecule =~ /^NA$/){ #other CMs without bitscore
 			cleancmsearch($filein, $maxthreshold, 2, $cm_scores, $len_scores, $names_cms, $minBitscore);
 		} else { # Other RNA families

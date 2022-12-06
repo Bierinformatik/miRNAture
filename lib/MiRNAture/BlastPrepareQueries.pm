@@ -10,7 +10,7 @@ with 'MiRNAture::ToolBox'; #Import set of subroutines
 	Function: Normalize the fasta format from query(ies) from ncRNAs to 
 		be searched on the subject genome.
 	Returns: Creates new query files, with designed tag for each query
-		specie. All the results are located on the output folder
+		species. All the results are located on the output folder
 		assigned to store the data to be blasted. 
 =cut 
 
@@ -25,10 +25,10 @@ sub detect_blast_queries {
 	my $speciesTag = generate_tags($queriesFolder); #Return hash based on queries_description.txt file
 	foreach my $fastaF (@fasta_files){ #Iterate along all the defined query files
 		next if ($fastaF =~ /\.new\.fasta/); #Skip database created files
-		my ($tag, $sum); #Specie tag
+		my ($tag, $sum); #Species tag
 		if (exists $$speciesTag{$fastaF}){
 			$tag = $$speciesTag{$fastaF};
-			$sum = generate_map_file_and_sizes("$queriesFolder/$fastaF", $tag, $count); #combine all to create new headers, based on mapping and generated tag for specie
+			$sum = generate_map_file_and_sizes("$queriesFolder/$fastaF", $tag, $count); #combine all to create new headers, based on mapping and generated tag for species
 			if ($sum =~ /^NA$/){ #Avoid to create map and sizes if exists
 				print_process("$fastaF has been processed and indexed");
 				next;
@@ -36,9 +36,6 @@ sub detect_blast_queries {
 				$count += 1; #$sum; #Avoid duplicated mapped headers
 			}
 		} 
-		#else {
-		#	print_warning("Sequence tag for query sequence: $fastaF is not available.");
-		#}
 	}
 	if (-s "$queriesFolder/queries_description.txt"){
 		open my $METADATA, "< $queriesFolder/queries_description.txt" or die "Metadata file is corrupted\n";
@@ -58,9 +55,9 @@ sub detect_blast_queries {
 	Function: Check the existence of the file <queries_description.txt> 
 		which would have the information about the origin of the 
 		query files, based in the following format:
-		<file.fasta name> <type_ncRNA_molecule> <Specie_name: (Genera specie)>
+		<file.fasta name> <type_ncRNA_molecule> <Species_name: (Genera species)>
 	Returns: It returns a hash reference for the files and the created tag for each
-		specie.
+		species.
 =cut 
 
 sub generate_tags {
@@ -73,8 +70,8 @@ sub generate_tags {
 			chomp;
 			my @all = split /\t|\s+/, $_;
 			my $file = $all[0]; #snRNA.fasta
-			my $specie = "$all[-2] $all[-1]"; #Ciona intestinalis
-			my $tag = create_tag_specie($specie);
+			my $species = "$all[-2] $all[-1]"; #Ciona intestinalis
+			my $tag = create_tag_species($species);
 			$tags{$file} = $tag;	
 		}
 	} else {
@@ -83,37 +80,37 @@ sub generate_tags {
 	return \%tags;
 }
 
-=head1 create_tag_specie
-	Title: create_tag_specie
-	Usage: create_tag_specie(specie name)
-	Function: Create a tag based on the Genera and specie names from 
-		the reported specie. This name must be the scientific name
-		written as: Genera specie (i.e Homo sapiens).
+=head1 create_tag_species
+	Title: create_tag_species
+	Usage: create_tag_species(species name)
+	Function: Create a tag based on the Genera and species names from 
+		the reported species. This name must be the scientific name
+		written as: Genera species (i.e Homo sapiens).
 	Returns: The created tag based on the first two letters of the 
 		input name. (i.e Homo sapiens -> hosa)
 =cut 
 
-sub create_tag_specie {
-	my $specie = shift;
-	my $tag = lc($specie);
-	$tag =~ s/^([a-z]{2})[a-z]+\s+([a-z]{2})[a-z]+$/$1$2/g; #Take first 2 letters both, genera and specie.
+sub create_tag_species{
+	my $species = shift;
+	my $tag = lc($species);
+	$tag =~ s/^([a-z]{2})[a-z]+\s+([a-z]{2})[a-z]+$/$1$2/g; #Take first 2 letters both, genera and species.
 	return $tag;
 }
 
 =head1 create_metadata_file_fasta 
 	Title: create_metadata_file_fasta
-	Usage: create_metadata_file_fasta(specie name)
+	Usage: create_metadata_file_fasta(species name)
 	Function: In cases where the queries_description.txt file has not
 		been created, the program will generate a new one, based on the
 		recovered fasta files from the indicated query(ies) folder.
 	Returns: queries_description.txt file with the follow structure:
-		<Name_fasta_file> <Unknown> <Unknown specie>
+		<Name_fasta_file> <Unknown> <Unknown species>
 =cut 
 sub create_metadata_file_fasta {
 	my ($queriesFolder, $filesFasta) = @_;
 	open my $METADATA, "> $queriesFolder/queries_description.txt" or die;
 	foreach my $files (@$filesFasta){
-		print $METADATA "$files\tmiRNA\tUnknown specie\n";	
+		print $METADATA "$files\tmiRNA\tUnknown species\n";	
 	}
 	close $METADATA;
 	return;
@@ -189,10 +186,10 @@ sub check_fields_metadata_fasta {
 	} else {
 		die "The line $_ seems to be bad formated: $all[1] should be a recognized ncRNA type by RFAM: \n";
 	}
-	if ($scientific_name =~ m/^([A-Z]{1}[a-z]+)\s+([a-z]+)$|^Unknown specie$/){ #It has to be as scientific name species
+	if ($scientific_name =~ m/^([A-Z]{1}[a-z]+)\s+([a-z]+)$|^Unknown species$/){ #It has to be as scientific name species
 		$check3 = 1;
 	} else {
-		die "The line $_ seems to be bad formated: $scientific_name should be a scientific name of the query specie as: Didemnum vexillum (Genera + specie)\n";
+		die "The line $_ seems to be bad formated: $scientific_name should be a scientific name of the query species such as: Didemnum vexillum (Genera + species)\n";
 	}
 	return;
 }

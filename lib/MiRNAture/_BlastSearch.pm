@@ -33,7 +33,7 @@ has 'genome_subject' => (
 	required => 1,
 );
 
-has 'subject_specie' => (
+has 'subject_species' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
@@ -141,7 +141,7 @@ sub searchHomologySequenceBlast_parallel {
 	my $tags = shift;
 	my @id_running;
 	my $param = blast_strategies($shift->blast_str); #Get specific parameters.
-	create_folders($shift->output_folder, $shift->subject_specie ); #Create folder specific to spe
+	create_folders($shift->output_folder, $shift->subject_species ); #Create folder specific to spe
 	create_folders($shift->current_directory,".blastTemp/");
 	create_folders($shift->current_directory,".blastTemp/LOGs");
 	# Load both score files, from RFAM and others
@@ -150,21 +150,8 @@ sub searchHomologySequenceBlast_parallel {
 	my ($query_species) = create_index_fasta($shift->query_folder);
 	my ($molecules, $files_relation) = infer_data_queries($shift->query_folder, $tags); #Based on metafile, infer query species and molecules
 	foreach my $molecule (@$molecules){ #Each type of molecules
-##		foreach my $queryS (@$query_species){
-##			print_process("Searching $molecule homologs from $queryS");
-##			my $tag_query_spe = create_tag_specie($queryS);
-##			my $query_seq;
-##			if (exists $$files_relation{"${molecule}_${queryS}"}){
-##				my $file_name = $$files_relation{"${molecule}_${queryS}"};
-##				$query_seq = $shift->query_folder."/".$file_name;
-##			}
-##		}
-##	}
-	#writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->blast_program_path->stringify);
-		runBlastn_parallel($shift->blast_program_path, $param, $shift->genome_subject, $shift->blast_str, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running, $shift->query_folder);
+		runBlastn_parallel($shift->blast_program_path, $param, $shift->genome_subject, $shift->blast_str, $molecule, $shift->subject_species, $shift->output_folder."/".$shift->subject_species, $shift->current_directory, $shift->parallel_running, $shift->query_folder);
 	}
-	#runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running);
-	##push @id_running, $runId;
 	return ($molecules, $query_species, $families, $files_relation);
 }
 
@@ -173,7 +160,7 @@ sub searchHomologySequenceBlast {
 	my $tags = shift;
 	my @id_running;
 	my $param = blast_strategies($shift->blast_str); #Get specific parameters.
-	create_folders($shift->output_folder, $shift->subject_specie ); #Create folder specific to spe
+	create_folders($shift->output_folder, $shift->subject_species ); #Create folder specific to spe
 	create_folders($shift->current_directory,".blastTemp/");
 	create_folders($shift->current_directory,".blastTemp/LOGs");
 	# Load both score files, from RFAM and others
@@ -182,7 +169,7 @@ sub searchHomologySequenceBlast {
 	foreach my $molecule (@$molecules){ #Each type of molecules
 		foreach my $queryS (@$query_species){
 			print_process("Searching $molecule homologs from $queryS");
-			my $tag_query_spe = create_tag_specie($queryS);
+			my $tag_query_spe = create_tag_species($queryS);
 			my $query_seq;
 			if (exists $$files_relation{"${molecule}_${queryS}"}){
 				my $file_name = $$files_relation{"${molecule}_${queryS}"};
@@ -191,8 +178,8 @@ sub searchHomologySequenceBlast {
 			if (-z $query_seq || !-e $query_seq){
 				next;
 			} else {
-				writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->blast_program_path->stringify);
-				my $runId = runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->current_directory, $shift->parallel_running);
+				writeBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_species, $shift->output_folder."/".$shift->subject_species, $shift->current_directory, $shift->blast_program_path->stringify);
+				my $runId = runBlastn($param, $shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule,  $shift->subject_species, $shift->output_folder."/".$shift->subject_species, $shift->current_directory, $shift->parallel_running);
 				push @id_running, $runId;
 			}
 		}
@@ -208,7 +195,7 @@ sub searchHomologyBlast {
 		output_folder => $shift->output_folder,
 		query_folder => $shift->query_folder,
 		genome_subject => $shift->genome_subject,
-		subject_specie => $shift->subject_specie,
+		subject_species => $shift->subject_species,
 		data_folder => $shift->data_folder,
 		current_directory => $shift->current_directory,
 		path_covariance => $shift->path_covariance,
@@ -224,58 +211,52 @@ sub searchHomologyBlast {
 	foreach my $molecule (@$molecules){
 		foreach my $queryS (@$query_species){
 			print_process("Cleaning $molecule homologs from $queryS");
-			my $tag_query_spe = create_tag_specie($queryS);
+			my $tag_query_spe = create_tag_species($queryS);
 			my $query_seq;
 			if (exists $$files_relation{"${molecule}_${queryS}"}){
 				my $file_name = $$files_relation{"${molecule}_${queryS}"};
 				$query_seq = $shift->query_folder."/".$file_name;
 			}
 			my $queryDB = makeDatabaseQueryLen("$query_seq.len");
-			cleanBlastnOut($shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie,$queryDB);
-			# Specie and molecule-specific locations
-			my $output_merged = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db.location";
-			my $input_path_db_file = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db";
-			my $output_special = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db.special";
+			cleanBlastnOut($shift->genome_subject, $shift->blast_str, $query_seq, $tag_query_spe, $molecule, $shift->subject_species, $shift->output_folder."/".$shift->subject_species,$queryDB);
+			# species and molecule-specific locations
+			my $output_merged = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db.location";
+			my $input_path_db_file = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db";
+			my $output_special = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule.".".$tag_query_spe.".tab.db.special";
 			# Here join all to create location file: *.db -> *db.location
 			$result_blast_experiment->resolveBlastMergings($input_path_db_file, $output_merged, $output_special);
 		}
 		#Concatenate all location files with the same str and different query
 		concatenate_locations($shift, $molecule);
-		my $output_merged_concatenated = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".tab.db.location";
-		my $output_blocks = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".tab.db.location.blocks.coord";
+		my $output_merged_concatenated = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule.".tab.db.location";
+		my $output_blocks = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule.".tab.db.location.blocks.coord";
 		$result_blast_experiment->generate_blocks($output_merged_concatenated); #Based on location concatenated, generate blocks
-		getSequencesFasta($result_blast_experiment->subject_specie, $result_blast_experiment->genome_subject, "NA", $output_blocks, "6", $result_blast_experiment->length_CM, $result_blast_experiment->names_CM); #Header mode == 6 BLAST blocks
-		create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_specie, "Infernal");#Create folder specific to specie
-		create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_specie."/Infernal","Final");#Create folder to save the classified results
+		getSequencesFasta($result_blast_experiment->subject_species, $result_blast_experiment->genome_subject, "NA", $output_blocks, "6", $result_blast_experiment->length_CM, $result_blast_experiment->names_CM); #Header mode == 6 BLAST blocks
+		create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_species, "Infernal");#Create folder specific to species
+		create_folders($result_blast_experiment->output_folder."/".$result_blast_experiment->subject_species."/Infernal","Final");#Create folder to save the classified results
 		my $final_fasta_file = $output_blocks.".fasta";
 		if (-z $final_fasta_file || !-e $final_fasta_file){
 			next;
 		} else {
-			my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
+			my $infernal_out_path = $shift->output_folder."/".$shift->subject_species."/Infernal";
 			my $list_file = $result_blast_experiment->models_list->stringify;
 			my $all_cm_list = get_list_cms($molecule, $families, $list_file); #list of cms
-			runcmSearch_parallel($shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore, $shift->parallel_running);	
-			##write_cmsearch_specific_sequence_group($shift->current_directory, \@$all_cm_list, $shift->path_covariance, $infernal_out_path, $shift->subject_specie, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore);
-			##my $runIdCM = runcmSearch($shift->blast_str, $molecule, $shift->subject_specie, $shift->current_directory,$shift->parallel_running);
-			##push @id_running, $runIdCM;
+			runcmSearch_parallel($shift->path_covariance, $infernal_out_path, $shift->subject_species, $shift->blast_str, $molecule, $shift->cmsearch_program_path, $Zscore, $shift->parallel_running);	
 		}
 	}
-	##wait_processes($shift, \@id_running, $shift->parallel_running); #Wait until complete all processes from Str
 	# Iterate over infernal results, evaluate and merge
 	foreach my $molecule (@$molecules){
-		#foreach my $queryS (@$query_species){
-		#    my $tag_query_spe = create_tag_specie($queryS);
-		my $infernal_out_path = $shift->output_folder."/".$shift->subject_specie."/Infernal";
-		my @result_cmsearch = check_folder_files($infernal_out_path, $shift->subject_specie."\_".$shift->blast_str."\\.$molecule\\.\.*\\.tab"); #Dive_8.miRNA.RF02024.tab
+		my $infernal_out_path = $shift->output_folder."/".$shift->subject_species."/Infernal";
+		my @result_cmsearch = check_folder_files($infernal_out_path, $shift->subject_species."\_".$shift->blast_str."\\.$molecule\\.\.*\\.tab"); #Dive_8.miRNA.RF02024.tab
 		foreach my $file_out_cmsearch (@result_cmsearch){
-			classify_2rd_align_results($result_blast_experiment->subject_specie, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore, $maxthreshold); #Obtain true candidates
+			classify_2rd_align_results($result_blast_experiment->subject_species, "NA", $infernal_out_path, $file_out_cmsearch,"BLAST", $molecule, $result_blast_experiment->bitscores_CM, $result_blast_experiment->length_CM, $result_blast_experiment->names_CM, $minBitscore, $maxthreshold); #Obtain true candidates
 		}
 		print_process("Structural evaluation of strategy ".$shift->blast_str." complete");
 	}
 	#Here, concatenate by Str
 	if ($shift->blast_str =~ /^\d+$/){
-		my $infernal_out_path_final = $shift->output_folder."/".$shift->subject_specie."/Infernal/Final";
-		define_final_CMs($infernal_out_path_final, $shift->subject_specie, $shift->blast_str, $shift->length_CM);	
+		my $infernal_out_path_final = $shift->output_folder."/".$shift->subject_species."/Infernal/Final";
+		define_final_CMs($infernal_out_path_final, $shift->subject_species, $shift->blast_str, $shift->length_CM);	
 	} else {
 		print_error("Missing a correct strategy");
 	}
@@ -285,17 +266,17 @@ sub searchHomologyBlast {
 sub concatenate_locations {
 	my $shift = shift;
 	my $molecule = shift;
-	my $path = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule."."."*.tab.db.location";
-	my $out = $shift->output_folder."/".$shift->subject_specie."/".$shift->subject_specie."_".$shift->blast_str.".".$molecule.".tab.db.location";
+	my $path = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule."."."*.tab.db.location";
+	my $out = $shift->output_folder."/".$shift->subject_species."/".$shift->subject_species."_".$shift->blast_str.".".$molecule.".tab.db.location";
 	system "cat $path > $out";
 	return;
 }
 
 sub join_all_blast_str {
 	my $shift = shift;
-	my @all_converted_cmsearch = check_folder_files($shift->output_folder."/".$shift->subject_specie."/Infernal/Final", "truetable\\.clean"); #Files generated with define_final_CMs on all strategies
-	concatenate_true_cand($shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/Infernal/Final", \@all_converted_cmsearch, $shift->blast_str);
-	resolve_mergings($shift->subject_specie, $shift->output_folder."/".$shift->subject_specie."/Infernal/Final", "4", $shift->blast_str);
+	my @all_converted_cmsearch = check_folder_files($shift->output_folder."/".$shift->subject_species."/Infernal/Final", "truetable\\.clean"); #Files generated with define_final_CMs on all strategies
+	concatenate_true_cand($shift->subject_species, $shift->output_folder."/".$shift->subject_species."/Infernal/Final", \@all_converted_cmsearch, $shift->blast_str);
+	resolve_mergings($shift->subject_species, $shift->output_folder."/".$shift->subject_species."/Infernal/Final", "4", $shift->blast_str);
 	return;
 }
 
@@ -366,19 +347,18 @@ sub create_index_fasta {
 	}
 	open my $METADATA, "< $file" or die "The Metadata file describing the blast queries is missing\n";	
 	my (@species);
-	my (%specie);
+	my (%species);
 	while (<$METADATA>){
 		#tRNA.fasta	tRNA	Ciona intestinalis
 		chomp;
 		my @all = split /\t|\s+/, $_;
-		$specie{"$all[-2] $all[-1]"} = 1;
+		$species{"$all[-2] $all[-1]"} = 1;
 	}
-	foreach my $spe (sort keys %specie){
+	foreach my $spe (sort keys %species){
 		push @species, $spe;
 	}
 	for (my $i = 0; $i < $#species; $i++) {
-		my $tag = create_tag_specie($species[$i]);
-		#$specie_tag{$specie[$i]} = $tag;
+		my $tag = create_tag_species($species[$i]);
 	}
 	return (\@species);
 }
@@ -392,11 +372,10 @@ sub infer_data_queries {
 	while (<$METADATA>){
 		#tRNA.fasta	tRNA	Ciona intestinalis
 		chomp;
-		#print "$_\n";
 		my @all = split /\t|\s+/, $_;
 		$mol{$all[1]} = 1;
-		my $specie_complete = $all[0];
-		my $tag = $$tags{$specie_complete};
+		my $species_complete = $all[0];
+		my $tag = $$tags{$species_complete};
 		$all[0] =~ s/(.*)(\.fa$|\.fasta$|\.fna$)/$1.$tag.new.fasta/g;
 		$files{"$all[1]_$all[-2] $all[-1]"} = $all[0];	
 	}
@@ -419,10 +398,10 @@ sub makeDatabaseQueryLen {
 }
 
 sub writeBlastn {
-	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $specie, $out_path_blast, $dir_now, $blast_path) = @_;	
+	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $species, $out_path_blast, $dir_now, $blast_path) = @_;	
 	$genome =~ s/\"//g;
-	open my $OUTTEMP, "> $dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh";
-	my $out_file_blast = "${specie}_$strategy.$ncrna.$query_tag.tab";
+	open my $OUTTEMP, "> $dir_now/.blastTemp/${species}_$strategy.$ncrna.$query_tag.sh";
+	my $out_file_blast = "${species}_$strategy.$ncrna.$query_tag.tab";
 	print $OUTTEMP "\#!\/bin\/bash\n";
 	print $OUTTEMP "$blast_path -db $genome -query $query_seq -num_threads 4 $parameters $out_path_blast/$out_file_blast\n";
 	close $OUTTEMP;
@@ -430,36 +409,29 @@ sub writeBlastn {
 }
 
 sub runBlastn_parallel {
-	my ($blast_path, $parameters, $genome, $strategy, $ncrna, $specie, $out_path_blast, $dir_now, $parallel, $query_path_specific) = @_;	
-	if ($parallel == 1){
-		print_process("Going into parallel running!");
-		# Ciona_savignyi.cisa.new.fasta -> Cirp_3.miRNA.cisa.tab
-		system("parallel --will-cite --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${specie}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
-	}
+	my ($blast_path, $parameters, $genome, $strategy, $ncrna, $species, $out_path_blast, $dir_now, $parallel, $query_path_specific) = @_;	
+    # Ciona_savignyi.cisa.new.fasta -> Cirp_3.miRNA.cisa.tab
+    system("parallel --will-cite --rpl '.. s:(\.new\.fasta)::; s:(^\/.*\/)::; s:(^[A-z]+\_[a-z]+\.)::; s:(^):\.:; s:(\$):\.:;' $blast_path -db $genome -query {} $parameters $out_path_blast/${species}_$strategy.$ncrna'..'tab 1> /dev/null ::: $query_path_specific/*.new.fasta");
 	return; 
 }
 
 sub runBlastn {
-	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $specie, $out_path_blast, $dir_now, $parallel) = @_;	
+	my ($parameters, $genome, $strategy, $query_seq, $query_tag, $ncrna, $species, $out_path_blast, $dir_now, $parallel) = @_;	
 	#"$tag_query_spe-$spe-$molecule"
-	my $nameTTO = "$query_tag-$specie-$ncrna";
+	my $nameTTO = "$query_tag-$species-$ncrna";
 	my $id; 
-	system "chmod 755 $dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh";
+	system "chmod 755 $dir_now/.blastTemp/${species}_$strategy.$ncrna.$query_tag.sh";
 	if ($parallel == 1){
 		print_process("Going into SLURM running!\n");
-		$id = `sbatch --job-name=$nameTTO --nodes=1 --ntasks=1 --cpus-per-task=5 --time=96:00:00 --mem=2G --output=$dir_now/.blastTemp/LOGs/out_${specie}_$strategy.$ncrna.$query_tag.out --error=$dir_now/.blastTemp/LOGs/error_${specie}_$strategy.$ncrna.$query_tag.out $dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh`;
+		$id = `sbatch --job-name=$nameTTO --nodes=1 --ntasks=1 --cpus-per-task=5 --time=96:00:00 --mem=2G --output=$dir_now/.blastTemp/LOGs/out_${species}_$strategy.$ncrna.$query_tag.out --error=$dir_now/.blastTemp/LOGs/error_${species}_$strategy.$ncrna.$query_tag.out $dir_now/.blastTemp/${species}_$strategy.$ncrna.$query_tag.sh`;
 		$id =~ /^Submitted batch job (\d+)/; 
 		$id = $1;
-		#print "$id\n";
 	} else {
-		system("$dir_now/.blastTemp/${specie}_$strategy.$ncrna.$query_tag.sh &");
-		$id = `ps aux | grep ${specie}_$strategy.$ncrna.$query_tag.sh | grep bash`;
+		system("$dir_now/.blastTemp/${species}_$strategy.$ncrna.$query_tag.sh &");
+		$id = `ps aux | grep ${species}_$strategy.$ncrna.$query_tag.sh | grep bash`;
 		$id = (split /\s+/,(split /\n/, $id)[0])[1];
-		#$id = `ps aux | grep ${specie}_$strategy.$ncrna.$query_tag.sh | grep "bash \./" |awk '{print \$2}'`;
-		#print "$id\n";
 		$id =~ s/(\d+)(\s*)/$1/g;
 	}
-	####
 	return $id;
 }
 
@@ -472,7 +444,6 @@ sub wait_processes {
 	if ($parallel == 1){
 		foreach my $reference (@$processes){
 			chomp $reference;
-			#print_process("Waiting for the process: $reference"); 
 			EVAL:
 			my $state_qsub = `squeue -o "%8i %20j %4t %10u" | grep "^$reference"`; #Capture state
 			if ($state_qsub && length $state_qsub > 0){
@@ -486,7 +457,6 @@ sub wait_processes {
 		return;
 	} else {
 		foreach my $reference (@$processes){
-			#print_process("Waiting for the process: $reference"); 
 			EVAL2:
 			my $exists = kill 0, $reference;
 			if ( $exists ){
@@ -517,10 +487,9 @@ sub wait_slurm_process {
 }
 
 sub cleanBlastnOut {
-	my ($genome, $strategy, $query_seq, $query_tag, $ncrna, $specie, $out_path_blast, $lenQueryDB) = @_;	
-	#makeIndex($query_tag, $ncrna);
-	open my $INFILE, "< $out_path_blast/${specie}_$strategy.$ncrna.$query_tag.tab" or die "Not possible to open the blastn input file: $out_path_blast/${specie}_$strategy.$ncrna.$query_tag.tab\n";
-	open my $OUTT, "> $out_path_blast/${specie}_$strategy.$ncrna.$query_tag.tab.db" or die;
+	my ($genome, $strategy, $query_seq, $query_tag, $ncrna, $species, $out_path_blast, $lenQueryDB) = @_;	
+	open my $INFILE, "< $out_path_blast/${species}_$strategy.$ncrna.$query_tag.tab" or die "Not possible to open the blastn input file: $out_path_blast/${species}_$strategy.$ncrna.$query_tag.tab\n";
+	open my $OUTT, "> $out_path_blast/${species}_$strategy.$ncrna.$query_tag.tab.db" or die;
 	while (<$INFILE>){
 		chomp;
 		next if $_ =~ m/^\#/;
@@ -592,8 +561,8 @@ sub get_list_cms {
 
 sub write_cmsearch_specific_sequence_group {
 	my ($dir_now, $cm_group, $cm_models_path, $out_path_infernal, $genome_tag, $str, $molecule_query, $cmsearch_path, $Zvalue) = @_;
-	create_folders("$dir_now",".infernalTemp"); #Create folder specific to specie
-	create_folders("$dir_now/.infernalTemp","LOGs"); #Create folder specific to specie
+	create_folders("$dir_now",".infernalTemp"); #Create folder specific to species
+	create_folders("$dir_now/.infernalTemp","LOGs"); #Create folder specific to species
 	existenceProgram($cmsearch_path);
 	#Dive_9.snRNA.pema.tab.db.location.fasta
 	open my $OUTTEMPC, "> $dir_now/.infernalTemp/${genome_tag}_$str.$molecule_query.sh";
@@ -637,22 +606,19 @@ sub runcmSearch_parallel {
 
 
 sub runcmSearch {
-	#infernalTemp/${genome_tag}_$str.$molecule_query.$query_name_spe.sh";
-	my ($strategy, $ncrna, $specie, $dir_now, $parallel) = @_;	
-	my $name = "${ncrna}_${specie}";
-	my $nameTTO = "$specie-$ncrna";
+	my ($strategy, $ncrna, $species, $dir_now, $parallel) = @_;	
+	my $name = "${ncrna}_${species}";
+	my $nameTTO = "$species-$ncrna";
 	my $id;
-	system "chmod 755 $dir_now/.infernalTemp/${specie}_$strategy.$ncrna.sh";
+	system "chmod 755 $dir_now/.infernalTemp/${species}_$strategy.$ncrna.sh";
 	if ($parallel == 1){
-		$id = `sbatch --job-name=$nameTTO --nodes=1 --ntasks=1 --cpus-per-task=4 --time=3-01:00:00 --mem=2G --output=$dir_now/.infernalTemp/LOGs/out_${specie}_$strategy.$ncrna.out --error=$dir_now/.infernalTemp/LOGs/error_${specie}_$strategy.$ncrna.out $dir_now/.infernalTemp/${specie}_$strategy.$ncrna.sh`;
+		$id = `sbatch --job-name=$nameTTO --nodes=1 --ntasks=1 --cpus-per-task=4 --time=3-01:00:00 --mem=2G --output=$dir_now/.infernalTemp/LOGs/out_${species}_$strategy.$ncrna.out --error=$dir_now/.infernalTemp/LOGs/error_${species}_$strategy.$ncrna.out $dir_now/.infernalTemp/${species}_$strategy.$ncrna.sh`;
 		$id =~ /^Submitted batch job (\d+)/; 
 		$id = $1;
 	} else {
-		system("$dir_now/.infernalTemp/${specie}_$strategy.$ncrna.sh 1> /dev/null &");
-		$id = `ps aux | grep ${specie}_$strategy.$ncrna.sh | grep bash`;
+		system("$dir_now/.infernalTemp/${species}_$strategy.$ncrna.sh 1> /dev/null &");
+		$id = `ps aux | grep ${species}_$strategy.$ncrna.sh | grep bash`;
 		$id = (split /\s+/,(split /\n/, $id)[0])[1];
-		#$id = `ps aux | grep ${specie}_$strategy.$ncrna.sh | grep "bash \./" |awk '{print \$2}'`;
-		#print "$id\n";
 		$id =~ s/(\d+)(\s*)/$1/g;
 	}
 	return $id;
@@ -660,9 +626,9 @@ sub runcmSearch {
 
 sub clean_empty {
 	my $shift = shift;
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie); #Blast/Specie
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie."/Infernal"); #Blast/Specie/Infernal
-	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_specie."/Infernal/Final"); #Blast/Specie/Infernal/Final
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species); #Blast/species
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species."/Infernal"); #Blast/species/Infernal
+	delete_empty_files($shift->output_folder->stringify."/".$shift->subject_species."/Infernal/Final"); #Blast/species/Infernal/Final
 	return;
 }
 

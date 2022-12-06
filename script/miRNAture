@@ -22,11 +22,11 @@ our $VERSION = '1.10';
 ### Input data
 my $mode = ""; #run mode
 my @strategy;
-my $specie_genome_path = ""; #target specie genomes
+my $species_genome_path = ""; #target species genomes
 my $data_path = ""; # Pre-calculated data from miRNAture
 my $work_folder = ""; #output folder
-my $name_specie = ""; #Scientific name of specie
-my $specie_tag = ""; #Label of specie
+my $name_species = ""; #Scientific name of species
+my $species_tag = ""; #Label of species
 my $subset_models; #Subset of models provided by the user
 my $rep_cutoff = ""; # Homology cutoff to speed-up the searches 
 my $maxthresholdBit = ""; # nBitscore threshold to clean data: 0-1
@@ -44,9 +44,9 @@ my $man;
 my %opts;
 GetOptions (
 	\%opts,
-	'specie_genome|speG=s' => \$specie_genome_path,
-	'specie_name|speN=s' => \$name_specie,
-	'specie_tag|speT=s' => \$specie_tag,
+	'species_genome|speG=s' => \$species_genome_path,
+	'species_name|speN=s' => \$name_species,
+	'species_tag|speT=s' => \$species_tag,
 	'subset_models|sublist=s' => \$subset_models,
 	'workdir|w=s' => \$work_folder,
 	'datadir|dataF=s' => \$data_path,
@@ -71,29 +71,38 @@ GetOptions (
 pod2usage ( -verbose => 1 ) if $help;
 pod2usage ( -verbose => 2 ) if $man;
 pod2usage ( -verbose => 99, -sections => "VERSION" ) if $ver;
-pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $specie_genome_path == 0);
+pod2usage ( -message => "Seems that you did pass an empty flag, please refer to documentation.", -verbose => 1) if (keys %opts == 0 && length $species_genome_path == 0);
 
 @strategy = split (/,/, join(',',@strategy));
 
 # Relative paths correction for input paths
-if ($subset_models && $subset_models =~ /\/\.\.\/|^\.\//){
+if ($subset_models && $subset_models !~ /^\/\.+\//){
 	$subset_models = abs_path($subset_models);
 }
-if ($path_blast_queries =~ /\/\.\.\//){
+if ($user_folder && $user_folder !~ /^\/\.+\//){
+	$user_folder = abs_path($user_folder);
+}
+if ($path_blast_queries !~ /^\/\.+\//){
 	$path_blast_queries = abs_path($path_blast_queries);
 }
-if ($work_folder =~ /\/\.\.\//){
+if ($work_folder !~ /^\/\.+\//){
 	$work_folder = abs_path($work_folder);
 }
-if ($specie_genome_path =~ /\/\.\.\//){
-	$specie_genome_path = abs_path($specie_genome_path);
+if ($species_genome_path !~ /^\/\.+\//){
+	$species_genome_path = abs_path($species_genome_path);
+}
+if ($mirfix_path && $mirfix_path !~ /^\/\.+\//){
+	$mirfix_path = abs_path($mirfix_path);
+}
+if ($data_path !~ /^\/\.+\//){
+	$data_path = abs_path($data_path);
 }
 
 my $config_file = Mir::ConfigurationFile->new (
 	stage => $stagesRun,
-	specie_name => $name_specie,
-	specie_tag => $specie_tag,
-	specie_genome => $specie_genome_path,
+	species_name => $name_species,
+	species_tag => $species_tag,
+	species_genome => $species_genome_path,
 	output_folder => $work_folder,
 	data_path => $data_path,
 	current_folder => $current_path,
@@ -291,15 +300,15 @@ This flag is blast mode specific. It corresponds to blast strategies that would 
 
 Selects the stage to be run on miRNAture. The options are: 'homology', 'no_homology', 'validation', 'evaluation', 'summarise' or 'complete'.
 
-=item -speG/-specie_genome <PATH>
+=item -speG/-species_genome <PATH>
 
 Path of target sequences to be analyzed in FASTA format.
 
-=item -speN/-specie_name <Genera_specie>
+=item -speN/-species_name <Genera_species>
 
-Specie or sequence source's scientific name. The format must be: I<Genera_specie>, separated by '_'.
+Species or sequence source's scientific name. The format must be: I<Genera_species>, separated by '_'.
 
-=item -speT/-specie_tag <TAG_NAME>
+=item -speT/-species_tag <TAG_NAME>
 
 Experiment tag. Will help to identify the generated files along miRNA output files.
 

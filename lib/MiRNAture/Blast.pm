@@ -34,7 +34,7 @@ has 'genome_subject' => (
 	required => 1,
 );
 
-has 'subject_specie' => (
+has 'subject_species' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
@@ -57,7 +57,6 @@ sub create_folders_blast {
 }
 
 sub index_query_genome {
-	#my $shift = shift;
 	my ($genome, $makeblastpath) = @_;
 	#Only create in case it doesn't exists
 	if (!-e $genome.".nhr"){

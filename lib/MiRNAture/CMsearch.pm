@@ -8,8 +8,8 @@ with 'MiRNAture::Evaluate';
 
 sub searchCMhomology {
 	my ($shift, $zscore,$minBitscore, $maxthreshold) = @_;
-	cmsearch_rfam_parallel($shift->genome_subject, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->path_covariance, 1, $shift->cmsearch_program_path->stringify, $zscore);
-	##cmsearch($shift->cm_model, $shift->genome_subject, $shift->subject_specie, $shift->output_folder."/".$shift->subject_specie, $shift->path_covariance, 1, $shift->cmsearch_program_path->stringify, $zscore);
+	cmsearch_rfam_parallel($shift->genome_subject, $shift->subject_species, $shift->output_folder."/".$shift->subject_species, $shift->path_covariance, 1, $shift->cmsearch_program_path->stringify, $zscore);
+	##cmsearch($shift->cm_model, $shift->genome_subject, $shift->subject_species, $shift->output_folder."/".$shift->subject_species, $shift->path_covariance, 1, $shift->cmsearch_program_path->stringify, $zscore);
 	return;
 }
 

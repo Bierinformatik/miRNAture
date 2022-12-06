@@ -20,7 +20,7 @@ sub include_folder_environment {
     my $config_file = shift;
     my $variables = shift;
     create_folders($shift->all_parameters->[3]->{"Default_folders"}->{"Output_folder"}, "miRNA_validation");
-    my $database_file = $variables->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/all_RFAM_".$variables->[3]->{Specie_data}->{Tag}."_final.ncRNAs_homology.txt.db";
+    my $database_file = $variables->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/all_RFAM_".$variables->[3]->{Species_data}->{Tag}."_final.ncRNAs_homology.txt.db";
     if (-e $database_file && !-z $database_file){
         $variables->[4]->{User_results}{Database_miRNA_file_result} = $database_file;
     } else {
@@ -36,14 +36,14 @@ sub generate_file_mirnanchor {
     my $variable = shift;
     my $config_file = shift;
     my $program = $variable->[2]->{Program_locations}->{miRNAnchor};
-    open (my $OUT, ">", $variable->[4]->{"User_results"}->{"Output_miRNAnchor_folder"}."/mirnanchor_run_".$variable->[3]->{Specie_data}->{Tag}.".sh");
+    open (my $OUT, ">", $variable->[4]->{"User_results"}->{"Output_miRNAnchor_folder"}."/mirnanchor_run_".$variable->[3]->{Species_data}->{Tag}.".sh");
     my $header = "# miRNAture\n# ".$variable->[0]->{"miRNAture"}->{"Author"}."\n# ".$variable->[0]->{"miRNAture"}->{"Date"}."\n# ".$variable->[0]->{"miRNAture"}->{"Version"};
     my $headerUser = "# Session data:\n# Hostname: ".$variable->[1]->{"Data_user"}->{"Hostname"}."\n# Date:".$variable->[1]->{"Data_user"}->{"Running_date"}."\n# User:".$variable->[1]->{"Data_user"}->{"User"}."\n# Program: miRNAnchor";
     print $OUT "#!/bin/bash\n\n####\n$header\n####\n$headerUser\n####\n";
     my $parameters = build_parameters_mirnanchor($variable);
     print $OUT "#Validation miRNAs\n";
     print $OUT $program." ".$parameters."\n";
-    $variable->[4]->{"User_results"}{"miRNAnchor_program"} = $variable->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/mirnanchor_run_".$variable->[3]->{Specie_data}->{Tag}.".sh"; 
+    $variable->[4]->{"User_results"}{"miRNAnchor_program"} = $variable->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/mirnanchor_run_".$variable->[3]->{Species_data}->{Tag}.".sh"; 
     $variable->write($config_file);
     close $OUT;
     return;
@@ -56,9 +56,8 @@ sub build_parameters_mirnanchor {
 	    $data_user = $variable->[3]->{Default_folders}->{User_folder};
     }
     # Homology genome with all specific candidates
-    my $homology_genome = $variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta/Genomes/".$variable->[3]->{Specie_data}->{Name}."_subgenome.fasta";
-    my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Specie_data"}->{"Old_Genome"}." -g ".$homology_genome." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Specie_data"}->{"Tag"}." -usrM ".$data_user;
-    #my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Specie_data"}->{"Old_Genome"}." -g ".$variable->[3]->{"Specie_data"}->{"Genome"}." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Specie_data"}->{"Tag"}." -usrM ".$data_user;
+    my $homology_genome = $variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta/Genomes/".$variable->[3]->{Species_data}->{Name}."_subgenome.fasta";
+    my $parameters = "-c ".$variable->[3]->{Default_folders}->{Output_folder}."/miRNA_prediction/Final_Candidates/Fasta -m ".$variable->[2]->{"Program_locations"}{"MIRfix"}." -o ".$variable->[3]->{"Default_folders"}->{"Output_folder"}." -e ".$variable->[3]->{"Default_folders"}->{"Pre_calculated_validation_data"}." -og ".$variable->[3]->{"Species_data"}->{"Old_Genome"}." -g ".$homology_genome." -db ".$variable->[4]->{User_results}->{Database_miRNA_file_result}." -p ".$variable->[3]->{Homology_options}->{Parallel}." -tag ".$variable->[3]->{"Species_data"}->{"Tag"}." -usrM ".$data_user;
     return $parameters;
 }
 

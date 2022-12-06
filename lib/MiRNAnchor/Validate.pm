@@ -14,7 +14,6 @@ with 'MiRNAnchor::Tools';
 
 sub process_query_fasta_specific {
 	my ($fasta_query_path, $family, $working_path, $tag) = @_;
-    #my $fasta_query = (check_folder_files($fasta_query_path, ".*\_$tag.$family\.*\.fasta"))[0]; 	
     my $fasta_query = (check_folder_files_miranchor($fasta_query_path, ".*\_$tag\.$family\.fasta"))[0]; 	
 	#>aeae-RF00103-856 B1566465451 Aedes aegypti RF00103 stem-loop
 	if (!-e $fasta_query_path."/".$fasta_query && -z $fasta_query_path."/".$fasta_query) {
@@ -157,7 +156,6 @@ sub create_genome_file {
     while (<$FASTA>){
 		if ($_ =~ /^>/){
 			my $specie_code = (split /\s+|\t/, $_)[2];
-            #create_genome_list_mirfix($new_path, "BaseFiles", $family, \@genome, $specie_code);		
 			create_genome_list_mirfix($new_path, "BaseFiles", $family, $genome_location, $specie_code);		
 		} else {
 			next;
@@ -362,9 +360,6 @@ sub copy_best_element_subset {
 				my $sto0 = "$output_folder/$rfam_defined_models/${rfam_defined_models}_0/$code/Output/${rfam_defined_models}_0.out/${rfam_defined_models}_0.stk";
 				my $sto1 = "$output_folder/$rfam_defined_models/${rfam_defined_models}_1/$code/Output/${rfam_defined_models}_1.out/${rfam_defined_models}_1.stk";
 				my $best = get_best_folding($sto0, $sto1, $current_dir);
-				#if ($best eq "NA"){ #Both were wrong alignments > discard
-				#    return;
-				#}
 				my $old = "$output_folder/$rfam_defined_models/${rfam_defined_models}_${best}/$code";
 				my $new = "$output_folder/$rfam_defined_models/$code";
 				copy_folders($old, $new);

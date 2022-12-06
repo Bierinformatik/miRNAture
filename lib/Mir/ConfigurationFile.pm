@@ -5,7 +5,6 @@ use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Bio::SeqIO;
 use Data::Dumper;
-#use File::Share ':all';
 
 use lib "lib/MiRNAture";
 
@@ -17,19 +16,19 @@ has 'stage' => (
 	required => 1,
 );
 
-has 'specie_name' => (
+has 'species_name' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
 );
 
-has 'specie_tag' => (
+has 'species_tag' => (
 	is => 'ro',
 	isa => 'Str',
 	required => 1,
 );
 
-has 'specie_genome' => (
+has 'species_genome' => (
 	is => 'ro',
 	isa => 'Path::Class::File',
 	coerce => 1,
@@ -37,19 +36,19 @@ has 'specie_genome' => (
 );
 
 
-has 'specie_genome_new' => (
+has 'species_genome_new' => (
 	is => 'rw',
 	isa => 'Path::Class::File',
 	coerce => 1,
 );
 
-has 'specie_genome_new_length' => (
+has 'species_genome_new_length' => (
 	is => 'rw',
 	isa => 'Path::Class::File',
 	coerce => 1,
 );
 
-has 'specie_genome_new_database' => (
+has 'species_genome_new_database' => (
 	is => 'rw',
 	isa => 'Path::Class::File',
 	coerce => 1,
@@ -190,8 +189,6 @@ has 'nbitscore_cut' => (
 	is => 'ro',
 	isa => 'Num',
 	required => 1
-	#lazy => 1
-	#default => 0.32 # By default this nBit= 0.32, cutoff bitscore
 );
 
 
@@ -293,7 +290,6 @@ sub models_list_hash {
 	return \%reference;
 }
 
-
 #Concatenate models in case both rfam and mirbase modes are indicated
 sub concatenate_models {
 	my $self =  shift;
@@ -330,29 +326,26 @@ sub concatenate_models {
 sub generate_copy_genome {
 	my $shift = shift;
 	if (!-e $shift->output_folder){
-        ##print_error("Output folder did not exist. Please create it to run miRNAture.");
         print_process("Output folder not detected. Creating...");
         create_folders($shift->output_folder, "");
 	}
 	my $data_folder = $shift->output_folder->stringify."/TemporalFiles"; #Genome folder in Temporal Folder
     create_folders($shift->output_folder->stringify, "TemporalFiles");
-	create_folders($data_folder, $shift->specie_name);
-	my $new_folder = $data_folder."/".$shift->specie_name;
-	my $new_genome_file = $data_folder."/".$shift->specie_name."/".$shift->specie_genome->basename.".new.fa"; # Name of the new genome
-	my $new_dababase_names = $data_folder."/".$shift->specie_name."/".$shift->specie_genome->basename.".map"; # Names DB
+	create_folders($data_folder, $shift->species_name);
+	my $new_folder = $data_folder."/".$shift->species_name;
+	my $new_genome_file = $data_folder."/".$shift->species_name."/".$shift->species_genome->basename.".new.fa"; # Name of the new genome
+	my $new_dababase_names = $data_folder."/".$shift->species_name."/".$shift->species_genome->basename.".map"; # Names DB
 	my $new_genome_len = $new_genome_file.".len"; #Len Chr
 	if (-e $new_genome_file && !-z $new_genome_file){ #Test if exists or process
-		print_process("miRNAture detected a previous genome reference for the ".$shift->specie_name." genome");
-		#generate_length_file_genome($new_genome_file, $shift->specie_tag, $data_folder."/".$shift->specie_name,$shift->specie_genome->basename.".new.fa");
+		print_process("miRNAture detected a previous genome reference for the ".$shift->species_name." genome");
 	} else {
-		print_process("Generating a carbon-copy of your ".$shift->specie_tag." genome");
-		create_map_genome($shift->specie_genome, $shift->specie_tag, $data_folder."/".$shift->specie_name, $shift->specie_genome->basename);
-		generate_length_file_genome($new_genome_file, $shift->specie_tag, $data_folder."/".$shift->specie_name, $shift->specie_genome->basename.".new.fa");
-		#copy_files($shift->specie_genome, $new_folder);
+		print_process("Generating a carbon-copy of your ".$shift->species_tag." genome");
+		create_map_genome($shift->species_genome, $shift->species_tag, $data_folder."/".$shift->species_name, $shift->species_genome->basename);
+		generate_length_file_genome($new_genome_file, $shift->species_tag, $data_folder."/".$shift->species_name, $shift->species_genome->basename.".new.fa");
 	}
-	$shift->specie_genome_new($new_genome_file);	
-	$shift->specie_genome_new_database($new_dababase_names);
-	$shift->specie_genome_new_length($new_genome_len);
+	$shift->species_genome_new($new_genome_file);	
+	$shift->species_genome_new_database($new_dababase_names);
+	$shift->species_genome_new_length($new_genome_len);
 	return;
 }
 
@@ -412,16 +405,10 @@ sub test_name {
 	}    
 }
 
-#sub read_data_share {
-#	my $data_location = dist_dir('Bio-miRNAture');
-#	#print "$data_location\n";
-#	return $data_location;
-#}
-
 sub create_config_file {
 	my $shift = shift;
 	my $yamlNew = YAML::Tiny->new();
-	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml"; #Allow multiple experiments at the same time
+	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->species_tag.".yaml"; #Allow multiple experiments at the same time
 	if (-e $final_file && !-z $final_file){
 		print_process("A previous configuration file was detected, then miRNAture will create an alternative one.");
 		my $final_file_alternative = test_name($final_file);
@@ -441,7 +428,6 @@ sub write_header {
 	$yaml_file->[0]->{"miRNAture"}{"Author"} = 'Cristian A. Velandia-Huerto, Joerg Fallmann, Peter F. Stadler';
 	$yaml_file->[0]->{"miRNAture"}{"Version"} = 'v.1.1';
 	$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Sept 21 2022';
-	#$yaml_file->[0]->{"miRNAture"}{"Date"} = 'Mon Mar 16 19:02:25 CET 2020';
 	$yaml_file->[1]->{"Data_user"}{"User"} = `whoami | tr -d '\n'`;
 	$yaml_file->[1]->{"Data_user"}{"Hostname"} = `hostname | tr -d '\n'`;
 	$yaml_file->[1]->{"Data_user"}{"Running_date"} = `date | tr -d '\n'`;
@@ -477,9 +463,6 @@ sub obtain_paths_programs {
 	my $mirfix = collect_data("MIRfix.py");
     my $mirnatureHomology = collect_data("miRNAture.pl");
     my $mirnanchor = collect_data("miRNAnchor.pl");
-    ##TEMPORAL TODO
-    #my $mirnatureHomology = "~/Proyects/miRNAture_v1/script/miRNAture.pl";
-    #my $mirnanchor = "~/Proyects/miRNAture_v1/script/miRNAnchor.pl";
     return ($makeblastdb, $blastn, $nhmmer, $cmsearch, $cmcalibrate, $cmbuild, $clustalo, $RNAalifold, $mirfix, $mirnatureHomology, $mirnanchor);
 }
 
@@ -497,15 +480,14 @@ sub write_config_file {
 	my $shift = shift;
 	my $data_path = shift;
 	my $yaml = YAML::Tiny->read($shift->config_file);
-	$yaml->[3]->{Specie_data}{"Tag"} = $shift->specie_tag;
-	$yaml->[3]->{Specie_data}{"Name"} = $shift->specie_name;
-	$yaml->[3]->{Specie_data}{"Old_Genome"} = $shift->specie_genome->stringify;
-	$yaml->[3]->{Specie_data}{"Genome"} = $shift->specie_genome_new->stringify;
-	$yaml->[3]->{Specie_data}{"Genome_length"} = $shift->specie_genome_new_length->stringify;
-	$yaml->[3]->{Specie_data}{"Database_names_genome"} = $shift->specie_genome_new_database->stringify;
+	$yaml->[3]->{Species_data}{"Tag"} = $shift->species_tag;
+	$yaml->[3]->{Species_data}{"Name"} = $shift->species_name;
+	$yaml->[3]->{Species_data}{"Old_Genome"} = $shift->species_genome->stringify;
+	$yaml->[3]->{Species_data}{"Genome"} = $shift->species_genome_new->stringify;
+	$yaml->[3]->{Species_data}{"Genome_length"} = $shift->species_genome_new_length->stringify;
+	$yaml->[3]->{Species_data}{"Database_names_genome"} = $shift->species_genome_new_database->stringify;
 	$yaml->[3]->{Default_folders}{"Current_dir"} = $shift->current_folder->stringify;
 	$yaml->[3]->{Default_folders}{"Output_folder"} = $shift->output_folder->stringify;
-	#$yaml->[3]->{Default_folders}{"Temp_folder"} = $shift->output_folder->stringify."/Temp";
 	
 	$yaml->[3]->{Default_folders}{Pre_calculated_validation_data} = "$data_path/Data/Validation_mature_data";
 	$yaml->[3]->{Default_folders}{"Data_folder"} = "$data_path/Data";
@@ -555,7 +537,7 @@ sub read_final_file {
 
 sub read_last_file {
 	my $shift = shift;
-	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->specie_tag.".yaml";
+	my $final_file = $shift->output_folder->stringify."/miRNAture_configuration_".$shift->species_tag.".yaml";
     my $last_name = get_last_name($final_file);
 	my $final = YAML::Tiny->read($last_name);
 	return $final;
@@ -589,8 +571,7 @@ sub evaluate_variables_file {
 	if ($valid_content == 1) {
 		return $temp_file;
 	}
-	# Information not in selected file. Evaluate
-	# previous one.
+	# Information not in selected file. Evaluate previous one.
 	my $previous_file = $temp_file;
 	$previous_file =~ s/(miRNAture_configuration_.*)(\-)(\d+)(.yaml)/$1/g;
 	# Previous file

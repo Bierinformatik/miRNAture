@@ -100,7 +100,6 @@ has 'mature_description' => (
 
 sub process_fasta_sequences {
 	my $shift = shift;
-    #my $fasta_query = (check_folder_files($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.*\.fasta"))[0];
 	my $fasta_query = (check_folder_files_miranchor($shift->source_miRNAs_fasta, ".*\_".$shift->subject_tag.".".$shift->accession_number_RFAM."\.fasta"))[0];
 	my $fasta_candidates = read_fasta_results($shift->source_miRNAs_fasta."/".$fasta_query);
 	$shift->fasta_results($fasta_candidates);
@@ -164,10 +163,8 @@ sub check_candidate {
 sub validate_secondary_structure_alignment {
 	my ($sto, $current_dir, $positionsBest) = @_;
 	my $result = system("evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
-    #my $result = system("~/Proyects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>/dev/null 1>/dev/null");
 	my $evaluation_result;
 	if ($result == 0){ #Success!
-        #$evaluation_result = `~/Proyects/miRNAture_v1/script/evaluate_conserved_str.py $sto $positionsBest 2>&1`;
 		$evaluation_result = `evaluate_conserved_str.py $sto $positionsBest 2>&1`;
 		chomp $evaluation_result;
 	} else { #Failed to read the file, didn't generated
@@ -276,7 +273,6 @@ sub infer_length_query {
 
 sub update_coordinates {
 	my ($shift, $fasta_query, $matureInfoLine, $old_info_miRNA, $chrName) = @_;
-	#my $genome = "$splitGenome/$chrName.fa"; #Pointer to the splitted Chromosome
 	# Here, reference the homology sub-genome:  <30-08-21, cavelandiah> #
     my $genome = $shift->subject_genome_path->stringify;
     check_blast_database($genome);
@@ -429,7 +425,7 @@ sub check_validity_mature_coordinates {
 	my $des2 = 0;
 	while (<$IN>){
 		chomp;
-		if ($_ =~ /^H/){ #The file contains a specie candidate
+		if ($_ =~ /^H/){ #The file contains a species candidate
 			if ($_ =~ m/\s-1\s|\s0\s/){ # Removed \sNULL\s, here I allow to annotate only one sequence
 				$des2 = 0;
 				print_result("Seems that $id does not fit with the alignment");
