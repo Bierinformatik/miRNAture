@@ -16,7 +16,6 @@ confidence through fast and efficient computational approaches relies on detaile
 specific features from typical miRNAs and/or their conservation patterns in a structure-annotated 
 multiple sequence alignment.
 
-
 The **miRNAture** pipeline implements a workflow specific to animal miRNAs that automatizes homology 
 search and miRNA-specific validation steps. The homology search combines two modes: sequence-homology by 
 `blast` and/or `nhmmer` using query sequences or Hidden Markov Models (HMMs), and structural validation 
@@ -90,25 +89,25 @@ which will install **miRNAture** in the `mirnature` `conda` environment.
 ## Input files
 
 The most important input file is a DNA sequence. This could be a multi-fasta 
-sequence that belongs from a common specie (i.e. complete genome or group of 
+sequence that belongs from a common species (i.e. complete genome or group of 
 particular sequences). At the same time, previous to execute **miRNAture** a
 _pre-calculated_ dataset (that contains default data as CMs, HMMs, and required 
 files to perform mature prediction) must be downloaded and correctly indicated
 in the command line options with the flag `-dataF`. 
 
 **New in version 1.1**
-A new dataset containing all miRBase HMMs/CMs and validated mature sequences is
+A new dataset containing all miRBase v.22.1 HMMs/CMs and validated mature sequences is
 recommended to use as first approach to identify miRNAs over target species.
-This dataset can be downloaded from **here**.
+This dataset can be downloaded from [here](https://doi.org/10.5281/zenodo.7180160).
 
-To run **miRNAture** in its _complete_ mode with default options, just run as:
+To run **miRNAture** in its _complete_ mode with default options, just execute:
 
 ```
 # Activate the mirnature environment
 conda activate mirnature
 
 # Run miRNAture
-./miRNAture -stage complete -dataF <Precalculated_folder> -speG <Target Genome> -speN <Specie_name> -speT <Tag_specie> -w <Output_dir> -m <Mode> (-str <Blast_strategy>) -blastq <Blast_queries_folder> 
+./miRNAture -stage complete -dataF <Precalculated_folder> -speG <Target Genome> -speN <Species_name> -speT <Species_tag> -w <Output_dir> -m <Mode> (-str <Blast_strategy>) -blastq <Blast_queries_folder> 
 ```
 
 ## Output files
@@ -120,19 +119,19 @@ follows:
 Final_miRNA_evaluation/
 ├── Fasta/
 ├── MFE/
-├── miRNA_annotation_Lach_accepted_conf.bed
-├── miRNA_annotation_Lach_accepted_conf.gff3
-├── miRNAture_summary_Lach.txt
+├── miRNA_annotation_<Species_tag>_accepted_conf.bed
+├── miRNA_annotation_<Species_tag>_accepted_conf.gff3
+├── miRNAture_summary_<Species_tag>.txt
 └── Tables/
 ```
 
-Inside this folder, **miRNAture** will create 3 folders containing their
-correspondent results: sequences in `fasta` format (`Fasta/`), minimum free
-energy and lengths from described sequences (`MFE/`) and the supporting
-information ordered in tables for each annotated candidate (`Tables/`).
+Inside this folder, **miRNAture** will create 3 subfolders containing the
+following results: sequences in `fasta` format (`Fasta/`), minimum free
+energy and lengths from described sequences (`MFE/`) and the supporting information 
+summarized in tabular format (`Tables/`).
 Additionally, associated genomic positions for the miRNA candidates are reported
 in `BED` and `GFF3` formats and a summary file, `miRNAture_summary_*.txt`, that
-describes overall descriptive statistics from found miRNA families. 
+reports statistics from annotated miRNA families. 
 
 For detailed instructions how to use **miRNAture** please refer to the Manual pages:
 
