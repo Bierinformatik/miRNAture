@@ -29,12 +29,11 @@ during the _Evaluation_ stage, which reviews all the latest precursor and mature
 filtering out the invalid candidates at a structural level and reporting valid candidates on GFF3/BED and 
 fasta files with summarized information about detected miRNA candidates and families.
 
-## **miRNAture** on `Galaxy`
+## miRNAture on `Galaxy` Europe
 
 **miRNAture** v.1.1 can be executed from [Galaxy Europe server](https://usegalaxy.eu/root?tool_id=toolshed.g2.bx.psu.edu/repos/iuc/mirnature/mirnature/1.1+galaxy0)
 
-
-## Installation
+## Local Installation
 
 The easiest way to install **miRNAture** is through `conda`. To do so, please first install
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/).
