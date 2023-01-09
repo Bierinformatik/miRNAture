@@ -9,10 +9,10 @@
 ## Description
 
 Detection of microRNAs is a difficult problem. Despite miRNA precursors (80-100 nt) 
-are often identified by sequence comparison, due their high conservation levels, 
-their small mature transcriptional products (about 22 nt) challenge sensitive homology-search 
-methods, such as: `blast`, `nhmmer`, or `cmsearch` due to an inevitable large number of 
-false positives. Recognize with high confidence true miRNAs, through fast and 
+are often identified by sequence comparison due their high conservation levels, 
+their small mature transcriptional products (about 22 nt) overpass sensitive homology-search 
+methods, such as: `blast`, `nhmmer`, or `cmsearch` given their inevitable large number of 
+false positives. Recognize true miRNAs with high confidence through fast and 
 efficient computational approaches, relies on detailed analysis of specific features 
 from typical miRNAs and/or their conservation patterns in a structure-annotated 
 multiple sequence alignments.  
