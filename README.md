@@ -31,7 +31,8 @@ fasta files with summarized information about detected miRNA candidates and fami
 
 ## miRNAture on `Galaxy` Europe
 
-**miRNAture** v.1.1 can be executed from [Galaxy Europe server](https://usegalaxy.eu/root?tool_id=toolshed.g2.bx.psu.edu/repos/iuc/mirnature/mirnature/1.1+galaxy0)
+**miRNAture** v.1.1 is one of the curated and approved tools in the Intergalactic Utilities Commission (IUA)
+repository and can be executed from [Galaxy Europe server](https://usegalaxy.eu/root?tool_id=toolshed.g2.bx.psu.edu/repos/iuc/mirnature/mirnature/1.1+galaxy0)
 
 ## Local Installation
 
