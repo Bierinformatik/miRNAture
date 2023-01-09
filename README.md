@@ -8,28 +8,30 @@
 
 ## Description
 
-Detection of miRNAs is a difficult problem. Due their small size limits the
-available information and current sensitive methods, such as: `blast`, `nhmmer`,
-or `cmsearch` are designed to increase sensitivity, but lead to an inevitable
-large number of false positives only detected by detailed analysis of specific
-features of typical miRNAs and/or conservation patterns in a structure-annotated
-multiple sequence alignments.
+Detection of microRNAs is a difficult problem. Despite miRNA precursors (80-100 nt) 
+are often identified by sequence comparison, due their high conservation levels, 
+their small mature transcriptional products (about 22 nt) challenge sensitive homology-search 
+methods, such as: `blast`, `nhmmer`, or `cmsearch` due to an inevitable large number of 
+false positives. Recognize with high confidence true miRNAs, through fast and 
+efficient computational approaches, relies on detailed analysis of specific features 
+from typical miRNAs and/or their conservation patterns in a structure-annotated 
+multiple sequence alignments.  
 
-The **miRNAture** pipeline implements a workflow specific to animal microRNAs
-that automatizes homology search and validation steps.
+The **miRNAture** pipeline implements a workflow specific to animal miRNAs
+that automatizes homology search and miRNA-specific validation steps.
 On the homology search it combines two modes: sequence-homology by `blast` or/and 
-`nhmmer` using query sequences or hidden markov models (HMMs), and structural 
-validation performed by the `INFERNAL` package, using covariance models (CMs).
-A merging step produces a final list of homology candidates. Over those
-candidates a _Mature annotation_ stage performs a correction of the position of
-mature sequences on the detected precursor and a structural evaluation 
-in terms of minimum free energy (MFE), precursor length, folding and the
-evaluation of anchored family specific-multiple secondary alignment 
-(using `MIRfix`). Final sanity checks are performed on the _Evaluation_ stage, 
-that reviews all the last mature annotation process, filtering the invalid candidates 
-at structure level and reporting valid candidates on GFF3/BED and fasta files 
-together with a summarize file that provides overall information about detected
-miRNA candidates and families.
+`nhmmer` using query sequences or Hidden Markov Models (HMMs), and structural 
+validation performed by the `INFERNAL` package, using pre-defined or user covariance 
+models (CMs). In addition to standard homology-searches, **miRNAture** implements a merging step 
+that produces a non-redundant list of homology candidates. Over those
+candidates a _Mature annotation_ stage (using `MIRfix`) performs a correction of the position of
+mature sequences on the detected precursor and an exhaustive structural evaluation 
+in terms of: minimum free energy (MFE), precursor length and folding, and the creation of a 
+*mature*-anchored family-specific multiple secondary alignment. Final sanity checks 
+are performed on the _Evaluation_ stage, that reviews all the last precursor and mature
+annotation steps, filtering the invalid candidates at structure level and reporting
+valid candidates on GFF3/BED and fasta files together with a summarize file that provides
+overall information about detected miRNA candidates and families.
 
 ## Installation
 
