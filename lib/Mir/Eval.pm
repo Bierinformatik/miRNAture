@@ -62,7 +62,7 @@ sub perform_evaluation {
 	my @modes = ('high_confidence', 'medium_confidence', 'NO_confidence');
 	my $input_table;
 	my $out_fasta = $variables->[4]->{"User_results"}{"Evaluation_results_folder"};
-    my $folder_temp = $shift->output_folder->stringify."/../TemporalFiles";
+    my $folder_temp = $shift->output_folder->stringify."/../TemporalFiles/".$species_name."/";
 	foreach my $md (@modes){
 		if ($md eq 'NO_confidence'){
 			$input_table = $variables->[4]->{"User_results"}{"NO_confidence_miRNAs"};

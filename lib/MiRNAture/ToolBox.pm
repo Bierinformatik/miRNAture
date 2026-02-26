@@ -7,7 +7,6 @@ use Exporter;
 use Moose::Role; 
 use File::Copy; 
 use File::Find;
-use Digest::MD5 qw(md5_hex);
 use File::Basename qw(basename);
 BEGIN {
 	local $SIG{__WARN__} = sub {};
@@ -347,12 +346,16 @@ sub getSequencesFasta {
 
     my $extension_blastn_candidates = 10;
 
-    my $idx_id = basename($genome) . "." . md5_hex($genome);
+    # ---- Stage genome into $foldert so BioPerl writes index THERE ----
+    my $gen_local = "$foldert/" . basename($genome);
+    if (!-e $gen_local) {
+        symlink($genome, $gen_local) or copy($genome, $gen_local)
+            or die "Cannot stage genome into $foldert: $!";
+    }
 
     my $dbCHR = Bio::DB::Fasta->new(
         $genome,
-        -dirname => $foldert,
-        -makeid  => $idx_id,
+        -dirname => $foldert."/",
         -reindex => 0,   # create if missing in $foldert
     );
 
@@ -624,238 +627,238 @@ sub getSequencesFasta {
     return;
 }
 
-sub getSequencesFastaOLD {
-	my ($species_name, $genome, $hmm_query, $out_fasta, $mode, $len_r, $names_r, $file_in, $complete_name) = @_; #mode: 1-> fasta as miRBase, 2-> as HMM, 3-> blast, 4-> final Coord ## $file_in is optional, only with TTO 5!, 6-> blocks
-	### First, index the genome
-	my $extension_blastn_candidates = 10;
-	my $dbCHR;
-	# Look if exists index
-	if (!-e $genome || -z $genome){
-		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
-	} else {
-		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
-	}
-	my $molecule_name;
-	my ($IN, $OUTFILE, $DBFILE);
-	if ($mode == 1 || $mode == 2){
-		open $DBFILE, ">> $out_fasta/${species_name}.db" or die; #Names DB
-		open $IN, "< $out_fasta/${species_name}.${hmm_query}.tab.true.table" or die "I need the tabular output from nhmmer\n"; #True table nhmmer 
-	} elsif ($mode == 3){
-		open $DBFILE, ">> $out_fasta.db" or die; #Names DB
-		open $IN, "< $out_fasta" or die "I need the location file, output from blastn\n"; #Dive_9.snRNA.anca.tab.db.location
-		$molecule_name = $out_fasta;
-		my @tmp_m = split /\./, $molecule_name;
-		$molecule_name = $tmp_m[1];
-	} elsif ($mode == 4){
-		open $DBFILE, ">> $out_fasta/all_RFAM_${species_name}.truetable.joined.table.db" or die; #Names DB
-		open $IN, "< $out_fasta/all_RFAM_${species_name}.truetable.joined.table" or die "I need the tabular output\n"; #Final Tab
-	} elsif ($mode == 5){
-		open $DBFILE, ">> ${file_in}.db" or die;
-		open ($IN, "<", $file_in) or die; 
-	} elsif ($mode == 6){
-		open $DBFILE, ">> $out_fasta.db" or die; #Names DB
-		open $IN, "< $out_fasta" or die "I need the location file, output from blastn\n"; #Dive_9.snRNA.anca.tab.db.location
-		$molecule_name = $out_fasta;
-		my @tmp_m = split /\./, $molecule_name;
-		$molecule_name = $tmp_m[1];
-	}
-	my $spe = lc($species_name);
-	my $species_name_complete;
-	if (!$complete_name){
-		$species_name_complete = getSpeciesName($spe);
-	} else {
-		$species_name_complete = $complete_name;
-		$species_name_complete =~ s/\_/ /g;
-	}
-	my (%tosearch,%db,%final_seq, %database);
-	my ($header, $sta, $end, $lon, $seq);
-	my $count = 0; #temporal for names!
-	if ( !-e $out_fasta || -z $out_fasta ){
-		print_result("The $out_fasta file does not contain homology candidates (from blast or hmm searches)");
-		return;
-	}
-	while (<$IN>){
-		chomp;
-		next if $_ =~ /^#/;
-		my ($ids, $idsDouble);
-		if ($mode == 1 || $mode == 5){
-			my $strand = (split /\s+|\t/, $_)[1];
-			$ids = generate_key();
-		} elsif ($mode == 2 || $mode == 3 || $mode == 4 || $mode == 6){
-			$ids = "Temporal$count"; #generate_key(); #ConsiderChange
-		}
-		my @tmp = split /\s+|\t/, $_;
-		my ($frame, $gene_name, $gen_seq);
-		if ($mode == 1 || $mode == 2 ){
-			my $chr_length = $dbCHR->length("$tmp[0]");
-			if (!$chr_length){
-				my $backfile = "$genome.len";
-				$chr_length = obtain_len_database($backfile, $tmp[0]); 
-			}
-			my ($exStart, $exEnd); 
-			if ($tmp[3] eq "-"){ # In case new HMM without ACC name would be created
-				$tmp[3] = $tmp[2];
-			}
-			if ($tmp[8] < $tmp[9]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
-				($exStart, $exEnd) = extendBlastnCoordinates($tmp[8], $tmp[9], $tmp[4], $tmp[5], $$len_r{$tmp[3]}, $chr_length, $extension_blastn_candidates);
-				$gen_seq = $dbCHR->seq( $tmp[0], $exStart, $exEnd ); #Coordinates from nhmmer output Chr,S,E
-			} else {
-				($exStart, $exEnd) = extendBlastnCoordinates($tmp[9], $tmp[8], $tmp[4], $tmp[5],$$len_r{$tmp[3]}, $chr_length, $extension_blastn_candidates);
-				#$gen_seq = $dbCHR->seq( $tmp[0], $exEnd, $exStart ); #Coordinates from nhmmer output Chr,S,E
-				$gen_seq = $dbCHR->seq( $tmp[0], $exStart, $exEnd ); #Coordinates from nhmmer output Chr,S,E
-			}
-			if ($mode == 2){ #HMM specific
-				$frame = $tmp[11]; #Strand
-			} else {
-				$frame = $tmp[1];
-			}
-			my $other_name = $$names_r{$tmp[3]};
-			### Modes:
-			#>hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop #1
-			# OR
-			#>dvexscf69170.-.49.191.RF00001.3.117.119 #2
-			##
-			$tmp[8] = $exStart;
-			$tmp[9] = $exEnd;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, $other_name, $spe, $species_name_complete, $len_r);
-		} elsif ($mode == 3){
-			#dre1	scaffold2992-size13932	+	1013	1127	46	161	164
-			my $chr_length = $dbCHR->length("$tmp[1]");
-			if (!$chr_length){
-				my $backfile = "$genome.len";
-				$chr_length = obtain_len_database($backfile, $tmp[1]); 
-			}
-			my ($exStart, $exEnd) = extendBlastnCoordinates($tmp[3], $tmp[4], $tmp[5], $tmp[6], $tmp[7], $chr_length, $extension_blastn_candidates);
-			if ($tmp[4] > $tmp[3]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
-				$gen_seq = $dbCHR->seq( $tmp[1], $exStart, $exEnd); #Coordinates from nhmmer output Chr,S,E
-			} else {
-				$gen_seq = $dbCHR->seq( $tmp[1], $exStart, $exEnd); #Coordinates from nhmmer output Chr,S,E
-			}
-			$frame = $tmp[2]; #Strand
-			$tmp[3] = $exStart;
-			$tmp[4] = $exEnd;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
-		} elsif ($mode == 4 || $mode == 5){ #Final Tables
-            if ($mode == 5){
-                my $extension_homology = 15; # Extension to the homology candidates
-                my $chr_length = $dbCHR->length("$tmp[0]");
-                ($tmp[5], $tmp[6]) = extendBlastnCoordinates($tmp[5], $tmp[6], 1, 0, 0, $chr_length, $extension_homology);
-            }
-			if ($tmp[6] > $tmp[5]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
-				$gen_seq = $dbCHR->seq( $tmp[0], $tmp[5], $tmp[6]); #Coordinates from nhmmer output Chr,S,E
-			} else {
-				$gen_seq = $dbCHR->seq( $tmp[0], $tmp[6], $tmp[5]); #Coordinates from nhmmer output Chr,S,E
-			}
-			$frame = $tmp[1]; #Strand
-			my $other_name = $$names_r{$tmp[10]};
-			push @tmp, $other_name;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
-		} elsif ($mode == 6){ # Blocks
-			#dre1	scaffold2992-size13932	+	1013	1127	46	161	164
-			# 20	JH126831.1	-	1045134	1045213
+#sub getSequencesFastaOLD {
+	#my ($species_name, $genome, $hmm_query, $out_fasta, $mode, $len_r, $names_r, $file_in, $complete_name) = @_; #mode: 1-> fasta as miRBase, 2-> as HMM, 3-> blast, 4-> final Coord ## $file_in is optional, only with TTO 5!, 6-> blocks
+	#### First, index the genome
+	#my $extension_blastn_candidates = 10;
+	#my $dbCHR;
+	## Look if exists index
+	#if (!-e $genome || -z $genome){
+		#$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
+	#} else {
+		#$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
+	#}
+	#my $molecule_name;
+	#my ($IN, $OUTFILE, $DBFILE);
+	#if ($mode == 1 || $mode == 2){
+		#open $DBFILE, ">> $out_fasta/${species_name}.db" or die; #Names DB
+		#open $IN, "< $out_fasta/${species_name}.${hmm_query}.tab.true.table" or die "I need the tabular output from nhmmer\n"; #True table nhmmer 
+	#} elsif ($mode == 3){
+		#open $DBFILE, ">> $out_fasta.db" or die; #Names DB
+		#open $IN, "< $out_fasta" or die "I need the location file, output from blastn\n"; #Dive_9.snRNA.anca.tab.db.location
+		#$molecule_name = $out_fasta;
+		#my @tmp_m = split /\./, $molecule_name;
+		#$molecule_name = $tmp_m[1];
+	#} elsif ($mode == 4){
+		#open $DBFILE, ">> $out_fasta/all_RFAM_${species_name}.truetable.joined.table.db" or die; #Names DB
+		#open $IN, "< $out_fasta/all_RFAM_${species_name}.truetable.joined.table" or die "I need the tabular output\n"; #Final Tab
+	#} elsif ($mode == 5){
+		#open $DBFILE, ">> ${file_in}.db" or die;
+		#open ($IN, "<", $file_in) or die; 
+	#} elsif ($mode == 6){
+		#open $DBFILE, ">> $out_fasta.db" or die; #Names DB
+		#open $IN, "< $out_fasta" or die "I need the location file, output from blastn\n"; #Dive_9.snRNA.anca.tab.db.location
+		#$molecule_name = $out_fasta;
+		#my @tmp_m = split /\./, $molecule_name;
+		#$molecule_name = $tmp_m[1];
+	#}
+	#my $spe = lc($species_name);
+	#my $species_name_complete;
+	#if (!$complete_name){
+		#$species_name_complete = getSpeciesName($spe);
+	#} else {
+		#$species_name_complete = $complete_name;
+		#$species_name_complete =~ s/\_/ /g;
+	#}
+	#my (%tosearch,%db,%final_seq, %database);
+	#my ($header, $sta, $end, $lon, $seq);
+	#my $count = 0; #temporal for names!
+	#if ( !-e $out_fasta || -z $out_fasta ){
+		#print_result("The $out_fasta file does not contain homology candidates (from blast or hmm searches)");
+		#return;
+	#}
+	#while (<$IN>){
+		#chomp;
+		#next if $_ =~ /^#/;
+		#my ($ids, $idsDouble);
+		#if ($mode == 1 || $mode == 5){
+			#my $strand = (split /\s+|\t/, $_)[1];
+			#$ids = generate_key();
+		#} elsif ($mode == 2 || $mode == 3 || $mode == 4 || $mode == 6){
+			#$ids = "Temporal$count"; #generate_key(); #ConsiderChange
+		#}
+		#my @tmp = split /\s+|\t/, $_;
+		#my ($frame, $gene_name, $gen_seq);
+		#if ($mode == 1 || $mode == 2 ){
+			#my $chr_length = $dbCHR->length("$tmp[0]");
+			#if (!$chr_length){
+				#my $backfile = "$genome.len";
+				#$chr_length = obtain_len_database($backfile, $tmp[0]); 
+			#}
+			#my ($exStart, $exEnd); 
+			#if ($tmp[3] eq "-"){ # In case new HMM without ACC name would be created
+				#$tmp[3] = $tmp[2];
+			#}
+			#if ($tmp[8] < $tmp[9]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
+				#($exStart, $exEnd) = extendBlastnCoordinates($tmp[8], $tmp[9], $tmp[4], $tmp[5], $$len_r{$tmp[3]}, $chr_length, $extension_blastn_candidates);
+				#$gen_seq = $dbCHR->seq( $tmp[0], $exStart, $exEnd ); #Coordinates from nhmmer output Chr,S,E
+			#} else {
+				#($exStart, $exEnd) = extendBlastnCoordinates($tmp[9], $tmp[8], $tmp[4], $tmp[5],$$len_r{$tmp[3]}, $chr_length, $extension_blastn_candidates);
+				##$gen_seq = $dbCHR->seq( $tmp[0], $exEnd, $exStart ); #Coordinates from nhmmer output Chr,S,E
+				#$gen_seq = $dbCHR->seq( $tmp[0], $exStart, $exEnd ); #Coordinates from nhmmer output Chr,S,E
+			#}
+			#if ($mode == 2){ #HMM specific
+				#$frame = $tmp[11]; #Strand
+			#} else {
+				#$frame = $tmp[1];
+			#}
+			#my $other_name = $$names_r{$tmp[3]};
+			#### Modes:
+			##>hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop #1
+			## OR
+			##>dvexscf69170.-.49.191.RF00001.3.117.119 #2
+			###
+			#$tmp[8] = $exStart;
+			#$tmp[9] = $exEnd;
+			#$gene_name = get_header_name(\@tmp, $mode, $ids, $count, $other_name, $spe, $species_name_complete, $len_r);
+		#} elsif ($mode == 3){
+			##dre1	scaffold2992-size13932	+	1013	1127	46	161	164
+			#my $chr_length = $dbCHR->length("$tmp[1]");
+			#if (!$chr_length){
+				#my $backfile = "$genome.len";
+				#$chr_length = obtain_len_database($backfile, $tmp[1]); 
+			#}
+			#my ($exStart, $exEnd) = extendBlastnCoordinates($tmp[3], $tmp[4], $tmp[5], $tmp[6], $tmp[7], $chr_length, $extension_blastn_candidates);
+			#if ($tmp[4] > $tmp[3]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
+				#$gen_seq = $dbCHR->seq( $tmp[1], $exStart, $exEnd); #Coordinates from nhmmer output Chr,S,E
+			#} else {
+				#$gen_seq = $dbCHR->seq( $tmp[1], $exStart, $exEnd); #Coordinates from nhmmer output Chr,S,E
+			#}
+			#$frame = $tmp[2]; #Strand
+			#$tmp[3] = $exStart;
+			#$tmp[4] = $exEnd;
+			#$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
+		#} elsif ($mode == 4 || $mode == 5){ #Final Tables
+            #if ($mode == 5){
+                #my $extension_homology = 15; # Extension to the homology candidates
+                #my $chr_length = $dbCHR->length("$tmp[0]");
+                #($tmp[5], $tmp[6]) = extendBlastnCoordinates($tmp[5], $tmp[6], 1, 0, 0, $chr_length, $extension_homology);
+            #}
+			#if ($tmp[6] > $tmp[5]){ #Verify sense, nhmmer report - swapped. Chr, smaller, greater.
+				#$gen_seq = $dbCHR->seq( $tmp[0], $tmp[5], $tmp[6]); #Coordinates from nhmmer output Chr,S,E
+			#} else {
+				#$gen_seq = $dbCHR->seq( $tmp[0], $tmp[6], $tmp[5]); #Coordinates from nhmmer output Chr,S,E
+			#}
+			#$frame = $tmp[1]; #Strand
+			#my $other_name = $$names_r{$tmp[10]};
+			#push @tmp, $other_name;
+			#$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
+		#} elsif ($mode == 6){ # Blocks
+			##dre1	scaffold2992-size13932	+	1013	1127	46	161	164
+			## 20	JH126831.1	-	1045134	1045213
 
-			my $chr_length = $dbCHR->length("$tmp[1]");
-			if (!$chr_length){
-				my $backfile = "$genome.len";
-				$chr_length = obtain_len_database($backfile, $tmp[1]); 
-			}
-			# Here the coordinates included the difference respect to the query 
-			# on the block
-			my ($exStart, $exEnd) = extendBlastnCoordinates($tmp[3], $tmp[4], 1, 0, 0, $chr_length, $extension_blastn_candidates);
-			$gen_seq = $dbCHR->seq($tmp[1], $exStart, $exEnd); #Coordinates from nhmmer output Chr,S,E
-			$frame = $tmp[2]; #Strand
-			$tmp[3] = $exStart;
-			$tmp[4] = $exEnd;
-			$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
-		}
-		my $output_nucleotide = Bio::Seq->new(
-			-seq        => $gen_seq,
-			-id         => $gene_name,
-			-display_id => $gene_name,
-			-alphabet   => 'dna',
-		);
-		my $output_nucleotideB;
-		if ($frame =~ /^\-$/) {
-			$output_nucleotide = $output_nucleotide->revcom();
-		} elsif ($frame =~ /,/){
-			$output_nucleotideB = $output_nucleotide->revcom(); #Here B is the reversed one
-		}
-		if ($mode == 1 || $mode == 2){
-			push @{ $final_seq{$tmp[3]}{$output_nucleotide->id}}, $output_nucleotide->seq;
-		} elsif ($mode == 3 || $mode == 6){
-			push @{ $final_seq{$molecule_name}{$output_nucleotide->id}}, $output_nucleotide->seq;
-		} elsif ($mode == 4){
-			push @{ $final_seq{$tmp[2]}{$output_nucleotide->id}}, $output_nucleotide->seq;
-		} elsif ($mode == 5){
-			# Only at the end table of homology, evaluate if exists strand overlapping candidates. 
-			if ($tmp[2] =~ /\-/){ #Some CMs has this additional thing, just report the name: MIPF0000001-100-Mammalia-F -> MIPF0000001, Only modify mirbase references with additions
-				if ($tmp[2] =~ /^MIPF/){
-					my @temp = split /\-/, $tmp[2];
-					$tmp[2] = $temp[0];
-				}
-			}
-			$_ = join "\t", @tmp; #Modified id of the family withouth dashes
-			if ($frame =~ /^\-$|^\+$/){
-				push @{ $final_seq{$tmp[2]}{$output_nucleotide->id}}, $output_nucleotide->seq;
-			} elsif ($frame =~ /,/){ #Here include both to be evaluated by miRNAnchor
-				my $header = $output_nucleotide->id;
-				my @modification = split /\s+|\t/, $header; 
-				my $idA = $modification[1]."A"; #Forward
-				my $idB = $modification[1]."B"; #Reverse
-				my $complement = join " ", @modification[2..$#modification];
-				my $headerA = "$modification[0] $idA $complement"; #Forward
-				my $headerB = "$modification[0] $idB $complement"; #Reverse
-				push @{ $final_seq{$tmp[2]}{$headerA}}, $output_nucleotide->seq; #Forward 
-				push @{ $final_seq{$tmp[2]}{$headerB}}, $output_nucleotideB->seq; #Reverse
-			}
-		}
-		if ($frame =~ /,/ && $mode == 5){
-			my @allA = split /\t|\s+/, $_;
-			my @allB = split /\t|\s+/, $_;
-			$allA[1] = "+"; #Reeplace combined strand to forward
-			$allB[1] = "-"; #Reeplace combined strand to reverse
-			my $lineA = join "\t", @allA;
-			my $lineB = join "\t", @allB;
-			$database{$ids."A"} = $lineA;
-			$database{$ids."B"} = $lineB;            
-		} else {
-			$database{$ids} = $_;
-		}
-		$count++;
-	}
-	foreach my $acc (sort keys %final_seq){
-		if ($mode == 1 || $mode == 2){
-			open $OUTFILE, ">> $out_fasta/${species_name}.${acc}.tab.true.table.fasta" or die;
-		} elsif ($mode == 3 || $mode == 6){
-			open $OUTFILE, ">> $out_fasta.fasta" or die;
-		} elsif ($mode == 4 || $mode == 5){
-			open $OUTFILE, ">> $out_fasta/all_RFAM_${species_name}.${acc}.fasta" or die;
-		}
-		foreach my $ids (sort keys %{$final_seq{$acc} }){
-			my $idsm = $ids;
-			print $OUTFILE ">$idsm\n";
-			my $all = $final_seq{$acc}{$ids}; #Here is a problem
-			foreach my $sq (@$all){
-				if (!$sq){
-					print_error("The sequence for $acc and $ids is empty");
-				}
-				$sq = uc($sq);
-				$sq =~ s/T/U/g;
-				$sq =~ s/(.{60})/$1\n/g;
-				print $OUTFILE "$sq\n";
-			}
-		}
-		close $OUTFILE;
-	}
-	foreach my $reg (keys %database){
-		print $DBFILE "H$reg\t$database{$reg}\n";
-	}
-	close $IN; close $DBFILE;
-    if ($mode == 1 || $mode == 5){
-        system("rm .used_ids.txt");
-    }
-	return;
-}
+			#my $chr_length = $dbCHR->length("$tmp[1]");
+			#if (!$chr_length){
+				#my $backfile = "$genome.len";
+				#$chr_length = obtain_len_database($backfile, $tmp[1]); 
+			#}
+			## Here the coordinates included the difference respect to the query 
+			## on the block
+			#my ($exStart, $exEnd) = extendBlastnCoordinates($tmp[3], $tmp[4], 1, 0, 0, $chr_length, $extension_blastn_candidates);
+			#$gen_seq = $dbCHR->seq($tmp[1], $exStart, $exEnd); #Coordinates from nhmmer output Chr,S,E
+			#$frame = $tmp[2]; #Strand
+			#$tmp[3] = $exStart;
+			#$tmp[4] = $exEnd;
+			#$gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
+		#}
+		#my $output_nucleotide = Bio::Seq->new(
+			#-seq        => $gen_seq,
+			#-id         => $gene_name,
+			#-display_id => $gene_name,
+			#-alphabet   => 'dna',
+		#);
+		#my $output_nucleotideB;
+		#if ($frame =~ /^\-$/) {
+			#$output_nucleotide = $output_nucleotide->revcom();
+		#} elsif ($frame =~ /,/){
+			#$output_nucleotideB = $output_nucleotide->revcom(); #Here B is the reversed one
+		#}
+		#if ($mode == 1 || $mode == 2){
+			#push @{ $final_seq{$tmp[3]}{$output_nucleotide->id}}, $output_nucleotide->seq;
+		#} elsif ($mode == 3 || $mode == 6){
+			#push @{ $final_seq{$molecule_name}{$output_nucleotide->id}}, $output_nucleotide->seq;
+		#} elsif ($mode == 4){
+			#push @{ $final_seq{$tmp[2]}{$output_nucleotide->id}}, $output_nucleotide->seq;
+		#} elsif ($mode == 5){
+			## Only at the end table of homology, evaluate if exists strand overlapping candidates. 
+			#if ($tmp[2] =~ /\-/){ #Some CMs has this additional thing, just report the name: MIPF0000001-100-Mammalia-F -> MIPF0000001, Only modify mirbase references with additions
+				#if ($tmp[2] =~ /^MIPF/){
+					#my @temp = split /\-/, $tmp[2];
+					#$tmp[2] = $temp[0];
+				#}
+			#}
+			#$_ = join "\t", @tmp; #Modified id of the family withouth dashes
+			#if ($frame =~ /^\-$|^\+$/){
+				#push @{ $final_seq{$tmp[2]}{$output_nucleotide->id}}, $output_nucleotide->seq;
+			#} elsif ($frame =~ /,/){ #Here include both to be evaluated by miRNAnchor
+				#my $header = $output_nucleotide->id;
+				#my @modification = split /\s+|\t/, $header; 
+				#my $idA = $modification[1]."A"; #Forward
+				#my $idB = $modification[1]."B"; #Reverse
+				#my $complement = join " ", @modification[2..$#modification];
+				#my $headerA = "$modification[0] $idA $complement"; #Forward
+				#my $headerB = "$modification[0] $idB $complement"; #Reverse
+				#push @{ $final_seq{$tmp[2]}{$headerA}}, $output_nucleotide->seq; #Forward 
+				#push @{ $final_seq{$tmp[2]}{$headerB}}, $output_nucleotideB->seq; #Reverse
+			#}
+		#}
+		#if ($frame =~ /,/ && $mode == 5){
+			#my @allA = split /\t|\s+/, $_;
+			#my @allB = split /\t|\s+/, $_;
+			#$allA[1] = "+"; #Reeplace combined strand to forward
+			#$allB[1] = "-"; #Reeplace combined strand to reverse
+			#my $lineA = join "\t", @allA;
+			#my $lineB = join "\t", @allB;
+			#$database{$ids."A"} = $lineA;
+			#$database{$ids."B"} = $lineB;            
+		#} else {
+			#$database{$ids} = $_;
+		#}
+		#$count++;
+	#}
+	#foreach my $acc (sort keys %final_seq){
+		#if ($mode == 1 || $mode == 2){
+			#open $OUTFILE, ">> $out_fasta/${species_name}.${acc}.tab.true.table.fasta" or die;
+		#} elsif ($mode == 3 || $mode == 6){
+			#open $OUTFILE, ">> $out_fasta.fasta" or die;
+		#} elsif ($mode == 4 || $mode == 5){
+			#open $OUTFILE, ">> $out_fasta/all_RFAM_${species_name}.${acc}.fasta" or die;
+		#}
+		#foreach my $ids (sort keys %{$final_seq{$acc} }){
+			#my $idsm = $ids;
+			#print $OUTFILE ">$idsm\n";
+			#my $all = $final_seq{$acc}{$ids}; #Here is a problem
+			#foreach my $sq (@$all){
+				#if (!$sq){
+					#print_error("The sequence for $acc and $ids is empty");
+				#}
+				#$sq = uc($sq);
+				#$sq =~ s/T/U/g;
+				#$sq =~ s/(.{60})/$1\n/g;
+				#print $OUTFILE "$sq\n";
+			#}
+		#}
+		#close $OUTFILE;
+	#}
+	#foreach my $reg (keys %database){
+		#print $DBFILE "H$reg\t$database{$reg}\n";
+	#}
+	#close $IN; close $DBFILE;
+    #if ($mode == 1 || $mode == 5){
+        #system("rm .used_ids.txt");
+    #}
+	#return;
+#}
 
 ##############
 
@@ -867,15 +870,9 @@ sub getSequencesFastaSubGenome {
     die "TemporalFiles folder not found or not writable: $foldert\n"
         unless (-d $foldert && -w $foldert);
 
-    # Stable, collision-proof ID for the index inside $foldert
-    # (Avoids clashes when many species use a file called genome.fna)
-    my $idx_id = basename($genome) . "." . md5_hex($genome);
-
-    # Create index
     my $dbCHR = Bio::DB::Fasta->new(
         $genome,
         -dirname => $foldert,
-        -makeid  => $idx_id,
         -reindex => 0,
     );
 
@@ -938,62 +935,62 @@ sub getSequencesFastaSubGenome {
 }
 
 
-sub getSequencesFastaSubGenomeOLD {
-	my ($species_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
-	my %final_seq;
-	### First, index the genome
-	my $dbCHR;
-	# Look if exists index
-	if (!-e "$genome" || -z "$genome"){
-		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
-	} else {
-		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
-	}
-	##
-    # Here read the .db file which already included +-15nt:  <30-08-21, cavelandiah> #
-	open my $IN, "< $input_table.db" or die;
-	my ($gen_seq);
-    my $extension_genome = 250; # Extension to the homology candidates
-	while (<$IN>){
-		chomp;
-		my $ids;
-        #H1625790349	S104	+	MIPF0000079	1	88	271598	271735	33.8	0.00099	no	mir-145	88	0	Infernal	Infernal	mir-145	miRNA	RF00675
-		my @tmp = split /\s+|\t/, $_;
-        my $chr_length = $dbCHR->length("$tmp[1]");
-        ($tmp[6], $tmp[7]) = extendBlastnCoordinates($tmp[6], $tmp[7], 1, 0, 0, $chr_length, $extension_genome);
-		if ($tmp[6] < $tmp[7]){ 
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
-        } else {
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
-        }
-		my $frame = $tmp[2]; #Strand
-		my $gene_name = "$tmp[0] $species_name $tmp[11] $tmp[1]#$tmp[6]#$tmp[7]"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
-		my $output_nucleotide2 = Bio::Seq->new(
-			-seq        => $gen_seq,
-			-id         => $gene_name,
-			-alphabet   => 'dna'
-		);
-		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
-	}
-	close $IN;
-	my $outfileF = "$out_fasta/${species_name}_subgenome.fasta";
-	open my $OUTFILE, ">> $outfileF";
-	foreach my $ids (sort keys %final_seq){
-		my $idsm = $ids;
-		print $OUTFILE ">$idsm\n";
-		my $all = $final_seq{$ids};
-		foreach my $sq (@$all){
-			if (!$sq){
-				print_error("The sequence for $ids is empty");
-			}
-			$sq = uc($sq);
-			$sq =~ s/(.{60})/$1\n/g;
-			print $OUTFILE "$sq\n";
-		}
-	}
-	close $OUTFILE;
-	return $outfileF;
-}
+#sub getSequencesFastaSubGenomeOLD {
+	#my ($species_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
+	#my %final_seq;
+	#### First, index the genome
+	#my $dbCHR;
+	## Look if exists index
+	#if (!-e "$genome" || -z "$genome"){
+		#$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
+	#} else {
+		#$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
+	#}
+	###
+    ## Here read the .db file which already included +-15nt:  <30-08-21, cavelandiah> #
+	#open my $IN, "< $input_table.db" or die;
+	#my ($gen_seq);
+    #my $extension_genome = 250; # Extension to the homology candidates
+	#while (<$IN>){
+		#chomp;
+		#my $ids;
+        ##H1625790349	S104	+	MIPF0000079	1	88	271598	271735	33.8	0.00099	no	mir-145	88	0	Infernal	Infernal	mir-145	miRNA	RF00675
+		#my @tmp = split /\s+|\t/, $_;
+        #my $chr_length = $dbCHR->length("$tmp[1]");
+        #($tmp[6], $tmp[7]) = extendBlastnCoordinates($tmp[6], $tmp[7], 1, 0, 0, $chr_length, $extension_genome);
+		#if ($tmp[6] < $tmp[7]){ 
+			#$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
+        #} else {
+			#$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
+        #}
+		#my $frame = $tmp[2]; #Strand
+		#my $gene_name = "$tmp[0] $species_name $tmp[11] $tmp[1]#$tmp[6]#$tmp[7]"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
+		#my $output_nucleotide2 = Bio::Seq->new(
+			#-seq        => $gen_seq,
+			#-id         => $gene_name,
+			#-alphabet   => 'dna'
+		#);
+		#push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
+	#}
+	#close $IN;
+	#my $outfileF = "$out_fasta/${species_name}_subgenome.fasta";
+	#open my $OUTFILE, ">> $outfileF";
+	#foreach my $ids (sort keys %final_seq){
+		#my $idsm = $ids;
+		#print $OUTFILE ">$idsm\n";
+		#my $all = $final_seq{$ids};
+		#foreach my $sq (@$all){
+			#if (!$sq){
+				#print_error("The sequence for $ids is empty");
+			#}
+			#$sq = uc($sq);
+			#$sq =~ s/(.{60})/$1\n/g;
+			#print $OUTFILE "$sq\n";
+		#}
+	#}
+	#close $OUTFILE;
+	#return $outfileF;
+#}
 
 #############
 
@@ -1011,12 +1008,9 @@ sub getSequencesFasta_final {
     die "Input table not found/empty: $input_table\n"
         unless (-e $input_table && !-z $input_table);
 
-    my $idx_id = basename($genome) . "." . md5_hex($genome);
-
     my $dbCHR = Bio::DB::Fasta->new(
         $genome,
         -dirname => $foldert,
-        -makeid  => $idx_id,
         -reindex => 0,
     );
 
@@ -1104,62 +1098,62 @@ sub getSequencesFasta_final {
     return $outfileF;
 }
 
-sub getSequencesFasta_finalOLD {
-	my ($species_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
-	my %final_seq;
-	### First, index the genome
-	my $dbCHR;
-	# Look if exists index
-	if (!-e "$genome" || -z "$genome"){
-		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
-	} else {
-		$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
-	}
-	##
-	open my $IN, "< $input_table" or die;
-	my ($gen_seq);
-	while (<$IN>){
-		chomp;
-		my $ids;
-		#H1595452937.0	JH127654.1	+.2	RF00929.3	1.4	77.5	486168.6	486267.7	33.8.8	0.0034.9	no.10	mir-574.1	77.2	9.3	Blast.4	ANCA.5	anca148294,anca148390.6	miRNA.7	2.8	18.9	-8.2	100.1
-		my @tmp = split /\s+|\t/, $_;
-		if ($tmp[6] < $tmp[7]){ 
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
-        } else {
-			$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
-        }
-		my $frame = $tmp[2]; #Strand
-		my $gene_name = "$tmp[0] $species_name $tmp[11] stem-loop"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
-		my $output_nucleotide2 = Bio::Seq->new(
-			-seq        => $gen_seq,
-			-id         => $gene_name,
-			-alphabet   => 'dna'
-		);
-		if ($frame eq "-") {
-			$output_nucleotide2 = $output_nucleotide2->revcom();
-		}
-		push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
-	}
-	close $IN;
-	my $outfileF = "$out_fasta/${species_name}_miRNAs_$mode.fasta";
-	open my $OUTFILE, "> $outfileF";
-	foreach my $ids (sort keys %final_seq){
-		my $idsm = $ids;
-		print $OUTFILE ">$idsm\n";
-		my $all = $final_seq{$ids};
-		foreach my $sq (@$all){
-			if (!$sq){
-				print_error("The sequence for $ids is empty");
-			}
-			$sq = uc($sq);
-			$sq =~ s/T/U/g;
-            $sq =~ s/(.{60})/$1\n/g;
-			print $OUTFILE "$sq\n";
-		}
-	}
-	close $OUTFILE;
-	return $outfileF;
-}
+#sub getSequencesFasta_finalOLD {
+	#my ($species_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
+	#my %final_seq;
+	#### First, index the genome
+	#my $dbCHR;
+	## Look if exists index
+	#if (!-e "$genome" || -z "$genome"){
+		#$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>1);
+	#} else {
+		#$dbCHR = Bio::DB::Fasta->new($genome, -reindex=>0);
+	#}
+	###
+	#open my $IN, "< $input_table" or die;
+	#my ($gen_seq);
+	#while (<$IN>){
+		#chomp;
+		#my $ids;
+		##H1595452937.0	JH127654.1	+.2	RF00929.3	1.4	77.5	486168.6	486267.7	33.8.8	0.0034.9	no.10	mir-574.1	77.2	9.3	Blast.4	ANCA.5	anca148294,anca148390.6	miRNA.7	2.8	18.9	-8.2	100.1
+		#my @tmp = split /\s+|\t/, $_;
+		#if ($tmp[6] < $tmp[7]){ 
+			#$gen_seq = $dbCHR->seq( $tmp[1], $tmp[6], $tmp[7]); 
+        #} else {
+			#$gen_seq = $dbCHR->seq( $tmp[1], $tmp[7], $tmp[6]); 
+        #}
+		#my $frame = $tmp[2]; #Strand
+		#my $gene_name = "$tmp[0] $species_name $tmp[11] stem-loop"; #>H1595458263 Latimeria chalumnae mir-26 stem-loop 
+		#my $output_nucleotide2 = Bio::Seq->new(
+			#-seq        => $gen_seq,
+			#-id         => $gene_name,
+			#-alphabet   => 'dna'
+		#);
+		#if ($frame eq "-") {
+			#$output_nucleotide2 = $output_nucleotide2->revcom();
+		#}
+		#push @{ $final_seq{$output_nucleotide2->id}}, $output_nucleotide2->seq;
+	#}
+	#close $IN;
+	#my $outfileF = "$out_fasta/${species_name}_miRNAs_$mode.fasta";
+	#open my $OUTFILE, "> $outfileF";
+	#foreach my $ids (sort keys %final_seq){
+		#my $idsm = $ids;
+		#print $OUTFILE ">$idsm\n";
+		#my $all = $final_seq{$ids};
+		#foreach my $sq (@$all){
+			#if (!$sq){
+				#print_error("The sequence for $ids is empty");
+			#}
+			#$sq = uc($sq);
+			#$sq =~ s/T/U/g;
+            #$sq =~ s/(.{60})/$1\n/g;
+			#print $OUTFILE "$sq\n";
+		#}
+	#}
+	#close $OUTFILE;
+	#return $outfileF;
+#}
 
 sub perform_measure_MFE {
 	my $file = shift;
