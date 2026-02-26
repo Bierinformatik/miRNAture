@@ -138,7 +138,7 @@ sub create_final_report {
 
 sub get_fasta_sequences {
 	my $shift = shift;
-	getSequencesFasta($shift->subject_species, $shift->genome_subject, "NA", $shift->output_folder->stringify."/Final_Candidates/Fasta/", "5", $shift->length_CM, $shift->names_CM, $shift->final_out_table->stringify, $shift->species_name); #Header mode == 5 Final table
+	getSequencesFasta($shift->subject_species, $shift->genome_subject, "NA", $shift->output_folder->stringify."/Final_Candidates/Fasta/", "5", $shift->length_CM, $shift->names_CM, $shift->final_out_table->stringify, $shift->species_name,$shift->output_folder->stringify."/../TemporalFiles"); #Header mode == 5 Final table
 	return;
 }
 
@@ -146,7 +146,7 @@ sub get_small_genomes {
     # Generate genome anchors from predicted miRNAs to be validated with MIRfix.
     # This will extend reported coordinates +-300 nt.
 	my $shift = shift;
-    getSequencesFastaSubGenome($shift->species_name, $shift->genome_subject, $shift->output_folder->stringify."/Final_Candidates/Fasta/Genomes", $shift->final_out_table);
+    getSequencesFastaSubGenome($shift->species_name, $shift->genome_subject, $shift->output_folder->stringify."/Final_Candidates/Fasta/Genomes", $shift->final_out_table, $shift->output_folder->stringify."/../TemporalFiles");
 	return;
 }
 

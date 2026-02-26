@@ -62,6 +62,7 @@ sub perform_evaluation {
 	my @modes = ('high_confidence', 'medium_confidence', 'NO_confidence');
 	my $input_table;
 	my $out_fasta = $variables->[4]->{"User_results"}{"Evaluation_results_folder"};
+    my $folder_temp = $shift->output_folder->stringify."/../TemporalFiles";
 	foreach my $md (@modes){
 		if ($md eq 'NO_confidence'){
 			$input_table = $variables->[4]->{"User_results"}{"NO_confidence_miRNAs"};
@@ -70,7 +71,7 @@ sub perform_evaluation {
 		} else {
 			$input_table = $variables->[4]->{"User_results"}{"Medium_confidence_miRNAs"};
 		}
-		my $fasta_file_out = getSequencesFasta_final($species_name, $genome, $out_fasta, $input_table, $md);
+		my $fasta_file_out = getSequencesFasta_final($species_name, $genome, $out_fasta, $input_table, $md, $folder_temp);
 		my $file_measure = perform_measure_MFE($fasta_file_out);
 		if ($file_measure eq "NA"){
 			print_result("The generation of MFE scores for $md mode is not available, there are no candidates.");

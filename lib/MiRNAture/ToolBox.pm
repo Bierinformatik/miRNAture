@@ -7,6 +7,8 @@ use Exporter;
 use Moose::Role; 
 use File::Copy; 
 use File::Find;
+use Digest::MD5 qw(md5_hex);
+use File::Basename qw(basename);
 BEGIN {
 	local $SIG{__WARN__} = sub {};
 	require Bio::DB::Fasta;
@@ -335,6 +337,294 @@ sub log2 {
 =cut 
 
 sub getSequencesFasta {
+    my ($species_name, $genome, $hmm_query, $out_fasta, $mode, $len_r, $names_r, $file_in, $complete_name, $foldert) = @_;
+
+    die "Genome FASTA not found: $genome\n" unless -e $genome;
+    die "Genome FASTA is empty: $genome\n"  if -z  $genome;
+
+    die "TemporalFiles folder missing/not writable: $foldert\n"
+        unless (defined $foldert && -d $foldert && -w $foldert);
+
+    my $extension_blastn_candidates = 10;
+
+    my $idx_id = basename($genome) . "." . md5_hex($genome);
+
+    my $dbCHR = Bio::DB::Fasta->new(
+        $genome,
+        -dirname => $foldert,
+        -makeid  => $idx_id,
+        -reindex => 0,   # create if missing in $foldert
+    );
+
+    my $molecule_name;
+    my ($IN, $DBFILE);
+
+    my $in_path;
+    my $db_path;
+
+    if ($mode == 1 || $mode == 2) {
+        $db_path = "$out_fasta/${species_name}.db";
+        $in_path = "$out_fasta/${species_name}.${hmm_query}.tab.true.table";
+    }
+    elsif ($mode == 3) {
+        $db_path = "$out_fasta.db";
+        $in_path = $out_fasta;  # location file
+        $molecule_name = $out_fasta;
+        my @tmp_m = split /\./, $molecule_name;
+        $molecule_name = $tmp_m[1];
+    }
+    elsif ($mode == 4) {
+        $db_path = "$out_fasta/all_RFAM_${species_name}.truetable.joined.table.db";
+        $in_path = "$out_fasta/all_RFAM_${species_name}.truetable.joined.table";
+    }
+    elsif ($mode == 5) {
+        die "Mode 5 requires file_in\n" unless defined $file_in;
+        $db_path = "${file_in}.db";
+        $in_path = $file_in;
+    }
+    elsif ($mode == 6) {
+        $db_path = "$out_fasta.db";
+        $in_path = $out_fasta;  # location file
+        $molecule_name = $out_fasta;
+        my @tmp_m = split /\./, $molecule_name;
+        $molecule_name = $tmp_m[1];
+    }
+    else {
+        die "Unknown mode: $mode\n";
+    }
+
+    # check the real input file (NOT $out_fasta dir)
+    if (!-e $in_path || -z $in_path) {
+        print_result("Input file $in_path has no homology candidates (mode=$mode)");
+        return;
+    }
+
+    open($DBFILE, ">>", $db_path) or die "Cannot write DB file $db_path: $!";
+    open($IN, "<",  $in_path)  or die "Cannot open input file $in_path: $!";
+
+    my $spe = lc($species_name);
+    my $species_name_complete;
+
+    if (!$complete_name) {
+        $species_name_complete = getSpeciesName($spe);
+    } else {
+        $species_name_complete = $complete_name;
+        $species_name_complete =~ s/\_/ /g;
+    }
+
+    my (%final_seq, %database);
+    my $count = 0;
+
+    while (my $line = <$IN>) {
+        chomp $line;
+        next if $line =~ /^#/ || $line =~ /^\s*$/;
+
+        my ($ids);
+        if ($mode == 1 || $mode == 5) {
+            # you compute strand but don’t use it here; kept as-is
+            my $strand = (split /\s+|\t/, $line)[1];
+            $ids = generate_key();
+        } else {
+            $ids = "Temporal$count";
+        }
+
+        my @tmp = split /\s+|\t/, $line;
+
+        my ($frame, $gene_name, $gen_seq);
+
+        if ($mode == 1 || $mode == 2) {
+            my $chr_length = $dbCHR->length("$tmp[0]");
+            if (!$chr_length) {
+                my $backfile = "$genome.len";
+                $chr_length = obtain_len_database($backfile, $tmp[0]);
+            }
+
+            if ($tmp[3] eq "-") {
+                $tmp[3] = $tmp[2];
+            }
+
+            my ($exStart, $exEnd);
+
+            if ($tmp[8] < $tmp[9]) {
+                ($exStart, $exEnd) = extendBlastnCoordinates($tmp[8], $tmp[9], $tmp[4], $tmp[5], $$len_r{$tmp[3]}, $chr_length, $extension_blastn_candidates);
+            } else {
+                ($exStart, $exEnd) = extendBlastnCoordinates($tmp[9], $tmp[8], $tmp[4], $tmp[5], $$len_r{$tmp[3]}, $chr_length, $extension_blastn_candidates);
+            }
+
+            $gen_seq = $dbCHR->seq($tmp[0], $exStart, $exEnd);
+
+            $frame = ($mode == 2) ? $tmp[11] : $tmp[1];
+
+            my $other_name = $$names_r{$tmp[3]};
+            $tmp[8] = $exStart;
+            $tmp[9] = $exEnd;
+
+            $gene_name = get_header_name(\@tmp, $mode, $ids, $count, $other_name, $spe, $species_name_complete, $len_r);
+        }
+        elsif ($mode == 3) {
+            my $chr_length = $dbCHR->length("$tmp[1]");
+            if (!$chr_length) {
+                my $backfile = "$genome.len";
+                $chr_length = obtain_len_database($backfile, $tmp[1]);
+            }
+
+            my ($exStart, $exEnd) = extendBlastnCoordinates($tmp[3], $tmp[4], $tmp[5], $tmp[6], $tmp[7], $chr_length, $extension_blastn_candidates);
+            $gen_seq = $dbCHR->seq($tmp[1], $exStart, $exEnd);
+
+            $frame = $tmp[2];
+            $tmp[3] = $exStart;
+            $tmp[4] = $exEnd;
+
+            $gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
+        }
+        elsif ($mode == 4 || $mode == 5) {
+            if ($mode == 5) {
+                my $extension_homology = 15;
+                my $chr_length = $dbCHR->length("$tmp[0]");
+                ($tmp[5], $tmp[6]) = extendBlastnCoordinates($tmp[5], $tmp[6], 1, 0, 0, $chr_length, $extension_homology);
+            }
+
+            my ($lo, $hi) = ($tmp[6] > $tmp[5]) ? ($tmp[5], $tmp[6]) : ($tmp[6], $tmp[5]);
+            $gen_seq = $dbCHR->seq($tmp[0], $lo, $hi);
+
+            $frame = $tmp[1];
+            my $other_name = $$names_r{$tmp[10]};
+            push @tmp, $other_name;
+
+            $gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
+        }
+        elsif ($mode == 6) {
+            my $chr_length = $dbCHR->length("$tmp[1]");
+            if (!$chr_length) {
+                my $backfile = "$genome.len";
+                $chr_length = obtain_len_database($backfile, $tmp[1]);
+            }
+
+            my ($exStart, $exEnd) = extendBlastnCoordinates($tmp[3], $tmp[4], 1, 0, 0, $chr_length, $extension_blastn_candidates);
+            $gen_seq = $dbCHR->seq($tmp[1], $exStart, $exEnd);
+
+            $frame = $tmp[2];
+            $tmp[3] = $exStart;
+            $tmp[4] = $exEnd;
+
+            $gene_name = get_header_name(\@tmp, $mode, $ids, $count, "NA", $spe, $species_name_complete, $len_r);
+        }
+
+        unless (defined $gen_seq && length($gen_seq)) {
+            print_error("Empty sequence extracted (mode=$mode, species=$species_name, line=$count)");
+            $count++;
+            next;
+        }
+
+        my $output_nucleotide = Bio::Seq->new(
+            -seq        => $gen_seq,
+            -id         => $gene_name,
+            -display_id => $gene_name,
+            -alphabet   => 'dna',
+        );
+
+        my $output_nucleotideB;
+        if (defined $frame && $frame =~ /^\-$/) {
+            $output_nucleotide = $output_nucleotide->revcom();
+        } elsif (defined $frame && $frame =~ /,/) {
+            $output_nucleotideB = $output_nucleotide->revcom();
+        }
+
+        # store sequences (preserving your original grouping behaviour)
+        if ($mode == 1 || $mode == 2) {
+            push @{ $final_seq{$tmp[3]}{$output_nucleotide->id} }, $output_nucleotide->seq;
+        } elsif ($mode == 3 || $mode == 6) {
+            push @{ $final_seq{$molecule_name}{$output_nucleotide->id} }, $output_nucleotide->seq;
+        } elsif ($mode == 4) {
+            push @{ $final_seq{$tmp[2]}{$output_nucleotide->id} }, $output_nucleotide->seq;
+        } elsif ($mode == 5) {
+            if ($tmp[2] =~ /\-/ && $tmp[2] =~ /^MIPF/) {
+                my @temp = split /\-/, $tmp[2];
+                $tmp[2] = $temp[0];
+            }
+            $line = join "\t", @tmp;
+
+            if ($frame =~ /^\-$|^\+$/) {
+                push @{ $final_seq{$tmp[2]}{$output_nucleotide->id} }, $output_nucleotide->seq;
+            } elsif ($frame =~ /,/) {
+                my $header = $output_nucleotide->id;
+                my @modification = split /\s+|\t/, $header;
+                my $idA = $modification[1]."A";
+                my $idB = $modification[1]."B";
+                my $complement = join " ", @modification[2..$#modification];
+                my $headerA = "$modification[0] $idA $complement";
+                my $headerB = "$modification[0] $idB $complement";
+
+                push @{ $final_seq{$tmp[2]}{$headerA} }, $output_nucleotide->seq;
+                push @{ $final_seq{$tmp[2]}{$headerB} }, ($output_nucleotideB ? $output_nucleotideB->seq : $output_nucleotide->revcom->seq);
+            }
+        }
+
+        # database lines
+        if ($frame =~ /,/ && $mode == 5) {
+            my @allA = split /\t|\s+/, $line;
+            my @allB = split /\t|\s+/, $line;
+            $allA[1] = "+";
+            $allB[1] = "-";
+            $database{$ids."A"} = join "\t", @allA;
+            $database{$ids."B"} = join "\t", @allB;
+        } else {
+            $database{$ids} = $line;
+        }
+
+        $count++;
+    }
+
+    for my $acc (sort keys %final_seq) {
+        my $out_path;
+
+        if ($mode == 1 || $mode == 2) {
+            $out_path = "$out_fasta/${species_name}.${acc}.tab.true.table.fasta";
+        } elsif ($mode == 3 || $mode == 6) {
+            $out_path = "$out_fasta.fasta";
+        } elsif ($mode == 4 || $mode == 5) {
+            $out_path = "$out_fasta/all_RFAM_${species_name}.${acc}.fasta";
+        }
+
+        open(my $OUTFILE, ">>", $out_path) or die "Cannot write $out_path: $!";
+
+        for my $ids (sort keys %{ $final_seq{$acc} }) {
+            print $OUTFILE ">$ids\n";
+            my $all = $final_seq{$acc}{$ids};
+
+            unless (ref($all) eq 'ARRAY') {
+                print_error("Internal error: expected ARRAY for final_seq{$acc}{$ids}");
+                next;
+            }
+
+            for my $sq (@$all) {
+                if (!defined $sq || $sq eq '') {
+                    print_error("The sequence for $acc and $ids is empty");
+                    next;
+                }
+                $sq = uc($sq);
+                $sq =~ s/T/U/g;
+                $sq =~ s/(.{60})/$1\n/g;
+                print $OUTFILE "$sq\n";
+            }
+        }
+        close $OUTFILE;
+    }
+
+    for my $reg (keys %database) {
+        print $DBFILE "H$reg\t$database{$reg}\n";
+    }
+
+    close $IN;
+    close $DBFILE;
+
+    if ($mode == 1 || $mode == 5) {
+        system("rm -f .used_ids.txt");
+    }
+    return;
+}
+
+sub getSequencesFastaOLD {
 	my ($species_name, $genome, $hmm_query, $out_fasta, $mode, $len_r, $names_r, $file_in, $complete_name) = @_; #mode: 1-> fasta as miRBase, 2-> as HMM, 3-> blast, 4-> final Coord ## $file_in is optional, only with TTO 5!, 6-> blocks
 	### First, index the genome
 	my $extension_blastn_candidates = 10;
@@ -570,6 +860,85 @@ sub getSequencesFasta {
 ##############
 
 sub getSequencesFastaSubGenome {
+    my ($species_name, $genome, $out_fasta, $input_table, $foldert) = @_;
+
+    die "Genome FASTA not found: $genome\n" unless -e $genome;
+    die "Genome FASTA is empty: $genome\n"  if -z  $genome;
+    die "TemporalFiles folder not found or not writable: $foldert\n"
+        unless (-d $foldert && -w $foldert);
+
+    # Stable, collision-proof ID for the index inside $foldert
+    # (Avoids clashes when many species use a file called genome.fna)
+    my $idx_id = basename($genome) . "." . md5_hex($genome);
+
+    # Create index
+    my $dbCHR = Bio::DB::Fasta->new(
+        $genome,
+        -dirname => $foldert,
+        -makeid  => $idx_id,
+        -reindex => 0,
+    );
+
+    my $outfileF = "$out_fasta/${species_name}_subgenome.fasta";
+    open my $OUTFILE, ">", $outfileF or die "Cannot write $outfileF: $!";
+
+    open my $IN, "<", "$input_table.db" or die "Cannot open $input_table.db: $!";
+
+    my $extension_genome = 250;
+
+    while (my $line = <$IN>) {
+        chomp $line;
+        next if $line =~ /^\s*$/;
+
+        my @tmp = split /\t/, $line;
+
+        next unless defined $tmp[1] && defined $tmp[2] && defined $tmp[6] && defined $tmp[7];
+
+        my $chr = $tmp[1];
+        my $strand = $tmp[2];
+
+        my $chr_length = $dbCHR->length($chr);
+        unless ($chr_length) {
+            print_error("Chromosome/contig '$chr' not found in genome for $species_name");
+            next;
+        }
+
+        # Extend coordinates (assuming this returns 1-based inclusive coords for BioPerl)
+        my ($start, $end) = ($tmp[6], $tmp[7]);
+        ($start, $end) = extendBlastnCoordinates($start, $end, 1, 0, 0, $chr_length, $extension_genome);
+
+        my ($lo, $hi) = ($start < $end) ? ($start, $end) : ($end, $start);
+
+        my $gen_seq = $dbCHR->seq($chr, $lo, $hi);
+        unless (defined $gen_seq && length($gen_seq)) {
+            print_error("Empty sequence for $species_name $chr:$lo-$hi");
+            next;
+        }
+
+        # Strand handling: reverse-complement if '-' (if that’s what tmp[2] encodes)
+        if (defined $strand && $strand eq '-') {
+            my $obj = Bio::Seq->new(-seq => $gen_seq, -alphabet => 'dna');
+            $gen_seq = $obj->revcom->seq;
+        }
+
+        # Header
+        my $gene_name = "$tmp[0] $species_name $tmp[11] $chr#$start#$end";
+
+        # FASTA formatting
+        $gen_seq = uc($gen_seq);
+        $gen_seq =~ s/(.{60})/$1\n/g;
+
+        print $OUTFILE ">$gene_name\n$gen_seq\n";
+    }
+
+    close $IN;
+    close $OUTFILE;
+
+    return $outfileF;
+}
+
+
+sub getSequencesFastaSubGenomeOLD {
 	my ($species_name, $genome, $out_fasta, $input_table) = @_;  #mode:validatedStr, validatedNoStr, discarded
 	my %final_seq;
 	### First, index the genome
@@ -629,6 +998,113 @@ sub getSequencesFastaSubGenome {
 #############
 
 sub getSequencesFasta_final {
+    my ($species_name, $genome, $out_fasta, $input_table, $mode, $foldert) = @_;
+
+    my %final_seq;
+
+    die "Genome FASTA not found: $genome\n" unless -e $genome;
+    die "Genome FASTA is empty: $genome\n"  if -z  $genome;
+
+    die "TemporalFiles folder missing/not writable: $foldert\n"
+        unless (defined $foldert && -d $foldert && -w $foldert);
+
+    die "Input table not found/empty: $input_table\n"
+        unless (-e $input_table && !-z $input_table);
+
+    my $idx_id = basename($genome) . "." . md5_hex($genome);
+
+    my $dbCHR = Bio::DB::Fasta->new(
+        $genome,
+        -dirname => $foldert,
+        -makeid  => $idx_id,
+        -reindex => 0,
+    );
+
+    open my $IN, "<", $input_table or die "Cannot open $input_table: $!";
+
+    while (my $line = <$IN>) {
+        chomp $line;
+        next if $line =~ /^\s*$/ || $line =~ /^#/;
+
+        my @tmp = split /\s+|\t/, $line;
+
+        next unless defined $tmp[0] && defined $tmp[1] && defined $tmp[2] && defined $tmp[6] && defined $tmp[7] && defined $tmp[11];
+
+        my $chr   = $tmp[1];
+        my $frame = $tmp[2];
+
+        my ($s_raw, $e_raw) = ($tmp[6], $tmp[7]);
+        my ($start) = ($s_raw =~ /(\d+)/);
+        my ($end)   = ($e_raw =~ /(\d+)/);
+
+        unless (defined $start && defined $end) {
+            print_error("Bad coordinates in input_table for $species_name: '$s_raw' '$e_raw'");
+            next;
+        }
+
+        my $chr_length = $dbCHR->length($chr);
+        unless ($chr_length) {
+            print_error("Contig '$chr' not found in genome for $species_name");
+            next;
+        }
+
+        my ($lo, $hi) = ($start < $end) ? ($start, $end) : ($end, $start);
+
+        $lo = 1 if $lo < 1;
+        $hi = $chr_length if $hi > $chr_length;
+
+        my $gen_seq = $dbCHR->seq($chr, $lo, $hi);
+        unless (defined $gen_seq && length($gen_seq)) {
+            print_error("Empty sequence for $species_name $chr:$lo-$hi");
+            next;
+        }
+
+        my $gene_name = "$tmp[0] $species_name $tmp[11] stem-loop";
+
+        my $output_nucleotide2 = Bio::Seq->new(
+            -seq      => $gen_seq,
+            -id       => $gene_name,
+            -alphabet => 'dna'
+        );
+
+        if (defined $frame && $frame eq "-") {
+            $output_nucleotide2 = $output_nucleotide2->revcom();
+        }
+
+        push @{ $final_seq{$output_nucleotide2->id} }, $output_nucleotide2->seq;
+    }
+
+    close $IN;
+
+    my $outfileF = "$out_fasta/${species_name}_miRNAs_$mode.fasta";
+    open my $OUTFILE, ">", $outfileF or die "Cannot write $outfileF: $!";
+
+    foreach my $ids (sort keys %final_seq) {
+        print $OUTFILE ">$ids\n";
+
+        my $all = $final_seq{$ids};
+        unless (ref($all) eq 'ARRAY') {
+            print_error("Internal error: expected ARRAY for final_seq{$ids}");
+            next;
+        }
+
+        foreach my $sq (@$all) {
+            if (!defined $sq || $sq eq '') {
+                print_error("The sequence for $ids is empty");
+                next;
+            }
+            $sq = uc($sq);
+            $sq =~ s/T/U/g;
+            $sq =~ s/(.{60})/$1\n/g;
+            print $OUTFILE "$sq\n";
+        }
+    }
+
+    close $OUTFILE;
+    return $outfileF;
+}
+
+sub getSequencesFasta_finalOLD {
 	my ($species_name, $genome, $out_fasta, $input_table, $mode) = @_;  #mode:validatedStr, validatedNoStr, discarded
 	my %final_seq;
 	### First, index the genome
