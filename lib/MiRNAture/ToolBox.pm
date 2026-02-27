@@ -354,7 +354,8 @@ sub getSequencesFasta {
     }
 
     my $dbCHR = Bio::DB::Fasta->new(
-        $genome,
+        $gen_local,
+        #$genome,
         -dirname => $foldert."/",
         -reindex => 0,   # create if missing in $foldert
     );
@@ -870,8 +871,10 @@ sub getSequencesFastaSubGenome {
     die "TemporalFiles folder not found or not writable: $foldert\n"
         unless (-d $foldert && -w $foldert);
 
+    my $gen_local = "$foldert/" . basename($genome);
     my $dbCHR = Bio::DB::Fasta->new(
-        $genome,
+        $gen_local,
+        #$genome,
         -dirname => $foldert,
         -reindex => 0,
     );
