@@ -5,7 +5,7 @@ channels:
   - defaults
   - r
 dependencies:
-  - biopython >=1.78
+  - biopython == 1.85
   - blast >=2.13.0
   - clustalo >=1.2.4
   - hmmer >=3.3.2
