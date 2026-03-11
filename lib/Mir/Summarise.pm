@@ -5,7 +5,7 @@ use MooseX::Types::Path::Class;
 use YAML::Tiny;
 use Data::Dumper;
 use Term::ANSIColor;
-use File::Copy;
+use File::Copy qw(copy);
 use lib "lib/MiRNAture";
 use Statistics::R;
 
@@ -172,30 +172,73 @@ sub process_table_small {
 }
 
 sub get_final_output {
-	my $shift = shift;
-	my $working_path = shift;
-	create_folders($working_path, "Tables");
-	create_folders($working_path, "Fasta");
-	create_folders($working_path, "MFE");
-	opendir DH, $working_path;
-	while (my $file = readdir DH) {
-		if ($file =~ /\.fasta$/){
-			move("$working_path/$file", "$working_path/Fasta");
-		} elsif ($file =~ /\.table/){
-			move("$working_path/$file", "$working_path/Tables");
-		} elsif ($file =~ /\.mfe/){
-			move("$working_path/$file", "$working_path/MFE");
-		} else {
-			;
-		}
-	}
-	my $tag = $shift->[3]->{Species_data}{Tag};
-	my $gffAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/GFF3/miRNA_annotation_".$tag."_accepted_conf.gff3";
-	my $bedAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/BED/miRNA_annotation_".$tag."_accepted_conf.bed";
-	copy($gffAccepted, $working_path);
-	copy($bedAccepted, $working_path);
-	return;
+    my $shift = shift;
+    my $working_path = shift;
+
+    create_folders($working_path, "Tables");
+    create_folders($working_path, "Fasta");
+    create_folders($working_path, "MFE");
+
+    opendir(my $dh, $working_path) or die "Cannot open directory $working_path: $!";
+
+    while (my $file = readdir($dh)) {
+        next if $file eq '.' or $file eq '..';
+
+        my $source = "$working_path/$file";
+
+        if ($file =~ /\.fasta$/) {
+            copy($source, "$working_path/Fasta/$file")
+                or warn "Could not copy $source to $working_path/Fasta/$file: $!";
+        }
+        elsif ($file =~ /\.table$/) {
+            copy($source, "$working_path/Tables/$file")
+                or warn "Could not copy $source to $working_path/Tables/$file: $!";
+        }
+        elsif ($file =~ /\.mfe$/) {
+            copy($source, "$working_path/MFE/$file")
+                or warn "Could not copy $source to $working_path/MFE/$file: $!";
+        }
+    }
+
+    closedir($dh);
+
+    my $tag = $shift->[3]->{Species_data}{Tag};
+    my $gffAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"} . "/GFF3/miRNA_annotation_" . $tag . "_accepted_conf.gff3";
+    my $bedAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"} . "/BED/miRNA_annotation_" . $tag . "_accepted_conf.bed";
+
+    copy($gffAccepted, "$working_path/" . (split('/', $gffAccepted))[-1])
+        or warn "Could not copy $gffAccepted to $working_path: $!";
+    copy($bedAccepted, "$working_path/" . (split('/', $bedAccepted))[-1])
+        or warn "Could not copy $bedAccepted to $working_path: $!";
+
+    return;
 }
+
+#sub get_final_output_old {
+	#my $shift = shift;
+	#my $working_path = shift;
+	#create_folders($working_path, "Tables");
+	#create_folders($working_path, "Fasta");
+	#create_folders($working_path, "MFE");
+	#opendir DH, $working_path;
+	#while (my $file = readdir DH) {
+		#if ($file =~ /\.fasta$/){
+			#move("$working_path/$file", "$working_path/Fasta");
+		#} elsif ($file =~ /\.table/){
+			#move("$working_path/$file", "$working_path/Tables");
+		#} elsif ($file =~ /\.mfe/){
+			#move("$working_path/$file", "$working_path/MFE");
+		#} else {
+			#;
+		#}
+	#}
+	#my $tag = $shift->[3]->{Species_data}{Tag};
+	#my $gffAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/GFF3/miRNA_annotation_".$tag."_accepted_conf.gff3";
+	#my $bedAccepted = $shift->[4]->{"User_results"}{"Output_miRNAnchor_folder"}."/BED/miRNA_annotation_".$tag."_accepted_conf.bed";
+	#copy($gffAccepted, $working_path);
+	#copy($bedAccepted, $working_path);
+	#return;
+#}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

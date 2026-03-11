@@ -8,7 +8,7 @@ use Moose;
 use MooseX::Types::Path::Class;
 use Data::Dumper;
 use RNA;
-use File::Copy;
+use File::Copy qw(copy);
 use Bio::AlignIO;
 use Bio::SimpleAlign;
 use MiRNAnchor::Check;
@@ -871,27 +871,64 @@ sub generate_bed {
 	return;
 }
 
+use File::Copy qw(copy);
+
 sub organise_mess {
-	my $shift = shift;
-	my $working_path = shift;
-	create_folders($working_path, "GFF3");
-	create_folders($working_path, "BED");
-	create_folders($working_path, "Additional_Support");
-    my $short_species = $shift->tag_spe_query;
-	opendir DH, $working_path;
-	while (my $file = readdir DH) {
-		if ($file =~ /\.txt$/ && $file =~ /\_$short_species/){
-			move("$working_path/$file", "$working_path/Additional_Support");
-		} elsif ($file =~ /\.gff3/ && $file =~ /\_$short_species/){
-			move("$working_path/$file", "$working_path/GFF3");
-		} elsif ($file =~ /\.bed/ && $file =~ /\_$short_species/){
-			move("$working_path/$file", "$working_path/BED");
-		} else {
-			;
-		}
-	}
-	return;
+    my $self         = shift;
+    my $working_path = shift;
+
+    create_folders($working_path, "GFF3");
+    create_folders($working_path, "BED");
+    create_folders($working_path, "Additional_Support");
+
+    my $short_species = $self->tag_spe_query;
+
+    opendir(my $dh, $working_path) or die "Cannot open directory '$working_path': $!";
+
+    while (my $file = readdir($dh)) {
+        next if $file =~ /^\.\.?$/;   # skip . and ..
+
+        my $full_path = "$working_path/$file";
+
+        if ($file =~ /\.txt$/ && $file =~ /_$short_species/) {
+            copy($full_path, "$working_path/Additional_Support/$file")
+                or warn "Could not copy '$full_path' to Additional_Support: $!";
+        }
+        elsif ($file =~ /\.gff3$/ && $file =~ /_$short_species/) {
+            copy($full_path, "$working_path/GFF3/$file")
+                or warn "Could not copy '$full_path' to GFF3: $!";
+        }
+        elsif ($file =~ /\.bed$/ && $file =~ /_$short_species/) {
+            copy($full_path, "$working_path/BED/$file")
+                or warn "Could not copy '$full_path' to BED: $!";
+        }
+    }
+
+    closedir($dh);
+    return;
 }
+
+#sub organise_mess_OLD {
+	#my $shift = shift;
+	#my $working_path = shift;
+	#create_folders($working_path, "GFF3");
+	#create_folders($working_path, "BED");
+	#create_folders($working_path, "Additional_Support");
+    #my $short_species = $shift->tag_spe_query;
+	#opendir DH, $working_path;
+	#while (my $file = readdir DH) {
+		#if ($file =~ /\.txt$/ && $file =~ /\_$short_species/){
+			#copy("$working_path/$file", "$working_path/Additional_Support");
+		#} elsif ($file =~ /\.gff3/ && $file =~ /\_$short_species/){
+			#copy("$working_path/$file", "$working_path/GFF3");
+		#} elsif ($file =~ /\.bed/ && $file =~ /\_$short_species/){
+			#copy("$working_path/$file", "$working_path/BED");
+		#} else {
+			#;
+		#}
+	#}
+	#return;
+#}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
