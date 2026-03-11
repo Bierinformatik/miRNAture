@@ -1008,9 +1008,6 @@ sub getSequencesFasta_final {
     die "TemporalFiles folder missing/not writable: $foldert\n"
         unless (defined $foldert && -d $foldert && -w $foldert);
 
-    die "Input table not found/empty: $input_table\n"
-        unless (-e $input_table && !-z $input_table);
-
     my $dbCHR = Bio::DB::Fasta->new(
         $genome,
         -dirname => $foldert,

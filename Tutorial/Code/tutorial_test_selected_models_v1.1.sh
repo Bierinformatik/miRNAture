@@ -16,7 +16,7 @@ data_precalculated_folder="$current/Dataset_mirnature_tutorial"
 sublistcms="${current}/list_miRNAs_to_search.txt"
 
 # Run miRNAture complete
-miRNAture -stage summarise -sublist ${sublistcms} -nbitscore_cut 0.32 \
+miRNAture -stage complete -sublist ${sublistcms} -nbitscore_cut 0.32 \
           -dataF ${data_precalculated_folder} -speG ${species_genome} -speN ${species_name} \
           -speT ${species_tag} -w ${workdir} -m ${mode} -pe 1 -str ${strategy} -blastq ${blast_queries_folder} \
           -rep relax,150,100 -usrM $user_models
