@@ -25,7 +25,7 @@ candidates a _Mature annotation_ stage performs a correction of the position of
 mature sequences on the detected precursor and a structural evaluation 
 in terms of minimum free energy (MFE), precursor length, folding and the
 evaluation of anchored family specific-multiple secondary alignment 
-(using `MIRfix`). Final sanity checks are performed on the _Evaluation_ stage, 
+(using `MIRfix` program). Final sanity checks are performed on the _Evaluation_ stage, 
 that reviews all the last mature annotation process, filtering the invalid candidates 
 at structure level and reporting valid candidates on GFF3/BED and fasta files 
 together with a summarize file that provides overall information about detected
