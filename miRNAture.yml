@@ -1,4 +1,4 @@
-name: mirnature
+name: mirnature_RUN
 channels:
   - conda-forge
   - bioconda

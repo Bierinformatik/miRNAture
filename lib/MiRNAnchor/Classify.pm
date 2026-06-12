@@ -341,7 +341,7 @@ sub cmsearch_global {
 	$sequence =~ s/"//g;
 	if (-e "${cm}" && !-z "${cm}"){
         # Here detect truncated sequences
-        my $param = "-g --cpu 5 --toponly --nohmmonly --tblout $outFolder/${nameCMFinal}_${speTag}_${code}_global.tab -o $outFolder/${nameCMFinal}_${speTag}_${code}_global.out $cm $sequence";
+        my $param = "-g --cpu 10 --toponly --nohmmonly --tblout $outFolder/${nameCMFinal}_${speTag}_${code}_global.tab -o $outFolder/${nameCMFinal}_${speTag}_${code}_global.out $cm $sequence";
 		system "$cmsearch_path $param 1> /dev/null";
 	} else {
 		print_error("The CM to global evaluation is not available\n");
